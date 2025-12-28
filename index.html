@@ -6,79 +6,94 @@
 
 <style>
 body {
-  font-family: Arial;
-  background:#111;
-  color:white;
-  text-align:center;
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 10px;
 }
 button {
-  width:90%;
-  padding:15px;
-  margin:8px;
-  font-size:18px;
+  width: 90%;
+  padding: 15px;
+  margin: 8px;
+  font-size: 18px;
 }
 input {
-  width:80%;
-  padding:10px;
-  font-size:16px;
+  width: 80%;
+  padding: 10px;
+  font-size: 16px;
+  margin-top: 5px;
+}
+hr {
+  margin: 20px 0;
 }
 </style>
 </head>
 
 <body>
+
 <h2>Camera Slider</h2>
 
 <button onclick="connect()">CONNECT</button>
-<button onclick="send('RUN')">RUN / PAUSE</button>
-<button onclick="send('STOP')">STOP</button>
+<button onclick="sendCmd('RUN')">RUN / PAUSE</button>
+<button onclick="sendCmd('STOP')">STOP</button>
 
 <hr>
 
-<button onclick="send('TRACK M1')">TRACK M1</button>
-<button onclick="send('TRACK M2')">TRACK M2</button>
-<button onclick="send('TRACK BOTH')">TRACK BOTH</button>
+<button onclick="sendCmd('TRACK M1')">TRACK M1</button>
+<button onclick="sendCmd('TRACK M2')">TRACK M2</button>
+<button onclick="sendCmd('TRACK BOTH')">TRACK BOTH</button>
 
 <hr>
 
-<input id="m1s" placeholder="M1 SPEED">
-<button onclick="send('SET M1_SPEED ' + m1s.value)">SET M1 SPEED</button>
+<input id="m1s" type="number" placeholder="M1 SPEED">
+<button onclick="sendCmd('SET M1_SPEED ' + m1s.value)">SET M1 SPEED</button>
 
-<input id="m2s" placeholder="M2 SPEED">
-<button onclick="send('SET M2_SPEED ' + m2s.value)">SET M2 SPEED</button>
+<input id="m2s" type="number" placeholder="M2 SPEED">
+<button onclick="sendCmd('SET M2_SPEED ' + m2s.value)">SET M2 SPEED</button>
 
-<input id="cy" placeholder="CYCLES (0 = INF)">
-<button onclick="send('SET CYCLES ' + cy.value)">SET CYCLES</button>
+<input id="cy" type="number" placeholder="CYCLES (0 = INF)">
+<button onclick="sendCmd('SET CYCLES ' + cy.value)">SET CYCLES</button>
 
 <script>
-let device, characteristic;
+let bleDevice = null;
+let bleCharacteristic = null;
+
+// Nordic UART Service UUIDs (commonly used & reliable)
+const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
+const CHAR_UUID    = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
 
 async function connect(){
-  device = await navigator.bluetooth.requestDevice({
-    filters: [{ name: 'CameraSlider' }],
-    optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
-  });
+  try {
+    // REQUIRED: must be called directly from button click
+    bleDevice = await navigator.bluetooth.requestDevice({
+      acceptAllDevices: true,
+      optionalServices: [SERVICE_UUID]
+    });
 
-  const server = await device.gatt.connect();
-  const service = await server.getPrimaryService(
-    '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
-  );
+    const server = await bleDevice.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
 
-  characteristic = await service.getCharacteristic(
-    '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
-  );
-
-  alert("Connected");
+    alert("Connected to " + (bleDevice.name || "device"));
+  }
+  catch(err){
+    alert("BLE ERROR:\n" + err);
+  }
 }
 
-function send(cmd){
-  if(!characteristic){
+function sendCmd(cmd){
+  if(!bleCharacteristic){
     alert("Not connected");
     return;
   }
-  characteristic.writeValue(
-    new TextEncoder().encode(cmd + "\n")
-  );
+
+  const data = new TextEncoder().encode(cmd + "\n");
+  bleCharacteristic.writeValue(data);
 }
 </script>
+
 </body>
 </html>
+
