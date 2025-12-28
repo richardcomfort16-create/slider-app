@@ -56,44 +56,52 @@ hr {
 <input id="cy" type="number" placeholder="CYCLES (0 = INF)">
 <button onclick="sendCmd('SET CYCLES ' + cy.value)">SET CYCLES</button>
 
+
 <script>
-let bleDevice = null;
-let bleCharacteristic = null;
+let device = null;
+let server = null;
+let service = null;
+let characteristic = null;
 
-// Nordic UART Service UUIDs (commonly used & reliable)
-const SERVICE_UUID = '6e400001-b5a3-f393-e0a9-e50e24dcca9e';
-const CHAR_UUID    = '6e400002-b5a3-f393-e0a9-e50e24dcca9e';
+const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
+const CHARACTERISTIC_UUID = "abcd1234-1234-1234-1234-abcdef123456";
 
-async function connect(){
+async function connectBLE() {
   try {
-    // REQUIRED: must be called directly from button click
-    bleDevice = await navigator.bluetooth.requestDevice({
-      acceptAllDevices: true,
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: "CameraSlider" }],
       optionalServices: [SERVICE_UUID]
     });
 
-    const server = await bleDevice.gatt.connect();
-    const service = await server.getPrimaryService(SERVICE_UUID);
-    bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
+    device.addEventListener('gattserverdisconnected', () => {
+      console.log("Disconnected");
+    });
 
-    alert("Connected to " + (bleDevice.name || "device"));
-  }
-  catch(err){
-    alert("BLE ERROR:\n" + err);
+    server = await device.gatt.connect();
+    service = await server.getPrimaryService(SERVICE_UUID);
+    characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+
+    console.log("BLE connected successfully");
+    alert("Connected to CameraSlider");
+
+  } catch (error) {
+    console.error("BLE error:", error);
+    alert("BLE Error: " + error.message);
   }
 }
 
-function sendCmd(cmd){
-  if(!bleCharacteristic){
+async function sendCommand(cmd) {
+  if (!characteristic) {
     alert("Not connected");
     return;
   }
 
-  const data = new TextEncoder().encode(cmd + "\n");
-  bleCharacteristic.writeValue(data);
+  const encoder = new TextEncoder();
+  await characteristic.writeValue(encoder.encode(cmd));
 }
 </script>
 
 </body>
 </html>
+
 
