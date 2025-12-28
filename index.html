@@ -1,66 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Camera Slider</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: white;
-  text-align: center;
-  margin: 0;
-  padding: 10px;
-}
-button {
-  width: 90%;
-  padding: 15px;
-  margin: 8px;
-  font-size: 18px;
-}
-input {
-  width: 80%;
-  padding: 10px;
-  font-size: 16px;
-  margin-top: 5px;
-}
-hr {
-  margin: 20px 0;
-}
-</style>
+  <meta charset="utf-8">
+  <title>Camera Slider</title>
 </head>
-
 <body>
 
-<h2>Camera Slider</h2>
+<h2>Camera Slider BLE</h2>
+
 <button onclick="connectBLE()">CONNECT</button>
-<button onclick="sendCmd('RUN')">RUN / PAUSE</button>
-<button onclick="sendCmd('STOP')">STOP</button>
-
-<hr>
-
-<button onclick="sendCmd('TRACK M1')">TRACK M1</button>
-<button onclick="sendCmd('TRACK M2')">TRACK M2</button>
-<button onclick="sendCmd('TRACK BOTH')">TRACK BOTH</button>
-
-<hr>
-
-<input id="m1s" type="number" placeholder="M1 SPEED">
-<button onclick="sendCmd('SET M1_SPEED ' + m1s.value)">SET M1 SPEED</button>
-
-<input id="m2s" type="number" placeholder="M2 SPEED">
-<button onclick="sendCmd('SET M2_SPEED ' + m2s.value)">SET M2 SPEED</button>
-
-<input id="cy" type="number" placeholder="CYCLES (0 = INF)">
-<button onclick="sendCmd('SET CYCLES ' + cy.value)">SET CYCLES</button>
-
+<button onclick="sendCommand('TEST')">SEND TEST</button>
 
 <script>
-let device = null;
-let server = null;
-let service = null;
-let characteristic = null;
+let device;
+let characteristic;
 
 const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
 const CHARACTERISTIC_UUID = "abcd1234-1234-1234-1234-abcdef123456";
@@ -72,20 +25,16 @@ async function connectBLE() {
       optionalServices: [SERVICE_UUID]
     });
 
-    device.addEventListener('gattserverdisconnected', () => {
-      console.log("Disconnected");
-    });
-
-    server = await device.gatt.connect();
-    service = await server.getPrimaryService(SERVICE_UUID);
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE_UUID);
     characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
 
-    console.log("BLE connected successfully");
     alert("Connected to CameraSlider");
+    console.log("BLE connected");
 
-  } catch (error) {
-    console.error("BLE error:", error);
-    alert("BLE Error: " + error.message);
+  } catch (err) {
+    console.error(err);
+    alert("BLE Error: " + err.message);
   }
 }
 
@@ -95,12 +44,14 @@ async function sendCommand(cmd) {
     return;
   }
 
-  const encoder = new TextEncoder();
-  await characteristic.writeValue(encoder.encode(cmd));
+  const data = new TextEncoder().encode(cmd);
+  await characteristic.writeValue(data);
+  console.log("Sent:", cmd);
 }
 </script>
 
 </body>
 </html>
+
 
 
