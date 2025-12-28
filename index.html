@@ -2,51 +2,69 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Camera Slider</title>
+  <title>Camera Slider BLE</title>
+  <style>
+    body {
+      font-family: Arial;
+      padding: 20px;
+    }
+    input, button {
+      font-size: 18px;
+      padding: 8px;
+      margin: 5px 0;
+      width: 100%;
+    }
+  </style>
 </head>
 <body>
 
-<h2>Camera Slider BLE</h2>
+<h2>Camera Slider BLE Control</h2>
 
-<button onclick="connectBLE()">CONNECT</button>
-<button onclick="sendCommand('TEST')">SEND TEST</button>
+<button onclick="connect()">CONNECT</button>
+
+<input id="cmd" placeholder="Enter command e.g. M1SPEED:1500">
+
+<button onclick="sendCommand()">SEND</button>
+
+<pre id="log"></pre>
 
 <script>
-let device;
 let characteristic;
 
 const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
-const CHARACTERISTIC_UUID = "abcd1234-1234-1234-1234-abcdef123456";
+const CHAR_UUID    = "abcd1234-1234-1234-1234-abcdef123456";
 
-async function connectBLE() {
+function log(msg) {
+  document.getElementById("log").textContent += msg + "\n";
+}
+
+async function connect() {
   try {
-    device = await navigator.bluetooth.requestDevice({
+    log("Requesting device...");
+    const device = await navigator.bluetooth.requestDevice({
       filters: [{ name: "CameraSlider" }],
       optionalServices: [SERVICE_UUID]
     });
 
     const server = await device.gatt.connect();
     const service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+    characteristic = await service.getCharacteristic(CHAR_UUID);
 
-    alert("Connected to CameraSlider");
-    console.log("BLE connected");
-
-  } catch (err) {
-    console.error(err);
-    alert("BLE Error: " + err.message);
+    log("Connected!");
+  } catch (e) {
+    log("ERROR: " + e);
   }
 }
 
-async function sendCommand(cmd) {
+async function sendCommand() {
   if (!characteristic) {
-    alert("Not connected");
+    log("Not connected");
     return;
   }
-
-  const data = new TextEncoder().encode(cmd);
+  const text = document.getElementById("cmd").value;
+  const data = new TextEncoder().encode(text);
   await characteristic.writeValue(data);
-  console.log("Sent:", cmd);
+  log("Sent: " + text);
 }
 </script>
 
