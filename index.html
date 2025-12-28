@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera Slider</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#111;
+  color:white;
+  text-align:center;
+}
+button {
+  width:90%;
+  padding:15px;
+  margin:8px;
+  font-size:18px;
+}
+input {
+  width:80%;
+  padding:10px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+<h2>Camera Slider</h2>
+
+<button onclick="connect()">CONNECT</button>
+<button onclick="send('RUN')">RUN / PAUSE</button>
+<button onclick="send('STOP')">STOP</button>
+
+<hr>
+
+<button onclick="send('TRACK M1')">TRACK M1</button>
+<button onclick="send('TRACK M2')">TRACK M2</button>
+<button onclick="send('TRACK BOTH')">TRACK BOTH</button>
+
+<hr>
+
+<input id="m1s" placeholder="M1 SPEED">
+<button onclick="send('SET M1_SPEED ' + m1s.value)">SET M1 SPEED</button>
+
+<input id="m2s" placeholder="M2 SPEED">
+<button onclick="send('SET M2_SPEED ' + m2s.value)">SET M2 SPEED</button>
+
+<input id="cy" placeholder="CYCLES (0 = INF)">
+<button onclick="send('SET CYCLES ' + cy.value)">SET CYCLES</button>
+
+<script>
+let device, characteristic;
+
+async function connect(){
+  device = await navigator.bluetooth.requestDevice({
+    filters: [{ name: 'CameraSlider' }],
+    optionalServices: ['6e400001-b5a3-f393-e0a9-e50e24dcca9e']
+  });
+
+  const server = await device.gatt.connect();
+  const service = await server.getPrimaryService(
+    '6e400001-b5a3-f393-e0a9-e50e24dcca9e'
+  );
+
+  characteristic = await service.getCharacteristic(
+    '6e400002-b5a3-f393-e0a9-e50e24dcca9e'
+  );
+
+  alert("Connected");
+}
+
+function send(cmd){
+  if(!characteristic){
+    alert("Not connected");
+    return;
+  }
+  characteristic.writeValue(
+    new TextEncoder().encode(cmd + "\n")
+  );
+}
+</script>
+</body>
+</html>
