@@ -1,53 +1,59 @@
-void onClick(unsigned long pressTime){
-  // ===== LONG PRESS: EXIT RUN =====
-  if(running && pressTime > 800){
-    stopRun();
-    running = false;
-    paused = false;
-    runActive = false;
-    drawMenu();
-    return;
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera Slider</title>
+</head>
+
+<body style="background:#111;color:white;text-align:center;font-family:Arial">
+
+<h2>Camera Slider</h2>
+
+<button onclick="connectBLE()">CONNECT</button><br><br>
+<button onclick="sendCmd('TEST')">TEST</button><br><br>
+<button onclick="sendCmd('RUN')">RUN</button>
+
+<script>
+let device;
+let characteristic;
+let connected = false;
+
+async function connectBLE() {
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: 'CameraSlider' }],
+      optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+    });
+
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(
+      '12345678-1234-1234-1234-1234567890ab'
+    );
+
+    characteristic = await service.getCharacteristic(
+      'abcd1234-1234-1234-1234-abcdef123456'
+    );
+
+    connected = true;
+    alert("BLE Connected");
+
+  } catch (e) {
+    alert("BLE Error");
   }
-
-  // ===== SHORT PRESS DURING RUN =====
-  if(running){
-    paused = !paused;
-    return;
-  }
-
-  // ===== TRACKING EXIT =====
-  if(trackM1 || trackM2){
-    trackM1 = trackM2 = false;
-    trackSpeed = trackTarget = 0;
-    drawMenu();
-    return;
-  }
-
-  // ===== MENU EDIT =====
-  if(editMode){
-    editMode = false;
-    drawMenu();
-    return;
-  }
-
-  MenuEntry &m = menu[menuIndex];
-
-  if(m.type == NUMBER){
-    editMode = true;
-    drawMenu();
-    return;
-  }
-
-  if(strcmp(m.name,"RUN") == 0){
-    startRun();
-  }
-  if(strcmp(m.name,"TRACK M1") == 0){ trackM1=true; trackM2=false; }
-  if(strcmp(m.name,"TRACK M2") == 0){ trackM1=false; trackM2=true; }
-  if(strcmp(m.name,"TRACK BOTH") == 0){ trackM1=trackM2=true; }
-  if(strcmp(m.name,"RETURN") == 0){ returnEnabled=!returnEnabled; }
-
-  drawMenu();
 }
+
+function sendCmd(cmd) {
+  if (!connected) {
+    alert("Not connected");
+    return;
+  }
+  const data = new TextEncoder().encode(cmd + "\n");
+  characteristic.writeValue(data);
+}
+</script>
+
+</body>
+</html>
 
 
 
