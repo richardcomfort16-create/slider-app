@@ -3,15 +3,41 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camera Slider</title>
+<style>
+body { background:#111; color:white; font-family:Arial; text-align:center; }
+input { width:80px; text-align:right; margin:5px; }
+button { margin:5px; padding:10px 15px; }
+</style>
 </head>
 
-<body style="background:#111;color:white;text-align:center;font-family:Arial">
+<body>
 
 <h2>Camera Slider</h2>
 
-<button onclick="connectBLE()">CONNECT</button><br><br>
-<button onclick="sendCmd('TEST')">TEST</button><br><br>
-<button onclick="sendCmd('RUN')">RUN</button>
+<!-- Numeric fields -->
+<div>
+  M1 START: <input type="number" id="M1S" value="0"><br>
+  M1 END: <input type="number" id="M1E" value="2000"><br>
+  M2 START: <input type="number" id="M2S" value="0"><br>
+  M2 END: <input type="number" id="M2E" value="2000"><br>
+  M1 SPEED: <input type="number" id="M1SPD" value="2000"><br>
+  M2 SPEED: <input type="number" id="M2SPD" value="2000"><br>
+  CYCLES: <input type="number" id="CYCLES" value="0"><br>
+</div>
+
+<!-- Action buttons -->
+<div>
+  <button onclick="sendValues()">SEND VALUES</button><br>
+  <button onclick="sendCmd('RUN')">RUN</button><br>
+  <button onclick="sendCmd('TRACKM1')">TRACK M1</button>
+  <button onclick="sendCmd('TRACKM2')">TRACK M2</button>
+  <button onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
+</div>
+
+<!-- Connect -->
+<div>
+  <button onclick="connectBLE()">CONNECT</button>
+</div>
 
 <script>
 let device;
@@ -38,17 +64,43 @@ async function connectBLE() {
     alert("BLE Connected");
 
   } catch (e) {
-    alert("BLE Error");
+    alert("BLE Error: " + e);
   }
 }
 
 function sendCmd(cmd) {
-  if (!connected) {
-    alert("Not connected");
-    return;
-  }
+  if (!connected) { alert("Not connected"); return; }
   const data = new TextEncoder().encode(cmd + "\n");
   characteristic.writeValue(data);
+}
+
+function sendValues() {
+  if (!connected) { alert("Not connected"); return; }
+
+  const M1S = document.getElementById('M1S').value;
+  const M1E = document.getElementById('M1E').value;
+  const M2S = document.getElementById('M2S').value;
+  const M2E = document.getElementById('M2E').value;
+  const M1SPD = document.getElementById('M1SPD').value;
+  const M2SPD = document.getElementById('M2SPD').value;
+  const CYCLES = document.getElementById('CYCLES').value;
+
+  const cmds = [
+    `M1S:${M1S}`,
+    `M1E:${M1E}`,
+    `M2S:${M2S}`,
+    `M2E:${M2E}`,
+    `M1SPD:${M1SPD}`,
+    `M2SPD:${M2SPD}`,
+    `CYCLES:${CYCLES}`
+  ];
+
+  cmds.forEach(cmd => {
+    const data = new TextEncoder().encode(cmd + "\n");
+    characteristic.writeValue(data);
+  });
+
+  alert("Values sent!");
 }
 </script>
 
