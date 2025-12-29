@@ -7,7 +7,6 @@
 body { background:#111; color:white; font-family:Arial; text-align:center; }
 input { width:80px; text-align:right; margin:5px; }
 button { margin:5px; padding:10px 15px; }
-.active { background:green; color:white; }
 </style>
 </head>
 
@@ -18,26 +17,26 @@ button { margin:5px; padding:10px 15px; }
 <!-- Numeric fields -->
 <div>
   M1 START: <input type="number" id="M1S" value="0"><br>
-  M1 END:   <input type="number" id="M1E" value="2000"><br>
+  M1 END: <input type="number" id="M1E" value="2000"><br>
   M2 START: <input type="number" id="M2S" value="0"><br>
-  M2 END:   <input type="number" id="M2E" value="2000"><br>
+  M2 END: <input type="number" id="M2E" value="2000"><br>
   M1 SPEED: <input type="number" id="M1SPD" value="2000"><br>
   M2 SPEED: <input type="number" id="M2SPD" value="2000"><br>
-  CYCLES:   <input type="number" id="CYCLES" value="0"><br>
+  CYCLES: <input type="number" id="CYCLES" value="0"><br>
 </div>
 
 <!-- Action buttons -->
 <div>
-  <button id="btnSend" onclick="sendValues()">SEND VALUES</button><br>
-  <button id="btnRun" onclick="sendCmd('RUN')">RUN</button><br>
-  <button id="btnTrackM1" onclick="sendCmd('TRACKM1')">TRACK M1</button>
-  <button id="btnTrackM2" onclick="sendCmd('TRACKM2')">TRACK M2</button>
-  <button id="btnTrackBoth" onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
+  <button onclick="sendValues()">SEND VALUES</button><br>
+  <button onclick="sendCmd('RUN')">RUN</button><br>
+  <button onclick="sendCmd('TRACKM1')">TRACK M1</button>
+  <button onclick="sendCmd('TRACKM2')">TRACK M2</button>
+  <button onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
 </div>
 
 <!-- Connect -->
 <div>
-  <button id="btnConnect" onclick="connectBLE()">CONNECT</button>
+  <button onclick="connectBLE()">CONNECT</button>
 </div>
 
 <script>
@@ -45,7 +44,18 @@ let device;
 let characteristic;
 let connected = false;
 
-// Connect to BLE
+// Initial values (can be updated from BLE if needed)
+let values = {
+  M1S: 0,
+  M1E: 2000,
+  M2S: 0,
+  M2E: 2000,
+  M1SPD: 2000,
+  M2SPD: 2000,
+  CYCLES: 0
+};
+
+// Connect to ESP32 via BLE
 async function connectBLE() {
   try {
     device = await navigator.bluetooth.requestDevice({
@@ -65,38 +75,41 @@ async function connectBLE() {
     connected = true;
     alert("BLE Connected");
 
+    // Optionally, request current values from ESP32 if implemented
+    populateFields();
+
   } catch (e) {
     alert("BLE Error: " + e);
   }
 }
 
-// Send single command
+// Send single command (RUN/TRACK)
 function sendCmd(cmd) {
   if (!connected) { alert("Not connected"); return; }
   const data = new TextEncoder().encode(cmd + "\n");
   characteristic.writeValue(data);
 }
 
-// Send all numeric values
+// Send all numeric values to ESP32
 function sendValues() {
   if (!connected) { alert("Not connected"); return; }
 
-  const M1S = document.getElementById('M1S').value;
-  const M1E = document.getElementById('M1E').value;
-  const M2S = document.getElementById('M2S').value;
-  const M2E = document.getElementById('M2E').value;
-  const M1SPD = document.getElementById('M1SPD').value;
-  const M2SPD = document.getElementById('M2SPD').value;
-  const CYCLES = document.getElementById('CYCLES').value;
+  values.M1S = document.getElementById('M1S').value;
+  values.M1E = document.getElementById('M1E').value;
+  values.M2S = document.getElementById('M2S').value;
+  values.M2E = document.getElementById('M2E').value;
+  values.M1SPD = document.getElementById('M1SPD').value;
+  values.M2SPD = document.getElementById('M2SPD').value;
+  values.CYCLES = document.getElementById('CYCLES').value;
 
   const cmds = [
-    `M1S:${M1S}`,
-    `M1E:${M1E}`,
-    `M2S:${M2S}`,
-    `M2E:${M2E}`,
-    `M1SPD:${M1SPD}`,
-    `M2SPD:${M2SPD}`,
-    `CYCLES:${CYCLES}`
+    `M1S:${values.M1S}`,
+    `M1E:${values.M1E}`,
+    `M2S:${values.M2S}`,
+    `M2E:${values.M2E}`,
+    `M1SPD:${values.M1SPD}`,
+    `M2SPD:${values.M2SPD}`,
+    `CYCLES:${values.CYCLES}`
   ];
 
   cmds.forEach(cmd => {
@@ -107,28 +120,21 @@ function sendValues() {
   alert("Values sent!");
 }
 
-// Optional: visual feedback for RUN / TRACK buttons
-function setActiveButton(id) {
-  ['btnRun','btnTrackM1','btnTrackM2','btnTrackBoth'].forEach(b => {
-    document.getElementById(b).classList.remove('active');
-  });
-  document.getElementById(id).classList.add('active');
+// Populate HTML fields from current values
+function populateFields() {
+  document.getElementById('M1S').value = values.M1S;
+  document.getElementById('M1E').value = values.M1E;
+  document.getElementById('M2S').value = values.M2S;
+  document.getElementById('M2E').value = values.M2E;
+  document.getElementById('M1SPD').value = values.M1SPD;
+  document.getElementById('M2SPD').value = values.M2SPD;
+  document.getElementById('CYCLES').value = values.CYCLES;
 }
 
-// Override sendCmd to highlight active button
-function sendCmd(cmd) {
-  if (!connected) { alert("Not connected"); return; }
-  const data = new TextEncoder().encode(cmd + "\n");
-  characteristic.writeValue(data);
-
-  if(cmd === 'RUN') setActiveButton('btnRun');
-  else if(cmd === 'TRACKM1') setActiveButton('btnTrackM1');
-  else if(cmd === 'TRACKM2') setActiveButton('btnTrackM2');
-  else if(cmd === 'TRACKBOTH') setActiveButton('btnTrackBoth');
-}
 </script>
 
 </body>
 </html>
+
 
 
