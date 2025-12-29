@@ -1,75 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <title>Camera Slider BLE</title>
-  <style>
-    body {
-      font-family: Arial;
-      padding: 20px;
-    }
-    input, button {
-      font-size: 18px;
-      padding: 8px;
-      margin: 5px 0;
-      width: 100%;
-    }
-  </style>
-</head>
 <body>
-
-<h2>Camera Slider BLE Control</h2>
-
-<button onclick="connect()">CONNECT</button>
-
-<input id="cmd" placeholder="Enter command e.g. M1SPEED:1500">
-
-<button onclick="sendCommand()">SEND</button>
-
-<pre id="log"></pre>
-
+<button onclick="connect()">Connect</button>
 <script>
-let characteristic;
+let device, characteristic;
 
-const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
-const CHAR_UUID    = "abcd1234-1234-1234-1234-abcdef123456";
-
-function log(msg) {
-  document.getElementById("log").textContent += msg + "\n";
+async function connect(){
+  device = await navigator.bluetooth.requestDevice({
+    filters:[{name:'CameraSlider'}],
+    optionalServices:['12345678-1234-1234-1234-1234567890ab']
+  });
+  const server = await device.gatt.connect();
+  const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+  characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
 }
 
-async function connect() {
-  try {
-    log("Requesting device...");
-    const device = await navigator.bluetooth.requestDevice({
-      filters: [{ name: "CameraSlider" }],
-      optionalServices: [SERVICE_UUID]
-    });
-
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(CHAR_UUID);
-
-    log("Connected!");
-  } catch (e) {
-    log("ERROR: " + e);
-  }
-}
-
-async function sendCommand() {
-  if (!characteristic) {
-    log("Not connected");
-    return;
-  }
-  const text = document.getElementById("cmd").value;
-  const data = new TextEncoder().encode(text);
-  await characteristic.writeValue(data);
-  log("Sent: " + text);
+function send(cmd){
+  if(!characteristic) return;
+  characteristic.writeValue(new TextEncoder().encode(cmd));
 }
 </script>
-
 </body>
 </html>
-
-
 
