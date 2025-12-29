@@ -1,97 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Camera Slider</title>
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #111;
-  color: #fff;
-  padding: 20px;
-}
-button, input {
-  font-size: 18px;
-  padding: 10px;
-  margin: 5px 0;
-  width: 100%;
-}
-button {
-  background: #2196F3;
-  color: white;
-  border: none;
-}
-</style>
-</head>
-
-<body>
-<h2>Camera Slider</h2>
-
-<button onclick="connect()">Connect</button>
-
-<label>M1 Start</label>
-<input id="m1s" type="number" value="0">
-<button onclick="sendValue('M1S', m1s.value)">Send M1 Start</button>
-
-<label>M1 End</label>
-<input id="m1e" type="number" value="2000">
-<button onclick="sendValue('M1E', m1e.value)">Send M1 End</button>
-
-<label>M2 Start</label>
-<input id="m2s" type="number" value="0">
-<button onclick="sendValue('M2S', m2s.value)">Send M2 Start</button>
-
-<label>M2 End</label>
-<input id="m2e" type="number" value="2000">
-<button onclick="sendValue('M2E', m2e.value)">Send M2 End</button>
-
-<label>Cycles (0 = INF)</label>
-<input id="cyc" type="number" value="0">
-<button onclick="sendValue('CYC', cyc.value)">Send Cycles</button>
-
-<button onclick="sendCmd('RUN')">RUN</button>
-<button onclick="sendCmd('TRACKM1')">Track M1</button>
-<button onclick="sendCmd('TRACKM2')">Track M2</button>
-<button onclick="sendCmd('TRACKBOTH')">Track Both</button>
-
-<script>
-let device;
-let characteristic;
-
-const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
-const CHAR_UUID    = 'abcd1234-5678-90ab-cdef-1234567890ab';
-
-async function connect() {
-  device = await navigator.bluetooth.requestDevice({
-    filters: [{ services: [SERVICE_UUID] }]
-  });
-
-  const server = await device.gatt.connect();
-  const service = await server.getPrimaryService(SERVICE_UUID);
-  characteristic = await service.getCharacteristic(CHAR_UUID);
-
-  alert("BLE Connected");
-}
-
-function sendCmd(cmd) {
-  send(cmd);
-}
-
-function sendValue(prefix, value) {
-  send(prefix + ":" + value);
-}
-
-function send(text) {
-  if (!characteristic) {
-    alert("Not connected");
+void onClick(unsigned long pressTime){
+  // ===== LONG PRESS: EXIT RUN =====
+  if(running && pressTime > 800){
+    stopRun();
+    running = false;
+    paused = false;
+    runActive = false;
+    drawMenu();
     return;
   }
-  const encoder = new TextEncoder();
-  characteristic.writeValue(encoder.encode(text));
+
+  // ===== SHORT PRESS DURING RUN =====
+  if(running){
+    paused = !paused;
+    return;
+  }
+
+  // ===== TRACKING EXIT =====
+  if(trackM1 || trackM2){
+    trackM1 = trackM2 = false;
+    trackSpeed = trackTarget = 0;
+    drawMenu();
+    return;
+  }
+
+  // ===== MENU EDIT =====
+  if(editMode){
+    editMode = false;
+    drawMenu();
+    return;
+  }
+
+  MenuEntry &m = menu[menuIndex];
+
+  if(m.type == NUMBER){
+    editMode = true;
+    drawMenu();
+    return;
+  }
+
+  if(strcmp(m.name,"RUN") == 0){
+    startRun();
+  }
+  if(strcmp(m.name,"TRACK M1") == 0){ trackM1=true; trackM2=false; }
+  if(strcmp(m.name,"TRACK M2") == 0){ trackM1=false; trackM2=true; }
+  if(strcmp(m.name,"TRACK BOTH") == 0){ trackM1=trackM2=true; }
+  if(strcmp(m.name,"RETURN") == 0){ returnEnabled=!returnEnabled; }
+
+  drawMenu();
 }
-</script>
-</body>
-</html>
+
 
 
