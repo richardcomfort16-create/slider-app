@@ -3,36 +3,20 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camera Slider</title>
-
-<style>
-body {
-  background:#111;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-}
-button {
-  width:90%;
-  padding:15px;
-  margin:8px;
-  font-size:18px;
-}
-</style>
 </head>
 
-<body>
+<body style="background:#111;color:white;text-align:center;font-family:Arial">
+
 <h2>Camera Slider</h2>
 
-<button onclick="connectBLE()">CONNECT</button>
-<button onclick="send('TEST')">TEST</button>
-<button onclick="send('RUN')">RUN</button>
-<button onclick="send('STOP')">STOP</button>
+<button onclick="connectBLE()">CONNECT</button><br><br>
+<button onclick="sendCmd('TEST')">TEST</button><br><br>
+<button onclick="sendCmd('RUN')">RUN</button>
 
 <script>
-let device = null;
-let server = null;
-let characteristic = null;
-let bleConnected = false;
+let device;
+let characteristic;
+let connected = false;
 
 async function connectBLE() {
   try {
@@ -41,13 +25,7 @@ async function connectBLE() {
       optionalServices: ['12345678-1234-1234-1234-1234567890ab']
     });
 
-    device.addEventListener(
-      'gattserverdisconnected',
-      onDisconnected
-    );
-
-    server = await device.gatt.connect();
-
+    const server = await device.gatt.connect();
     const service = await server.getPrimaryService(
       '12345678-1234-1234-1234-1234567890ab'
     );
@@ -56,30 +34,24 @@ async function connectBLE() {
       'abcd1234-1234-1234-1234-abcdef123456'
     );
 
-    bleConnected = true;
+    connected = true;
     alert("BLE Connected");
 
-  } catch (err) {
-    alert("BLE Error: " + err);
+  } catch (e) {
+    alert("BLE Error");
   }
 }
 
-function onDisconnected() {
-  bleConnected = false;
-  alert("BLE Disconnected");
-}
-
-function send(cmd) {
-  if (!bleConnected || !characteristic) {
+function sendCmd(cmd) {
+  if (!connected) {
     alert("Not connected");
     return;
   }
-
   const data = new TextEncoder().encode(cmd + "\n");
   characteristic.writeValue(data);
 }
 </script>
+
 </body>
 </html>
-
 
