@@ -16,7 +16,7 @@
     button {
       width: 95%;
       padding: 14px;
-      margin: 8px 0;
+      margin: 6px 0;
       font-size: 18px;
     }
     input {
@@ -30,17 +30,28 @@
       margin-top: 12px;
       text-align: left;
     }
+    hr {
+      margin: 20px 0;
+    }
   </style>
 </head>
 
 <body>
   <h2>Camera Slider</h2>
 
-  <!-- CONNECTION -->
+  <!-- BASIC CONTROL -->
   <button onclick="connectBLE()">CONNECT</button>
   <button onclick="sendCmd('TEST')">TEST</button>
   <button onclick="sendCmd('RUN')">RUN</button>
   <button onclick="sendCmd('STOP')">STOP</button>
+
+  <hr>
+
+  <!-- TRACKING -->
+  <button onclick="sendCmd('TRACK:M1')">TRACK M1</button>
+  <button onclick="sendCmd('TRACK:M2')">TRACK M2</button>
+  <button onclick="sendCmd('TRACK:BOTH')">TRACK BOTH</button>
+  <button onclick="sendCmd('TRACK:STOP')">STOP TRACK</button>
 
   <hr>
 
@@ -131,4 +142,5 @@
   </script>
 </body>
 </html>
+
 
