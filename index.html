@@ -44,6 +44,18 @@ let device;
 let characteristic;
 let connected = false;
 
+// Initial values (can be updated from BLE if needed)
+let values = {
+  M1S: 0,
+  M1E: 2000,
+  M2S: 0,
+  M2E: 2000,
+  M1SPD: 2000,
+  M2SPD: 2000,
+  CYCLES: 0
+};
+
+// Connect to ESP32 via BLE
 async function connectBLE() {
   try {
     device = await navigator.bluetooth.requestDevice({
@@ -63,36 +75,41 @@ async function connectBLE() {
     connected = true;
     alert("BLE Connected");
 
+    // Optionally, request current values from ESP32 if implemented
+    populateFields();
+
   } catch (e) {
     alert("BLE Error: " + e);
   }
 }
 
+// Send single command (RUN/TRACK)
 function sendCmd(cmd) {
   if (!connected) { alert("Not connected"); return; }
   const data = new TextEncoder().encode(cmd + "\n");
   characteristic.writeValue(data);
 }
 
+// Send all numeric values to ESP32
 function sendValues() {
   if (!connected) { alert("Not connected"); return; }
 
-  const M1S = document.getElementById('M1S').value;
-  const M1E = document.getElementById('M1E').value;
-  const M2S = document.getElementById('M2S').value;
-  const M2E = document.getElementById('M2E').value;
-  const M1SPD = document.getElementById('M1SPD').value;
-  const M2SPD = document.getElementById('M2SPD').value;
-  const CYCLES = document.getElementById('CYCLES').value;
+  values.M1S = document.getElementById('M1S').value;
+  values.M1E = document.getElementById('M1E').value;
+  values.M2S = document.getElementById('M2S').value;
+  values.M2E = document.getElementById('M2E').value;
+  values.M1SPD = document.getElementById('M1SPD').value;
+  values.M2SPD = document.getElementById('M2SPD').value;
+  values.CYCLES = document.getElementById('CYCLES').value;
 
   const cmds = [
-    `M1S:${M1S}`,
-    `M1E:${M1E}`,
-    `M2S:${M2S}`,
-    `M2E:${M2E}`,
-    `M1SPD:${M1SPD}`,
-    `M2SPD:${M2SPD}`,
-    `CYCLES:${CYCLES}`
+    `M1S:${values.M1S}`,
+    `M1E:${values.M1E}`,
+    `M2S:${values.M2S}`,
+    `M2E:${values.M2E}`,
+    `M1SPD:${values.M1SPD}`,
+    `M2SPD:${values.M2SPD}`,
+    `CYCLES:${values.CYCLES}`
   ];
 
   cmds.forEach(cmd => {
@@ -102,6 +119,18 @@ function sendValues() {
 
   alert("Values sent!");
 }
+
+// Populate HTML fields from current values
+function populateFields() {
+  document.getElementById('M1S').value = values.M1S;
+  document.getElementById('M1E').value = values.M1E;
+  document.getElementById('M2S').value = values.M2S;
+  document.getElementById('M2E').value = values.M2E;
+  document.getElementById('M1SPD').value = values.M1SPD;
+  document.getElementById('M2SPD').value = values.M2SPD;
+  document.getElementById('CYCLES').value = values.CYCLES;
+}
+
 </script>
 
 </body>
