@@ -1,61 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="utf-8">
+  <title>Camera Slider BLE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Camera Slider</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      width: 90%;
+      padding: 15px;
+      margin: 10px;
+      font-size: 18px;
+    }
+  </style>
 </head>
+
 <body>
+  <h2>Camera Slider</h2>
 
-<h2>Camera Slider BLE</h2>
+  <button onclick="connectBLE()">CONNECT</button>
+  <button onclick="sendCmd('TEST')">TEST</button>
+  <button onclick="sendCmd('RUN')">RUN</button>
+  <button onclick="sendCmd('STOP')">STOP</button>
 
-<button onclick="connectBLE()">CONNECT</button>
-<button onclick="sendCmd('TEST')">TEST</button>
-<button onclick="sendCmd('RUN')">RUN</button>
-<button onclick="sendCmd('STOP')">STOP</button>
+  <script>
+    let bleDevice = null;
+    let bleCharacteristic = null;
 
-<script>
-let device;
-let server;
-let service;
-let characteristic;
+    const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
+    const CHAR_UUID    = 'abcd1234-5678-1234-5678-abcdef123456';
 
-const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
-const CHAR_UUID    = 'abcd1234-5678-90ab-cdef-1234567890ab';
+    async function connectBLE() {
+      try {
+        bleDevice = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'CameraSlider' }],
+          optionalServices: [SERVICE_UUID]
+        });
 
-async function connectBLE() {
-  try {
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{ name: 'CameraSlider' }],
-      optionalServices: [SERVICE_UUID]
-    });
+        const server = await bleDevice.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
 
-    server = await device.gatt.connect();
-    service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(CHAR_UUID);
+        alert("BLE Connected");
+        console.log("BLE Connected");
 
-    alert("CONNECTED");
-  } catch (e) {
-    alert("BLE ERROR");
-    console.log(e);
-  }
-}
+      } catch (err) {
+        console.error(err);
+        alert("BLE Error");
+      }
+    }
 
-async function sendCmd(cmd) {
-  if (!characteristic) {
-    alert("NOT CONNECTED");
-    return;
-  }
+    function sendCmd(cmd) {
+      if (!bleCharacteristic) {
+        alert("Not connected");
+        return;
+      }
 
-  try {
-    const data = new TextEncoder().encode(cmd);
-    await characteristic.writeValue(data);
-  } catch (e) {
-    alert("BLE ERROR");
-    console.log(e);
-  }
-}
-</script>
+      const data = new TextEncoder().encode(cmd);
+      bleCharacteristic.writeValue(data);
 
+      console.log("Sent:", cmd);
+    }
+  </script>
 </body>
 </html>
 
