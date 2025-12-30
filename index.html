@@ -1,110 +1,74 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Camera Slider</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8">
+  <title>Camera Slider BLE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body {
-  font-family: Arial;
-  text-align: center;
-  background: #111;
-  color: #fff;
-}
-button {
-  font-size: 18px;
-  margin: 6px;
-  padding: 12px 18px;
-}
-input {
-  font-size: 16px;
-  width: 90px;
-}
-.section {
-  border-top: 1px solid #444;
-  margin-top: 15px;
-  padding-top: 10px;
-}
-</style>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      color: #fff;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      width: 90%;
+      padding: 15px;
+      margin: 10px;
+      font-size: 18px;
+    }
+  </style>
 </head>
 
 <body>
+  <h2>Camera Slider</h2>
 
-<h2>Camera Slider</h2>
+  <button onclick="connectBLE()">CONNECT</button>
+  <button onclick="sendCmd('TEST')">TEST</button>
+  <button onclick="sendCmd('RUN')">RUN</button>
+  <button onclick="sendCmd('STOP')">STOP</button>
 
-<button onclick="connectBLE()">CONNECT</button>
-<button onclick="send('RUN')">RUN</button>
-<button onclick="send('STOP')">STOP</button>
+  <script>
+    let bleDevice = null;
+    let bleCharacteristic = null;
 
-<div class="section">
-<h3>Values</h3>
-M1 Start <input id="m1s" type="number" value="0"><br>
-M1 End <input id="m1e" type="number" value="2000"><br>
-M1 Speed <input id="m1v" type="number" value="2000"><br><br>
+    const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
+    const CHAR_UUID    = 'abcd1234-5678-1234-5678-abcdef123456';
 
-M2 Start <input id="m2s" type="number" value="0"><br>
-M2 End <input id="m2e" type="number" value="2000"><br>
-M2 Speed <input id="m2v" type="number" value="2000"><br><br>
+    async function connectBLE() {
+      try {
+        bleDevice = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'CameraSlider' }],
+          optionalServices: [SERVICE_UUID]
+        });
 
-<button onclick="sendValues()">SEND VALUES</button>
-</div>
+        const server = await bleDevice.gatt.connect();
+        const service = await server.getPrimaryService(SERVICE_UUID);
+        bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
 
-<div class="section">
-<h3>Tracking</h3>
-<button onclick="send('TRACK_M1:+')">M1 +</button>
-<button onclick="send('TRACK_M1:-')">M1 −</button><br>
+        alert("BLE Connected");
+        console.log("BLE Connected");
 
-<button onclick="send('TRACK_M2:+')">M2 +</button>
-<button onclick="send('TRACK_M2:-')">M2 −</button><br>
+      } catch (err) {
+        console.error(err);
+        alert("BLE Error");
+      }
+    }
 
-<button onclick="send('TRACK_BOTH:+')">BOTH +</button>
-<button onclick="send('TRACK_BOTH:-')">BOTH −</button>
-</div>
+    function sendCmd(cmd) {
+      if (!bleCharacteristic) {
+        alert("Not connected");
+        return;
+      }
 
-<script>
-let device, server, service, characteristic;
+      const data = new TextEncoder().encode(cmd);
+      bleCharacteristic.writeValue(data);
 
-const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
-const CHAR_UUID    = 'abcd1234-5678-1234-5678-abcdef123456';
-
-async function connectBLE() {
-  try {
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{ name: 'CameraSlider' }],
-      optionalServices: [SERVICE_UUID]
-    });
-
-    server = await device.gatt.connect();
-    service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(CHAR_UUID);
-
-    alert('BLE Connected');
-  } catch (e) {
-    alert('BLE Error');
-    console.log(e);
-  }
-}
-
-function send(cmd) {
-  if (!characteristic) {
-    alert('Not connected');
-    return;
-  }
-  characteristic.writeValue(new TextEncoder().encode(cmd));
-}
-
-function sendValues() {
-  send('M1S:' + m1s.value);
-  send('M1E:' + m1e.value);
-  send('M1V:' + m1v.value);
-
-  send('M2S:' + m2s.value);
-  send('M2E:' + m2e.value);
-  send('M2V:' + m2v.value);
-}
-</script>
-
+      console.log("Sent:", cmd);
+    }
+  </script>
 </body>
 </html>
 
