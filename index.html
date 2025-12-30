@@ -1,72 +1,26 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="utf-8">
-<title>Camera Slider</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body {
-  font-family: Arial;
-  text-align: center;
-  background: #111;
-  color: #fff;
-}
-button {
-  font-size: 18px;
-  margin: 6px;
-  padding: 12px 18px;
-}
-input {
-  font-size: 16px;
-  width: 90px;
-}
-.section {
-  border-top: 1px solid #444;
-  margin-top: 15px;
-  padding-top: 10px;
-}
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Camera Slider</title>
 </head>
-
 <body>
 
-<h2>Camera Slider</h2>
+<h2>Camera Slider BLE</h2>
 
 <button onclick="connectBLE()">CONNECT</button>
-<button onclick="send('RUN')">RUN</button>
-<button onclick="send('STOP')">STOP</button>
-
-<div class="section">
-<h3>Values</h3>
-M1 Start <input id="m1s" type="number" value="0"><br>
-M1 End <input id="m1e" type="number" value="2000"><br>
-M1 Speed <input id="m1v" type="number" value="2000"><br><br>
-
-M2 Start <input id="m2s" type="number" value="0"><br>
-M2 End <input id="m2e" type="number" value="2000"><br>
-M2 Speed <input id="m2v" type="number" value="2000"><br><br>
-
-<button onclick="sendValues()">SEND VALUES</button>
-</div>
-
-<div class="section">
-<h3>Tracking</h3>
-<button onclick="send('TRACK_M1:+')">M1 +</button>
-<button onclick="send('TRACK_M1:-')">M1 −</button><br>
-
-<button onclick="send('TRACK_M2:+')">M2 +</button>
-<button onclick="send('TRACK_M2:-')">M2 −</button><br>
-
-<button onclick="send('TRACK_BOTH:+')">BOTH +</button>
-<button onclick="send('TRACK_BOTH:-')">BOTH −</button>
-</div>
+<button onclick="sendCmd('TEST')">TEST</button>
+<button onclick="sendCmd('RUN')">RUN</button>
+<button onclick="sendCmd('STOP')">STOP</button>
 
 <script>
-let device, server, service, characteristic;
+let device;
+let server;
+let service;
+let characteristic;
 
 const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
-const CHAR_UUID    = 'abcd1234-5678-1234-5678-abcdef123456';
+const CHAR_UUID    = 'abcd1234-5678-90ab-cdef-1234567890ab';
 
 async function connectBLE() {
   try {
@@ -79,29 +33,26 @@ async function connectBLE() {
     service = await server.getPrimaryService(SERVICE_UUID);
     characteristic = await service.getCharacteristic(CHAR_UUID);
 
-    alert('BLE Connected');
+    alert("CONNECTED");
   } catch (e) {
-    alert('BLE Error');
+    alert("BLE ERROR");
     console.log(e);
   }
 }
 
-function send(cmd) {
+async function sendCmd(cmd) {
   if (!characteristic) {
-    alert('Not connected');
+    alert("NOT CONNECTED");
     return;
   }
-  characteristic.writeValue(new TextEncoder().encode(cmd));
-}
 
-function sendValues() {
-  send('M1S:' + m1s.value);
-  send('M1E:' + m1e.value);
-  send('M1V:' + m1v.value);
-
-  send('M2S:' + m2s.value);
-  send('M2E:' + m2e.value);
-  send('M2V:' + m2v.value);
+  try {
+    const data = new TextEncoder().encode(cmd);
+    await characteristic.writeValue(data);
+  } catch (e) {
+    alert("BLE ERROR");
+    console.log(e);
+  }
 }
 </script>
 
