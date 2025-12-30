@@ -1,146 +1,108 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>Camera Slider BLE</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #111;
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-    }
-    button {
-      width: 95%;
-      padding: 14px;
-      margin: 6px 0;
-      font-size: 18px;
-    }
-    input {
-      width: 95%;
-      padding: 10px;
-      font-size: 18px;
-      margin: 4px 0;
-    }
-    label {
-      display: block;
-      margin-top: 12px;
-      text-align: left;
-    }
-    hr {
-      margin: 20px 0;
-    }
-  </style>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera Slider</title>
+<style>
+body { background:#111; color:white; font-family:Arial; text-align:center; }
+input { width:80px; text-align:right; margin:5px; }
+button { margin:5px; padding:10px 15px; }
+</style>
 </head>
 
 <body>
-  <h2>Camera Slider</h2>
 
-  <!-- BASIC CONTROL -->
+<h2>Camera Slider</h2>
+
+<!-- Numeric fields -->
+<div>
+  M1 START: <input type="number" id="M1S" value="0"><br>
+  M1 END: <input type="number" id="M1E" value="2000"><br>
+  M2 START: <input type="number" id="M2S" value="0"><br>
+  M2 END: <input type="number" id="M2E" value="2000"><br>
+  M1 SPEED: <input type="number" id="M1SPD" value="2000"><br>
+  M2 SPEED: <input type="number" id="M2SPD" value="2000"><br>
+  CYCLES: <input type="number" id="CYCLES" value="0"><br>
+</div>
+
+<!-- Action buttons -->
+<div>
+  <button onclick="sendValues()">SEND VALUES</button><br>
+  <button onclick="sendCmd('RUN')">RUN</button><br>
+  <button onclick="sendCmd('TRACKM1')">TRACK M1</button>
+  <button onclick="sendCmd('TRACKM2')">TRACK M2</button>
+  <button onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
+</div>
+
+<!-- Connect -->
+<div>
   <button onclick="connectBLE()">CONNECT</button>
-  <button onclick="sendCmd('TEST')">TEST</button>
-  <button onclick="sendCmd('RUN')">RUN</button>
-  <button onclick="sendCmd('STOP')">STOP</button>
+</div>
 
-  <hr>
+<script>
+let device;
+let characteristic;
+let connected = false;
 
-  <!-- TRACKING -->
-  <button onclick="sendCmd('TRACK:M1')">TRACK M1</button>
-  <button onclick="sendCmd('TRACK:M2')">TRACK M2</button>
-  <button onclick="sendCmd('TRACK:BOTH')">TRACK BOTH</button>
-  <button onclick="sendCmd('TRACK:STOP')">STOP TRACK</button>
+async function connectBLE() {
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: 'CameraSlider' }],
+      optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+    });
 
-  <hr>
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(
+      '12345678-1234-1234-1234-1234567890ab'
+    );
 
-  <!-- VALUES -->
-  <label>M1 START</label>
-  <input id="m1s" type="number" value="0">
+    characteristic = await service.getCharacteristic(
+      'abcd1234-1234-1234-1234-abcdef123456'
+    );
 
-  <label>M1 END</label>
-  <input id="m1e" type="number" value="2000">
+    connected = true;
+    alert("BLE Connected");
 
-  <label>M2 START</label>
-  <input id="m2s" type="number" value="0">
+  } catch (e) {
+    alert("BLE Error: " + e);
+  }
+}
 
-  <label>M2 END</label>
-  <input id="m2e" type="number" value="2000">
+function sendCmd(cmd) {
+  if (!connected) { alert("Not connected"); return; }
+  const data = new TextEncoder().encode(cmd + "\n");
+  characteristic.writeValue(data);
+}
 
-  <label>M1 SPEED</label>
-  <input id="m1spd" type="number" value="2000">
+function sendValues() {
+  if (!connected) { alert("Not connected"); return; }
 
-  <label>M2 SPEED</label>
-  <input id="m2spd" type="number" value="2000">
+  const M1S = document.getElementById('M1S').value;
+  const M1E = document.getElementById('M1E').value;
+  const M2S = document.getElementById('M2S').value;
+  const M2E = document.getElementById('M2E').value;
+  const M1SPD = document.getElementById('M1SPD').value;
+  const M2SPD = document.getElementById('M2SPD').value;
+  const CYCLES = document.getElementById('CYCLES').value;
 
-  <label>CYCLES (0 = INF)</label>
-  <input id="cycles" type="number" value="0">
+  const cmds = [
+    `M1S:${M1S}`,
+    `M1E:${M1E}`,
+    `M2S:${M2S}`,
+    `M2E:${M2E}`,
+    `M1SPD:${M1SPD}`,
+    `M2SPD:${M2SPD}`,
+    `CYCLES:${CYCLES}`
+  ];
 
-  <button onclick="sendValues()">SEND VALUES</button>
+  cmds.forEach(cmd => {
+    const data = new TextEncoder().encode(cmd + "\n");
+    characteristic.writeValue(data);
+  });
 
-  <script>
-    let bleDevice = null;
-    let bleCharacteristic = null;
+  alert("Values sent!");
+}
+</script>
 
-    const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
-    const CHAR_UUID    = 'abcd1234-5678-1234-5678-abcdef123456';
-
-    async function connectBLE() {
-      try {
-        bleDevice = await navigator.bluetooth.requestDevice({
-          filters: [{ name: 'CameraSlider' }],
-          optionalServices: [SERVICE_UUID]
-        });
-
-        const server = await bleDevice.gatt.connect();
-        const service = await server.getPrimaryService(SERVICE_UUID);
-        bleCharacteristic = await service.getCharacteristic(CHAR_UUID);
-
-        alert("BLE Connected");
-        console.log("BLE Connected");
-      } catch (err) {
-        console.error(err);
-        alert("BLE Error");
-      }
-    }
-
-    function sendCmd(cmd) {
-      if (!bleCharacteristic) {
-        alert("Not connected");
-        return;
-      }
-      bleCharacteristic.writeValue(
-        new TextEncoder().encode(cmd)
-      );
-      console.log("Sent:", cmd);
-    }
-
-    function sendValues() {
-      if (!bleCharacteristic) {
-        alert("Not connected");
-        return;
-      }
-
-      const cmds = [
-        `M1S:${document.getElementById('m1s').value}`,
-        `M1E:${document.getElementById('m1e').value}`,
-        `M2S:${document.getElementById('m2s').value}`,
-        `M2E:${document.getElementById('m2e').value}`,
-        `M1SPD:${document.getElementById('m1spd').value}`,
-        `M2SPD:${document.getElementById('m2spd').value}`,
-        `CYC:${document.getElementById('cycles').value}`
-      ];
-
-      cmds.forEach(cmd => {
-        bleCharacteristic.writeValue(
-          new TextEncoder().encode(cmd)
-        );
-        console.log("Sent:", cmd);
-      });
-    }
-  </script>
 </body>
 </html>
-
-
