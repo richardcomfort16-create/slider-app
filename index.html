@@ -18,6 +18,9 @@ button {
   margin:8px;
   font-size:18px;
 }
+input[type=range] {
+  width:80%;
+}
 </style>
 </head>
 
@@ -25,7 +28,12 @@ button {
 
 <h2>Camera Slider</h2>
 
-<p>Tap to move — press STOP to halt</p>
+<p>Jog Speed</p>
+<input type="range" min="100" max="3000" value="800" id="jogspd"
+       oninput="updateJogSpeed(this.value)">
+<p id="spdlabel">800</p>
+
+<hr>
 
 <button onclick="jog('M1',-1)">M1 ◀</button>
 <button onclick="jog('M1',1)">M1 ▶</button><br>
@@ -66,8 +74,12 @@ function send(cmd){
 function jog(axis,dir){
   send(`JOG:${axis}:${dir}`);
 }
+
+function updateJogSpeed(v){
+  document.getElementById("spdlabel").innerText = v;
+  send(`JOGSPD:${v}`);
+}
 </script>
 
 </body>
 </html>
-
