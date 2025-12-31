@@ -10,16 +10,17 @@ body {
   color:white;
   font-family:Arial;
   text-align:center;
-  -webkit-user-select:none;
   user-select:none;
 }
+input { width:90px; }
 button {
-  padding:16px 22px;
-  margin:8px;
-  font-size:18px;
+  padding:14px 20px;
+  margin:6px;
+  font-size:16px;
 }
-input[type=range] {
-  width:80%;
+fieldset {
+  border:1px solid #444;
+  margin:10px;
 }
 </style>
 </head>
@@ -28,12 +29,21 @@ input[type=range] {
 
 <h2>Camera Slider</h2>
 
-<p>Jog Speed</p>
-<input type="range" min="100" max="3000" value="800" id="jogspd"
-       oninput="updateJogSpeed(this.value)">
-<p id="spdlabel">800</p>
+<fieldset>
+<legend>Positions (Steps)</legend>
+M1 START <input id="m1s" type="number" value="0"><br>
+M1 END <input id="m1e" type="number" value="2000"><br>
+M2 START <input id="m2s" type="number" value="0"><br>
+M2 END <input id="m2e" type="number" value="2000"><br>
+<button onclick="sendPositions()">SEND POSITIONS</button>
+</fieldset>
 
-<hr>
+<fieldset>
+<legend>Jog Speed</legend>
+<input type="range" min="100" max="3000" value="800"
+oninput="setJogSpeed(this.value)">
+<p id="spd">800</p>
+</fieldset>
 
 <button onclick="jog('M1',-1)">M1 ◀</button>
 <button onclick="jog('M1',1)">M1 ▶</button><br>
@@ -62,7 +72,7 @@ async function connect(){
   });
   const s = await (await d.gatt.connect()).getPrimaryService(S);
   char = await s.getCharacteristic(C);
-  connected = true;
+  connected=true;
   alert("Connected");
 }
 
@@ -75,11 +85,19 @@ function jog(axis,dir){
   send(`JOG:${axis}:${dir}`);
 }
 
-function updateJogSpeed(v){
-  document.getElementById("spdlabel").innerText = v;
+function setJogSpeed(v){
+  document.getElementById("spd").innerText=v;
   send(`JOGSPD:${v}`);
+}
+
+function sendPositions(){
+  send(`M1S:${m1s.value}`);
+  send(`M1E:${m1e.value}`);
+  send(`M2S:${m2s.value}`);
+  send(`M2E:${m2e.value}`);
 }
 </script>
 
 </body>
 </html>
+
