@@ -3,13 +3,9 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camera Slider</title>
-
 <style>
 body { background:#111; color:white; font-family:Arial; text-align:center; }
-button { padding:12px 18px; margin:6px; font-size:15px; }
-input { width:90px; text-align:right; }
-fieldset { border:1px solid #444; margin:10px; }
-legend { color:#aaa; }
+button { padding:14px 20px; margin:6px; font-size:16px; }
 </style>
 </head>
 
@@ -17,23 +13,14 @@ legend { color:#aaa; }
 
 <h2>Camera Slider</h2>
 
-<fieldset>
-<legend>Jog Step</legend>
-<input id="JOGSTEP" type="number" value="200">
-<button onclick="send(`JOGSTEP:${JOGSTEP.value}`)">SET</button>
-</fieldset>
-
-<fieldset>
-<legend>Manual Jog</legend>
 <button onmousedown="jog('M1',-1)" onmouseup="stop()">M1 ◀</button>
-<button onmousedown="jog('M1',1)" onmouseup="stop()">M1 ▶</button><br>
+<button onmousedown="jog('M1',1)"  onmouseup="stop()">M1 ▶</button><br>
 
 <button onmousedown="jog('M2',-1)" onmouseup="stop()">M2 ◀</button>
-<button onmousedown="jog('M2',1)" onmouseup="stop()">M2 ▶</button><br>
+<button onmousedown="jog('M2',1)"  onmouseup="stop()">M2 ▶</button><br>
 
 <button onmousedown="jog('BOTH',-1)" onmouseup="stop()">BOTH ◀</button>
-<button onmousedown="jog('BOTH',1)" onmouseup="stop()">BOTH ▶</button>
-</fieldset>
+<button onmousedown="jog('BOTH',1)"  onmouseup="stop()">BOTH ▶</button><br><br>
 
 <button onclick="send('HOME')">HOME</button>
 <button onclick="send('RUN')">RUN</button>
