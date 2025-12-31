@@ -3,10 +3,30 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camera Slider</title>
+
 <style>
-body { background:#111; color:white; font-family:Arial; text-align:center; }
-input { width:80px; text-align:right; margin:5px; }
-button { margin:5px; padding:10px 15px; }
+body {
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+input {
+  width:90px;
+  text-align:right;
+  margin:4px;
+}
+button {
+  margin:6px;
+  padding:10px 18px;
+  font-size:14px;
+}
+fieldset {
+  border:1px solid #444;
+  margin:10px;
+  padding:10px;
+}
+legend { color:#aaa; }
 </style>
 </head>
 
@@ -14,123 +34,121 @@ button { margin:5px; padding:10px 15px; }
 
 <h2>Camera Slider</h2>
 
-<!-- Numeric fields -->
-<div>
-  M1 START: <input type="number" id="M1S" value="0"><br>
-  M1 END: <input type="number" id="M1E" value="2000"><br>
-  M2 START: <input type="number" id="M2S" value="0"><br>
-  M2 END: <input type="number" id="M2E" value="2000"><br>
-  M1 SPEED: <input type="number" id="M1SPD" value="2000"><br>
-  M2 SPEED: <input type="number" id="M2SPD" value="2000"><br>
-  CYCLES: <input type="number" id="CYCLES" value="0"><br>
-</div>
+<!-- POSITION SETTINGS -->
+<fieldset>
+<legend>Positions</legend>
+M1 START <input type="number" id="M1S" value="0"><br>
+M1 END <input type="number" id="M1E" value="2000"><br>
+M2 START <input type="number" id="M2S" value="0"><br>
+M2 END <input type="number" id="M2E" value="2000"><br>
+</fieldset>
 
-<!-- Action buttons -->
-<div>
-  <button onclick="sendValues()">SEND VALUES</button><br>
-  <button onclick="sendCmd('RUN')">RUN</button><br>
-  <button onclick="sendCmd('TRACKM1')">TRACK M1</button>
-  <button onclick="sendCmd('TRACKM2')">TRACK M2</button>
-  <button onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
-</div>
+<!-- SPEED -->
+<fieldset>
+<legend>Speed</legend>
+M1 SPEED <input type="number" id="M1SPD" value="2000"><br>
+M2 SPEED <input type="number" id="M2SPD" value="2000"><br>
+</fieldset>
 
-<!-- Connect -->
-<div>
-  <button onclick="connectBLE()">CONNECT</button>
-</div>
+<!-- HOMING -->
+<fieldset>
+<legend>Homing (no switches)</legend>
+M1 HOME OFFSET <input type="number" id="M1HOME" value="-2000"><br>
+M2 HOME OFFSET <input type="number" id="M2HOME" value="-2000"><br>
+<button onclick="sendHoming()">HOME</button>
+</fieldset>
+
+<!-- CYCLES -->
+<fieldset>
+<legend>Cycles</legend>
+CYCLES <input type="number" id="CYCLES" value="0">
+<br>
+<button onclick="setInfinite()">INF</button>
+</fieldset>
+
+<!-- ACTIONS -->
+<fieldset>
+<legend>Actions</legend>
+<button onclick="sendValues()">SEND VALUES</button><br>
+<button onclick="sendCmd('RUN')">RUN</button><br><br>
+<button onclick="sendCmd('TRACKM1')">TRACK M1</button>
+<button onclick="sendCmd('TRACKM2')">TRACK M2</button>
+<button onclick="sendCmd('TRACKBOTH')">TRACK BOTH</button>
+</fieldset>
+
+<!-- CONNECT -->
+<button onclick="connectBLE()">CONNECT</button>
 
 <script>
 let device;
 let characteristic;
 let connected = false;
 
-// Initial values (can be updated from BLE if needed)
-let values = {
-  M1S: 0,
-  M1E: 2000,
-  M2S: 0,
-  M2E: 2000,
-  M1SPD: 2000,
-  M2SPD: 2000,
-  CYCLES: 0
-};
+const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
+const CHAR_UUID    = 'abcd1234-1234-1234-1234-abcdef123456';
 
-// Connect to ESP32 via BLE
 async function connectBLE() {
   try {
     device = await navigator.bluetooth.requestDevice({
       filters: [{ name: 'CameraSlider' }],
-      optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+      optionalServices: [SERVICE_UUID]
     });
 
     const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(
-      '12345678-1234-1234-1234-1234567890ab'
-    );
-
-    characteristic = await service.getCharacteristic(
-      'abcd1234-1234-1234-1234-abcdef123456'
-    );
+    const service = await server.getPrimaryService(SERVICE_UUID);
+    characteristic = await service.getCharacteristic(CHAR_UUID);
 
     connected = true;
     alert("BLE Connected");
-
-    // Optionally, request current values from ESP32 if implemented
-    populateFields();
 
   } catch (e) {
     alert("BLE Error: " + e);
   }
 }
 
-// Send single command (RUN/TRACK)
 function sendCmd(cmd) {
-  if (!connected) { alert("Not connected"); return; }
-  const data = new TextEncoder().encode(cmd + "\n");
-  characteristic.writeValue(data);
+  if (!connected) {
+    alert("Not connected");
+    return;
+  }
+  characteristic.writeValue(
+    new TextEncoder().encode(cmd + "\n")
+  );
 }
 
-// Send all numeric values to ESP32
 function sendValues() {
   if (!connected) { alert("Not connected"); return; }
 
-  values.M1S = document.getElementById('M1S').value;
-  values.M1E = document.getElementById('M1E').value;
-  values.M2S = document.getElementById('M2S').value;
-  values.M2E = document.getElementById('M2E').value;
-  values.M1SPD = document.getElementById('M1SPD').value;
-  values.M2SPD = document.getElementById('M2SPD').value;
-  values.CYCLES = document.getElementById('CYCLES').value;
-
   const cmds = [
-    `M1S:${values.M1S}`,
-    `M1E:${values.M1E}`,
-    `M2S:${values.M2S}`,
-    `M2E:${values.M2E}`,
-    `M1SPD:${values.M1SPD}`,
-    `M2SPD:${values.M2SPD}`,
-    `CYCLES:${values.CYCLES}`
+    `M1S:${M1S.value}`,
+    `M1E:${M1E.value}`,
+    `M2S:${M2S.value}`,
+    `M2E:${M2E.value}`,
+    `M1SPD:${M1SPD.value}`,
+    `M2SPD:${M2SPD.value}`,
+    `CYCLES:${CYCLES.value}`
   ];
 
-  cmds.forEach(cmd => {
-    const data = new TextEncoder().encode(cmd + "\n");
-    characteristic.writeValue(data);
-  });
+  cmds.forEach(cmd =>
+    characteristic.writeValue(
+      new TextEncoder().encode(cmd + "\n")
+    )
+  );
 
-  alert("Values sent!");
+  alert("Values sent");
 }
 
-// Populate HTML fields from current values
-function populateFields() {
-  document.getElementById('M1S').value = values.M1S;
-  document.getElementById('M1E').value = values.M1E;
-  document.getElementById('M2S').value = values.M2S;
-  document.getElementById('M2E').value = values.M2E;
-  document.getElementById('M1SPD').value = values.M1SPD;
-  document.getElementById('M2SPD').value = values.M2SPD;
-  document.getElementById('CYCLES').value = values.CYCLES;
+function sendHoming() {
+  if (!connected) { alert("Not connected"); return; }
+
+  sendCmd(`M1HOME:${M1HOME.value}`);
+  sendCmd(`M2HOME:${M2HOME.value}`);
+  sendCmd("HOME");
 }
 
+function setInfinite() {
+  document.getElementById('CYCLES').value = 0;
+}
 </script>
 
 </body>
