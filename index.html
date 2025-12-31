@@ -3,9 +3,21 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Camera Slider</title>
+
 <style>
-body { background:#111; color:white; font-family:Arial; text-align:center; }
-button { padding:14px 20px; margin:6px; font-size:16px; }
+body {
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+  -webkit-user-select:none;
+  user-select:none;
+}
+button {
+  padding:16px 22px;
+  margin:8px;
+  font-size:18px;
+}
 </style>
 </head>
 
@@ -13,14 +25,18 @@ button { padding:14px 20px; margin:6px; font-size:16px; }
 
 <h2>Camera Slider</h2>
 
-<button onmousedown="jog('M1',-1)" onmouseup="stop()">M1 ◀</button>
-<button onmousedown="jog('M1',1)"  onmouseup="stop()">M1 ▶</button><br>
+<p>Tap to move — press STOP to halt</p>
 
-<button onmousedown="jog('M2',-1)" onmouseup="stop()">M2 ◀</button>
-<button onmousedown="jog('M2',1)"  onmouseup="stop()">M2 ▶</button><br>
+<button onclick="jog('M1',-1)">M1 ◀</button>
+<button onclick="jog('M1',1)">M1 ▶</button><br>
 
-<button onmousedown="jog('BOTH',-1)" onmouseup="stop()">BOTH ◀</button>
-<button onmousedown="jog('BOTH',1)"  onmouseup="stop()">BOTH ▶</button><br><br>
+<button onclick="jog('M2',-1)">M2 ◀</button>
+<button onclick="jog('M2',1)">M2 ▶</button><br>
+
+<button onclick="jog('BOTH',-1)">BOTH ◀</button>
+<button onclick="jog('BOTH',1)">BOTH ▶</button><br><br>
+
+<button onclick="send('STOP')" style="background:#900;">STOP</button><br><br>
 
 <button onclick="send('HOME')">HOME</button>
 <button onclick="send('RUN')">RUN</button>
@@ -32,12 +48,13 @@ const S="12345678-1234-1234-1234-1234567890ab";
 const C="abcd1234-1234-1234-1234-abcdef123456";
 
 async function connect(){
-  const d=await navigator.bluetooth.requestDevice({
-    filters:[{name:'CameraSlider'}], optionalServices:[S]
+  const d = await navigator.bluetooth.requestDevice({
+    filters:[{name:'CameraSlider'}],
+    optionalServices:[S]
   });
-  const s=await (await d.gatt.connect()).getPrimaryService(S);
-  char=await s.getCharacteristic(C);
-  connected=true;
+  const s = await (await d.gatt.connect()).getPrimaryService(S);
+  char = await s.getCharacteristic(C);
+  connected = true;
   alert("Connected");
 }
 
@@ -48,9 +65,6 @@ function send(cmd){
 
 function jog(axis,dir){
   send(`JOG:${axis}:${dir}`);
-}
-function stop(){
-  send("STOP");
 }
 </script>
 
