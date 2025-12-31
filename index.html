@@ -35,7 +35,20 @@ M1 START <input id="m1s" type="number" value="0"><br>
 M1 END <input id="m1e" type="number" value="2000"><br>
 M2 START <input id="m2s" type="number" value="0"><br>
 M2 END <input id="m2e" type="number" value="2000"><br>
-<button onclick="sendPositions()">SEND POSITIONS</button>
+</fieldset>
+
+<fieldset>
+<legend>Run Speeds</legend>
+M1 SPEED <input id="m1spd" type="number" value="2000"><br>
+M2 SPEED <input id="m2spd" type="number" value="2000"><br>
+</fieldset>
+
+<fieldset>
+<legend>Return</legend>
+<label>
+<input type="checkbox" id="ret" checked onchange="sendReturn()">
+ Enable Return
+</label>
 </fieldset>
 
 <fieldset>
@@ -56,6 +69,7 @@ oninput="setJogSpeed(this.value)">
 
 <button onclick="send('STOP')" style="background:#900;">STOP</button><br><br>
 
+<button onclick="sendPositions()">SEND VALUES</button><br>
 <button onclick="send('HOME')">HOME</button>
 <button onclick="send('RUN')">RUN</button>
 <button onclick="connect()">CONNECT</button>
@@ -90,11 +104,17 @@ function setJogSpeed(v){
   send(`JOGSPD:${v}`);
 }
 
+function sendReturn(){
+  send(`RETURN:${ret.checked ? 1 : 0}`);
+}
+
 function sendPositions(){
   send(`M1S:${m1s.value}`);
   send(`M1E:${m1e.value}`);
   send(`M2S:${m2s.value}`);
   send(`M2E:${m2e.value}`);
+  send(`M1SPD:${m1spd.value}`);
+  send(`M2SPD:${m2spd.value}`);
 }
 </script>
 
