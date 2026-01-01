@@ -1,3 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Camera Slider</title>
+
+<style>
+body {
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+  user-select:none;
+}
+input[type=range] {
+  width:90%;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Jog Slider</h2>
+
+<select id="axis">
+  <option value="BOTH">BOTH</option>
+  <option value="M1">M1</option>
+  <option value="M2">M2</option>
+</select><br><br>
+
+<input type="range" min="-100" max="100" value="0" id="slider">
+<p id="val">0</p>
+
+<button onclick="connect()">CONNECT</button>
+
 <script>
 let char, connected=false;
 let lastSend=0;
@@ -13,3 +48,7 @@ function jogSlider(v){
   );
 }
 </script>
+
+
+</body>
+</html>
