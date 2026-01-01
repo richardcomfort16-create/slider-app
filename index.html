@@ -11,20 +11,27 @@ body {
   font-family:Arial;
   text-align:center;
   user-select:none;
-  -webkit-user-select:none;
-  touch-action:none;
 }
-input[type=range] {
-  width:90%;
-}
+
 button {
   padding:14px 20px;
   margin:6px;
   font-size:16px;
 }
+
+input[type=range] {
+  width:90%;
+}
+
+select {
+  font-size:16px;
+  padding:6px;
+}
+
 fieldset {
   border:1px solid #444;
-  margin:10px;
+  margin:12px;
+  padding:10px;
 }
 </style>
 </head>
@@ -33,8 +40,11 @@ fieldset {
 
 <h2>Camera Slider</h2>
 
+<button id="connectBtn">CONNECT</button>
+<p id="status">Not connected</p>
+
 <fieldset>
-<legend>Jog Slider</legend>
+<legend>Jog Control</legend>
 
 <select id="axis">
   <option value="BOTH">BOTH</option>
@@ -42,6 +52,78 @@ fieldset {
   <option value="M2">M2</option>
 </select><br><br>
 
-<input
-  type="range"
-  min=
+<input id="jog" type="range" min="-100" max="100" value="0">
+<p>Value: <span id="val">0</span></p>
+
+</fieldset>
+
+<button id="homeBtn">HOME</button>
+<button id="runBtn">RUN</button>
+<button id="stopBtn" style="background:#900;">STOP</button>
+
+<script>
+let device, characteristic;
+let connected = false;
+let lastSent = 0;
+let lastValue = 0;
+
+const SERVICE = "12345678-1234-1234-1234-1234567890ab";
+const CHAR = "abcd1234-1234-1234-1234-abcdef123456";
+
+document.getElementById("connectBtn").onclick = connectBLE;
+document.getElementById("homeBtn").onclick = () => send("HOME");
+document.getElementById("runBtn").onclick = () => send("RUN");
+document.getElementById("stopBtn").onclick = () => send("STOP");
+
+const slider = document.getElementById("jog");
+slider.oninput = handleJog;
+slider.onchange = () => sendJog(0);
+
+async function connectBLE() {
+  try {
+    device = await navigator.bluetooth.requestDevice({
+      filters: [{ name: "CameraSlider" }],
+      optionalServices: [SERVICE]
+    });
+
+    const server = await device.gatt.connect();
+    const service = await server.getPrimaryService(SERVICE);
+    characteristic = await service.getCharacteristic(CHAR);
+
+    connected = true;
+    document.getElementById("status").innerText = "Connected";
+  } catch (e) {
+    alert(e);
+  }
+}
+
+function send(cmd) {
+  if (!connected) return;
+  characteristic.writeValue(
+    new TextEncoder().encode(cmd + "\n")
+  );
+}
+
+function handleJog() {
+  const v = Number(slider.value);
+  document.getElementById("val").innerText = v;
+
+  const now = Date.now();
+  if (now - lastSent < 40) return;   // throttle BLE
+  if (v === lastValue) return;
+
+  lastSent = now;
+  lastValue = v;
+
+  sendJog(v);
+}
+
+function sendJog(v) {
+  if (!connected) return;
+  const axis = document.getElementById("axis").value;
+  send(`JOGSLIDER:${axis}:${v}`);
+}
+</script>
+
+</body>
+</html>
