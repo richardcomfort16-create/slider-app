@@ -11,16 +11,30 @@ body {
   font-family:Arial;
   text-align:center;
   user-select:none;
+  -webkit-user-select:none;
+  touch-action:none;
 }
 input[type=range] {
   width:90%;
+}
+button {
+  padding:14px 20px;
+  margin:6px;
+  font-size:16px;
+}
+fieldset {
+  border:1px solid #444;
+  margin:10px;
 }
 </style>
 </head>
 
 <body>
 
-<h2>Jog Slider</h2>
+<h2>Camera Slider</h2>
+
+<fieldset>
+<legend>Jog Slider</legend>
 
 <select id="axis">
   <option value="BOTH">BOTH</option>
@@ -28,27 +42,6 @@ input[type=range] {
   <option value="M2">M2</option>
 </select><br><br>
 
-<input type="range" min="-100" max="100" value="0" id="slider">
-<p id="val">0</p>
-
-<button onclick="connect()">CONNECT</button>
-
-<script>
-let char, connected=false;
-let lastSend=0;
-
-function jogSlider(v){
-  const now = Date.now();
-  if(now - lastSend < 40) return; // throttle BLE
-  lastSend = now;
-
-  const axis = document.getElementById("axis").value;
-  char.writeValue(
-    new TextEncoder().encode(`JOGSLIDER:${axis}:${v}\n`)
-  );
-}
-</script>
-
-
-</body>
-</html>
+<input
+  type="range"
+  min=
