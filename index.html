@@ -1,82 +1,15 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Camera Slider</title>
-
-<style>
-body {
-  background:#111;
-  color:white;
-  font-family:Arial;
-  text-align:center;
-  user-select:none;
-}
-input[type=range] {
-  width:90%;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Jog Control</h2>
-
-<select id="axis">
-  <option value="BOTH">BOTH</option>
-  <option value="M1">M1</option>
-  <option value="M2">M2</option>
-</select><br><br>
-
-<input type="range" min="-100" max="100" value="0" id="slider">
-<p id="val">0</p>
-
-<button onclick="connect()">CONNECT</button>
-
 <script>
 let char, connected=false;
-let lastSend = 0;
+let lastSend=0;
 
-const S="12345678-1234-1234-1234-1234567890ab";
-const C="abcd1234-1234-1234-1234-abcdef123456";
-
-async function connect(){
-  const d = await navigator.bluetooth.requestDevice({
-    filters:[{name:'CameraSlider'}],
-    optionalServices:[S]
-  });
-  const s = await (await d.gatt.connect()).getPrimaryService(S);
-  char = await s.getCharacteristic(C);
-  connected=true;
-  alert("Connected");
-}
-
-const slider = document.getElementById("slider");
-
-slider.addEventListener("input", () => {
-  const now = performance.now();
-  if (now - lastSend < 40) return; // ~25Hz
+function jogSlider(v){
+  const now = Date.now();
+  if(now - lastSend < 40) return; // throttle BLE
   lastSend = now;
 
-  const v = slider.value;
-  document.getElementById("val").innerText = v;
   const axis = document.getElementById("axis").value;
-
-  if (connected) {
-    char.writeValueWithoutResponse(
-      new TextEncoder().encode(`JOGSLIDER:${axis}:${v}\n`)
-    );
-  }
-});
-
-slider.addEventListener("change", () => {
-  slider.value = 0;
-  if (connected)
-    char.writeValueWithoutResponse(
-      new TextEncoder().encode("JOGSLIDER:BOTH:0\n")
-    );
-});
+  char.writeValue(
+    new TextEncoder().encode(`JOGSLIDER:${axis}:${v}\n`)
+  );
+}
 </script>
-
-</body>
-</html>
