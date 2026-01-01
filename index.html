@@ -15,24 +15,12 @@ body {
 input[type=range] {
   width:90%;
 }
-button {
-  padding:14px 20px;
-  margin:6px;
-  font-size:16px;
-}
-fieldset {
-  border:1px solid #444;
-  margin:10px;
-}
 </style>
 </head>
 
 <body>
 
-<h2>Camera Slider</h2>
-
-<fieldset>
-<legend>Jog Slider</legend>
+<h2>Jog Slider</h2>
 
 <select id="axis">
   <option value="BOTH">BOTH</option>
@@ -40,21 +28,16 @@ fieldset {
   <option value="M2">M2</option>
 </select><br><br>
 
-<input type="range" min="-100" max="100" value="0"
-oninput="jogSlider(this.value)"
-onchange="stopJog()">
+<input type="range" min="-100" max="100" value="0" id="slider">
+<p id="val">0</p>
 
-<p id="jogval">0</p>
-</fieldset>
-
-<button onclick="send('STOP')" style="background:#900;">STOP</button><br><br>
-
-<button onclick="send('HOME')">HOME</button>
-<button onclick="send('RUN')">RUN</button>
 <button onclick="connect()">CONNECT</button>
 
 <script>
 let char, connected=false;
+let lastSend = 0;
+const SEND_INTERVAL = 33; // ms (~30Hz)
+
 const S="12345678-1234-1234-1234-1234567890ab";
 const C="abcd1234-1234-1234-1234-abcdef123456";
 
@@ -69,20 +52,28 @@ async function connect(){
   alert("Connected");
 }
 
-function send(cmd){
+const slider = document.getElementById("slider");
+
+slider.addEventListener("input", ()=>{
+  document.getElementById("val").innerText = slider.value;
+
+  const now = Date.now();
+  if (now - lastSend < SEND_INTERVAL) return;
+  lastSend = now;
+
   if(!connected) return;
-  char.writeValue(new TextEncoder().encode(cmd+"\n"));
-}
-
-function jogSlider(v){
-  document.getElementById("jogval").innerText = v;
   const axis = document.getElementById("axis").value;
-  send(`JOGSLIDER:${axis}:${v}`);
-}
+  const cmd = `JOGSLIDER:${axis}:${slider.value}\n`;
+  char.writeValue(new TextEncoder().encode(cmd));
+});
 
-function stopJog(){
-  jogSlider(0);
-}
+slider.addEventListener("change", ()=>{
+  slider.value = 0;
+  document.getElementById("val").innerText = 0;
+  if(!connected) return;
+  const axis = document.getElementById("axis").value;
+  char.writeValue(new TextEncoder().encode(`JOGSLIDER:${axis}:0\n`));
+});
 </script>
 
 </body>
