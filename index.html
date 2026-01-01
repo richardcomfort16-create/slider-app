@@ -1,165 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Camera Slider</title>
-
+<html>
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
-body {
-  background:#111;
-  color:#fff;
-  font-family:Arial, Helvetica, sans-serif;
-  text-align:center;
-  margin:0;
-  padding:10px;
-}
-
-h2 { margin-top:10px; }
-
-fieldset {
-  border:1px solid #444;
-  margin:10px auto;
-  padding:10px;
-  max-width:360px;
-}
-
-legend {
-  padding:0 10px;
-  color:#aaa;
-}
-
-button {
-  padding:14px 20px;
-  margin:6px;
-  font-size:16px;
-  background:#333;
-  color:white;
-  border:none;
-  border-radius:6px;
-}
-
-button:active {
-  background:#555;
-}
-
-select {
-  padding:6px;
-  font-size:16px;
-}
-
-input[type=range] {
-  width:100%;
-  margin-top:15px;
-}
-
-.status {
-  font-size:14px;
-  color:#0f0;
-}
+body{background:#111;color:#fff;font-family:Arial;text-align:center}
+input[type=range]{width:90%}
+select,button{font-size:16px;margin:5px;padding:8px}
 </style>
-</head>
 
 <body>
 
-<h2>Camera Slider</h2>
+<h3>Camera Slider</h3>
 
-<div class="status" id="status">DISCONNECTED</div>
+<select id="axis">
+<option value="BOTH">BOTH</option>
+<option value="M1">M1</option>
+<option value="M2">M2</option>
+</select><br>
 
-<!-- CONNECT -->
-<fieldset>
-  <legend>Connection</legend>
-  <button onclick="connectBLE()">CONNECT</button>
-</fieldset>
+<input type="range" min="-100" max="100" value="0"
+oninput="jog(this.value)" onchange="stop()">
+<p id="v">0</p>
 
-<!-- JOG -->
-<fieldset>
-  <legend>Jog Control</legend>
-
-  <select id="axis">
-    <option value="BOTH">BOTH</option>
-    <option value="M1">M1</option>
-    <option value="M2">M2</option>
-  </select>
-
-  <input
-    id="jog"
-    type="range"
-    min="-100"
-    max="100"
-    value="0"
-  >
-
-  <div id="jogVal">0</div>
-</fieldset>
-
-<!-- ACTIONS -->
-<fieldset>
-  <legend>Actions</legend>
-  <button onclick="sendCmd('RUN')">RUN</button>
-  <button onclick="sendCmd('HOME')">HOME</button>
-  <button onclick="sendCmd('STOP')" style="background:#900;">STOP</button>
-</fieldset>
+<button onclick="send('RUN')">RUN</button>
+<button onclick="send('STOP')">STOP</button>
+<button onclick="send('HOME')">HOME</button>
+<button onclick="connect()">CONNECT</button>
 
 <script>
-let device, characteristic;
-let connected = false;
+let c,ok=false;
+const S="12345678-1234-1234-1234-1234567890ab";
+const C="abcd1234-1234-1234-1234-abcdef123456";
 
-/* ===== BLE UUIDS ===== */
-const SERVICE_UUID = "12345678-1234-1234-1234-1234567890ab";
-const CHAR_UUID    = "abcd1234-1234-1234-1234-abcdef123456";
-
-/* ===== BLE CONNECT ===== */
-async function connectBLE() {
-  try {
-    device = await navigator.bluetooth.requestDevice({
-      filters: [{ name: 'CameraSlider' }],
-      optionalServices: [SERVICE_UUID]
-    });
-
-    const server = await device.gatt.connect();
-    const service = await server.getPrimaryService(SERVICE_UUID);
-    characteristic = await service.getCharacteristic(CHAR_UUID);
-
-    connected = true;
-    document.getElementById("status").innerText = "CONNECTED";
-  }
-  catch (e) {
-    alert("BLE Error: " + e);
-  }
+async function connect(){
+ const d=await navigator.bluetooth.requestDevice({
+  filters:[{name:'CameraSlider'}],optionalServices:[S]});
+ const s=await (await d.gatt.connect()).getPrimaryService(S);
+ c=await s.getCharacteristic(C);
+ ok=true; alert("Connected");
 }
 
-/* ===== SEND COMMAND ===== */
-function sendCmd(cmd) {
-  if (!connected) return;
-  characteristic.writeValue(
-    new TextEncoder().encode(cmd + "\n")
-  );
+function send(t){
+ if(ok) c.writeValue(new TextEncoder().encode(t+"\n"));
 }
 
-/* ===== JOG SLIDER (THROTTLED) ===== */
-const slider = document.getElementById("jog");
-const jogVal = document.getElementById("jogVal");
+function jog(v){
+ document.getElementById("v").innerText=v;
+ send("JOGSLIDER:"+axis.value+":"+v);
+}
 
-let lastSend = 0;
-const SEND_INTERVAL = 30; // ms (CRITICAL FOR iOS)
-
-slider.addEventListener("input", () => {
-  jogVal.innerText = slider.value;
-
-  const now = Date.now();
-  if (now - lastSend < SEND_INTERVAL) return;
-  lastSend = now;
-
-  const axis = document.getElementById("axis").value;
-  sendCmd(`JOGSLIDER:${axis}:${slider.value}`);
-});
-
-/* Auto-stop when released */
-slider.addEventListener("change", () => {
-  slider.value = 0;
-  jogVal.innerText = "0";
-  sendCmd("JOGSLIDER:BOTH:0");
-});
+function stop(){ jog(0); }
 </script>
 
 </body>
