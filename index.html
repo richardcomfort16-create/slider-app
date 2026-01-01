@@ -20,7 +20,7 @@ input[type=range] {
 
 <body>
 
-<h2>Jog Slider</h2>
+<h2>Jog Control</h2>
 
 <select id="axis">
   <option value="BOTH">BOTH</option>
@@ -36,7 +36,6 @@ input[type=range] {
 <script>
 let char, connected=false;
 let lastSend = 0;
-const SEND_INTERVAL = 33; // ms (~30Hz)
 
 const S="12345678-1234-1234-1234-1234567890ab";
 const C="abcd1234-1234-1234-1234-abcdef123456";
@@ -54,25 +53,28 @@ async function connect(){
 
 const slider = document.getElementById("slider");
 
-slider.addEventListener("input", ()=>{
-  document.getElementById("val").innerText = slider.value;
-
-  const now = Date.now();
-  if (now - lastSend < SEND_INTERVAL) return;
+slider.addEventListener("input", () => {
+  const now = performance.now();
+  if (now - lastSend < 40) return; // ~25Hz
   lastSend = now;
 
-  if(!connected) return;
+  const v = slider.value;
+  document.getElementById("val").innerText = v;
   const axis = document.getElementById("axis").value;
-  const cmd = `JOGSLIDER:${axis}:${slider.value}\n`;
-  char.writeValue(new TextEncoder().encode(cmd));
+
+  if (connected) {
+    char.writeValueWithoutResponse(
+      new TextEncoder().encode(`JOGSLIDER:${axis}:${v}\n`)
+    );
+  }
 });
 
-slider.addEventListener("change", ()=>{
+slider.addEventListener("change", () => {
   slider.value = 0;
-  document.getElementById("val").innerText = 0;
-  if(!connected) return;
-  const axis = document.getElementById("axis").value;
-  char.writeValue(new TextEncoder().encode(`JOGSLIDER:${axis}:0\n`));
+  if (connected)
+    char.writeValueWithoutResponse(
+      new TextEncoder().encode("JOGSLIDER:BOTH:0\n")
+    );
 });
 </script>
 
