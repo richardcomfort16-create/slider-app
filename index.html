@@ -36,99 +36,119 @@
             border: none;
         }
         
-        button { width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 8px; font-size: 18px; }
+        button { width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
         .btn-primary { background: #007bff; color: white; }
-        .status { padding: 15px; text-align: center; margin: 15px 0; border-radius: 8px; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-danger { background: #dc3545; color: white; }
+        .btn-warning { background: #ffc107; color: black; }
+        
+        .status { padding: 15px; text-align: center; margin: 15px 0; border-radius: 8px; font-weight: bold; }
         .disconnected { background: #f8d7da; color: #721c24; }
+        .connected { background: #d4edda; color: #155724; }
+        
+        label { display: block; margin: 15px 0 5px 0; font-weight: bold; }
+        input[type="number"], input[type="checkbox"] { 
+            width: 100%; padding: 12px; margin-bottom: 15px; 
+            border: 2px solid #ddd; border-radius: 8px; font-size: 16px; 
+        }
+        input[type="checkbox"] { width: auto; }
+        h3 { margin: 25px 0 15px 0; color: #333; border-bottom: 2px solid #eee; padding-bottom: 10px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Camera Slider Control</h1>
         
-        <div class="status disconnected" id="status">Disconnected</div>
-        
+        <div id="status" class="status disconnected">Disconnected</div>
         <button class="btn-primary" onclick="connectBLE()">Connect to Slider</button>
         
-        <h3>Motor 1 Jog</h3>
-        <input type="range" id="m1Slider" min="-100" max="100" value="0" 
-               oninput="sendJog('M1', this.value)">
-        <div id="m1Value">0</div>
+        <h3>Manual Control (Jog)</h3>
         
-        <h3>Motor 2 Jog</h3>
-        <input type="range" id="m2Slider" min="-100" max="100" value="0" 
-               oninput="sendJog('M2', this.value)">
-        <div id="m2Value">0</div>
+        <label>Motor 1: <span id="m1Value">0</span></label>
+        <input type="range" id="m1Slider" min="-100" max="100" value="0" step="1">
+        
+        <label>Motor 2: <span id="m2Value">0</span></label>
+        <input type="range" id="m2Slider" min="-100" max="100" value="0" step="1">
+        
+        <h3>Controls</h3>
+        <button class="btn-success" onclick="sendCommand('RUN')">START/PAUSE</button>
+        <button class="btn-danger" onclick="sendCommand('STOP')">STOP</button>
+        <button class="btn-warning" onclick="sendCommand('HOME')">HOME</button>
+<h3>Motor 1 Settings</h3>
+        <label>Start Position:</label>
+        <input type="number" id="m1Start" value="0" onchange="sendCommand('M1S:' + this.value)">
+        
+        <label>End Position:</label>
+        <input type="number" id="m1End" value="2000" onchange="sendCommand('M1E:' + this.value)">
+        
+        <label>Speed:</label>
+        <input type="number" id="m1Speed" value="2000" onchange="sendCommand('M1SPD:' + this.value)">
+        
+        <h3>Motor 2 Settings</h3>
+        <label>Start Position:</label>
+        <input type="number" id="m2Start" value="0" onchange="sendCommand('M2S:' + this.value)">
+        
+        <label>End Position:</label>
+        <input type="number" id="m2End" value="2000" onchange="sendCommand('M2E:' + this.value)">
+        
+        <label>Speed:</label>
+        <input type="number" id="m2Speed" value="2000" onchange="sendCommand('M2SPD:' + this.value)">
+        
+        <h3>Sequence</h3>
+        <label>Cycles (0=infinite):</label>
+        <input type="number" id="cycles" value="0" min="0" onchange="sendCommand('CYCLES:' + this.value)">
+        
+        <label>Return enabled:</label>
+        <input type="checkbox" id="returnEnabled" checked onchange="sendCommand('RETURN:' + (this.checked ? '1' : '0'))">
+        
     </div>
+<script>
+        let device, characteristic;
+        
+        // Connect to BLE device
+        async function connectBLE() {
+            try {
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'CameraSlider' }],
+                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+                });
+                
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+                
+                document.getElementById('status').textContent = 'Connected';
+                document.getElementById('status').className = 'status connected';
+            } catch (error) {
+                console.error('Connection failed:', error);
+                alert('Connection failed: ' + error);
+            }
+        }
+        
+        // Send command to device
+        function sendCommand(cmd) {
+            if (characteristic) {
+                characteristic.writeValue(new TextEncoder().encode(cmd));
+                console.log('Sent:', cmd);
+            } else {
+                alert('Not connected!');
+            }
+        }
+        
+        // Handle slider changes
+        document.getElementById('m1Slider').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('m1Value').textContent = value;
+            sendCommand(`JOGSLIDER:M1:${value}`);
+        });
+        
+        document.getElementById('m2Slider').addEventListener('input', function() {
+            const value = this.value;
+            document.getElementById('m2Value').textContent = value;
+            sendCommand(`JOGSLIDER:M2:${value}`);
+        });
+    </script>
 </body>
 </html>
-<script>
-let bleServer;
-let bleCharacteristic;
-let isConnected = false;
 
-// Connect to BLE device
-async function connectBLE() {
-    try {
-        const device = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'CameraSlider' }],
-            optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-        });
-
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-        bleCharacteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-
-        isConnected = true;
-        document.getElementById('status').textContent = 'Connected';
-        document.getElementById('status').className = 'status connected';
-        
-        device.addEventListener('gattserverdisconnected', onDisconnected);
-    } catch (error) {
-        console.error('Connection failed:', error);
-        alert('Connection failed. Make sure device is nearby.');
-    }
-}
-
-function onDisconnected() {
-    isConnected = false;
-    document.getElementById('status').textContent = 'Disconnected';
-    document.getElementById('status').className = 'status disconnected';
-}
-
-// Send BLE command
-function sendCommand(cmd) {
-    if (!isConnected || !bleCharacteristic) return;
-    
-    try {
-        const encoder = new TextEncoder();
-        bleCharacteristic.writeValue(encoder.encode(cmd));
-        console.log('Sent:', cmd);
-    } catch (error) {
-        console.error('Send failed:', error);
-    }
-}
-
-// Handle jog sliders
-function sendJog(motor, value) {
-    const cmd = `JOGSLIDER:${motor}:${value}`;
-    sendCommand(cmd);
-    
-    // Update display
-    if (motor === 'M1') {
-        document.getElementById('m1Value').textContent = value;
-    } else if (motor === 'M2') {
-        document.getElementById('m2Value').textContent = value;
-    }
-}
-
-// Update slider displays
-document.getElementById('m1Slider').oninput = function() {
-    sendJog('M1', this.value);
-};
-
-document.getElementById('m2Slider').oninput = function() {
-    sendJog('M2', this.value);
-};
-</script>
 
