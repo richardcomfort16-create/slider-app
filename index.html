@@ -3,308 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Slider Controller</title>
+    <title>Camera Slider Control</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f0f0f0;
+            background: #f5f5f5;
         }
-        
         .container {
             background: white;
-            padding: 20px;
             border-radius: 10px;
+            padding: 20px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
         }
-        
-        h3 {
-            color: #555;
-            border-bottom: 2px solid #007bff;
-            padding-bottom: 5px;
-            margin-top: 25px;
-        }
-        
-        .status {
-            text-align: center;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            font-weight: bold;
-        }
-        
-        .status.connected {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .status.disconnected {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-.control-group {
-            margin: 15px 0;
+        .section {
+            margin-bottom: 20px;
             padding: 15px;
             border: 1px solid #ddd;
             border-radius: 8px;
-            background-color: #f9f9f9;
         }
-        
-        .button-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 15px 0;
+        .section h3 {
+            margin-top: 0;
+            color: #0066cc;
         }
-        
-        button {
-            background: linear-gradient(145deg, #007bff, #0056b3);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-        
-        button:hover {
-            background: linear-gradient(145deg, #0056b3, #003d82);
-            transform: translateY(-1px);
-        }
-        
-        button:active {
-            transform: translateY(0);
-        }
-        
-        .stop-button {
-            background: linear-gradient(145deg, #dc3545, #a71e2a) !important;
-        }
-        
-        .stop-button:hover {
-            background: linear-gradient(145deg, #a71e2a, #7a1622) !important;
-        }
-        
-        input[type="number"] {
-            width: 100px;
-            padding: 8px;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-.slider-container {
-            margin: 20px 0;
-        }
-        
-        .slider-wrapper {
+        .control-group {
             display: flex;
             align-items: center;
-            gap: 15px;
             margin: 10px 0;
         }
-        
-        .slider-label {
+        .control-group label {
+            width: 120px;
             font-weight: bold;
-            min-width: 80px;
         }
-        
-        .slider {
-            flex: 1;
-            height: 8px;
-            border-radius: 5px;
-            background: #ddd;
-            outline: none;
-            -webkit-appearance: none;
+        input[type="number"] {
+            width: 100px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
-        
-        .slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #007bff;
-            cursor: pointer;
-        }
-        
-        .slider::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: #007bff;
-            cursor: pointer;
+        button {
+            background: #0066cc;
+            color: white;
             border: none;
-        }
-        
-        .value-display {
-            font-weight: bold;
-            min-width: 50px;
-            text-align: center;
-            background: #e9ecef;
-            padding: 5px 10px;
+            padding: 10px 20px;
             border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0052a3;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            text-align: center;
+        }
+        .status.disconnected {
+            background: #ffebee;
+            color: #c62828;
+        }
+        .status.connected {
+            background: #e8f5e8;
+            color: #2e7d32;
         }
     </style>
 </head>
 <body>
-<div class="container">
-        <h1>📹 Camera Slider Controller</h1>
+    <div class="container">
+        <h1>Camera Slider Control Panel</h1>
         
         <div id="status" class="status disconnected">
-            Disconnected
+            Disconnected - Click Connect to find your slider
         </div>
-        
-        <h3>🎬 Sequence Control</h3>
-        <div class="control-group">
-            <div class="button-grid">
-                <button onclick="sendCommand('RUN')">▶️ Start</button>
-                <button onclick="sendCommand('STOP')" class="stop-button">⏹️ Stop</button>
+
+        <div class="section">
+            <h3>Connection</h3>
+            <button id="connectBtn" onclick="connectBLE()">Connect to Slider</button>
+            <button id="disconnectBtn" onclick="disconnectBLE()" style="display:none;">Disconnect</button>
+        </div>
+<div class="section">
+            <h3>Motor 1 Settings</h3>
+            <div class="control-group">
+                <label>Start Position:</label>
+                <input type="number" id="m1Start" value="0">
+                <button onclick="setM1Start()">Set</button>
+            </div>
+            <div class="control-group">
+                <label>End Position:</label>
+                <input type="number" id="m1End" value="2000">
+                <button onclick="setM1End()">Set</button>
+            </div>
+            <div class="control-group">
+                <label>Speed:</label>
+                <input type="number" id="m1Speed" value="2000" min="100" max="5000">
+                <button onclick="setM1Speed()">Set</button>
             </div>
         </div>
-        
-        <h3>⚙️ Motor 1 Settings</h3>
-        <div class="control-group">
-            Start: <input type="number" id="m1Start" value="0" onchange="sendSetting('M1S', this.value)">
-            End: <input type="number" id="m1End" value="2000" onchange="sendSetting('M1E', this.value)">
-            Speed: <input type="number" id="m1Speed" value="2000" onchange="sendSetting('M1SPD', this.value)">
-        </div>
-        
-        <h3>⚙️ Motor 2 Settings</h3>
-        <div class="control-group">
-            Start: <input type="number" id="m2Start" value="0" onchange="sendSetting('M2S', this.value)">
-            End: <input type="number" id="m2End" value="2000" onchange="sendSetting('M2E', this.value)">
-            Speed: <input type="number" id="m2Speed" value="2000" onchange="sendSetting('M2SPD', this.value)">
-        </div>
-        
-        <h3>🔄 Sequence Settings</h3>
-        <div class="control-group">
-            Cycles: <input type="number" id="cycles" value="0" min="0" onchange="sendSetting('CYCLES', this.value)">
-            <br><br>
-            Return: <input type="checkbox" id="returnEnabled" checked onchange="sendSetting('RETURN', this.checked ? 1 : 0)">
-        </div>
-<h3>🎮 Manual Jog Controls</h3>
-        <div class="control-group">
-            <div class="button-grid">
-                <button onmousedown="startJog('M1', -1)" onmouseup="stopJog()" ontouchstart="startJog('M1', -1)" ontouchend="stopJog()">← M1 Left</button>
-                <button onmousedown="startJog('M1', 1)" onmouseup="stopJog()" ontouchstart="startJog('M1', 1)" ontouchend="stopJog()">M1 Right →</button>
-                <button onmousedown="startJog('M2', -1)" onmouseup="stopJog()" ontouchstart="startJog('M2', -1)" ontouchend="stopJog()">← M2 Left</button>
-                <button onmousedown="startJog('M2', 1)" onmouseup="stopJog()" ontouchstart="startJog('M2', 1)" ontouchend="stopJog()">M2 Right →</button>
+
+        <div class="section">
+            <h3>Motor 2 Settings</h3>
+            <div class="control-group">
+                <label>Start Position:</label>
+                <input type="number" id="m2Start" value="0">
+                <button onclick="setM2Start()">Set</button>
             </div>
-            
-            <div class="slider-container">
-                <div class="slider-wrapper">
-                    <span class="slider-label">M1:</span>
-                    <input type="range" min="-100" max="100" value="0" class="slider" id="m1Slider" 
-                           oninput="jogSlider('M1', this.value)">
-                    <span class="value-display" id="m1Value">0</span>
-                </div>
-                
-                <div class="slider-wrapper">
-                    <span class="slider-label">M2:</span>
-                    <input type="range" min="-100" max="100" value="0" class="slider" id="m2Slider" 
-                           oninput="jogSlider('M2', this.value)">
-                    <span class="value-display" id="m2Value">0</span>
-                </div>
-                
-                <div class="slider-wrapper">
-                    <span class="slider-label">Both:</span>
-                    <input type="range" min="-100" max="100" value="0" class="slider" id="bothSlider" 
-                           oninput="jogSlider('BOTH', this.value)">
-                    <span class="value-display" id="bothValue">0</span>
-                </div>
+            <div class="control-group">
+                <label>End Position:</label>
+                <input type="number" id="m2End" value="2000">
+                <button onclick="setM2End()">Set</button>
             </div>
-            
-            <div style="text-align: center; margin-top: 15px;">
-                <button onclick="sendCommand('HOME')">🏠 Home All</button>
+            <div class="control-group">
+                <label>Speed:</label>
+                <input type="number" id="m2Speed" value="2000" min="100" max="5000">
+                <button onclick="setM2Speed()">Set</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Run Settings</h3>
+            <div class="control-group">
+                <label>Cycles:</label>
+                <input type="number" id="cycles" value="0" min="0" max="100">
+                <button onclick="setCycles()">Set</button>
+                <small>(0 = infinite)</small>
+            </div>
+            <div class="control-group">
+                <label>Return Mode:</label>
+                <button id="returnBtn" onclick="toggleReturn()">ON</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Controls</h3>
+            <button onclick="runSlider()" style="background: #4CAF50;">RUN</button>
+            <button onclick="stopSlider()" style="background: #f44336;">STOP</button>
+            <button onclick="homeSlider()" style="background: #ff9800;">HOME</button>
+        </div>
+<div class="section">
+            <h3>Manual Jog Control</h3>
+            <div class="control-group">
+                <label>Motor 1:</label>
+                <input type="range" id="jogM1" min="-100" max="100" value="0" 
+                       oninput="jogMotor('M1', this.value)" onchange="jogMotor('M1', 0)">
+                <span id="jogM1Value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Motor 2:</label>
+                <input type="range" id="jogM2" min="-100" max="100" value="0" 
+                       oninput="jogMotor('M2', this.value)" onchange="jogMotor('M2', 0)">
+                <span id="jogM2Value">0</span>
+            </div>
+            <div class="control-group">
+                <label>Both Motors:</label>
+                <input type="range" id="jogBoth" min="-100" max="100" value="0" 
+                       oninput="jogMotor('BOTH', this.value)" onchange="jogMotor('BOTH', 0)">
+                <span id="jogBothValue">0</span>
             </div>
         </div>
     </div>
-<script>
-        let ws;
-        let jogInterval;
-        
-        function connect() {
-            // For ESP32 BLE Web Bluetooth API
-            if (navigator.bluetooth) {
-                navigator.bluetooth.requestDevice({
-                    filters: [{name: 'CameraSlider'}],
+
+    <script>
+        let device = null;
+        let characteristic = null;
+        let returnEnabled = true;
+
+        // BLE Connection
+        async function connectBLE() {
+            try {
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'CameraSlider' }],
                     optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-                })
-                .then(device => {
-                    document.getElementById('status').textContent = 'Connected to ' + device.name;
-                    document.getElementById('status').className = 'status connected';
-                    return device.gatt.connect();
-                })
-                .then(server => {
-                    return server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-                })
-                .then(service => {
-                    return service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-                })
-                .then(characteristic => {
-                    window.bleCharacteristic = characteristic;
-                })
-                .catch(error => {
-                    console.error('Connection failed:', error);
-                    document.getElementById('status').textContent = 'Connection Failed';
-                    document.getElementById('status').className = 'status disconnected';
                 });
-            } else {
-                alert('Web Bluetooth not supported');
+                
+                const server = await device.gatt.connect();
+                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+                
+                updateStatus('Connected to Camera Slider', true);
+                document.getElementById('connectBtn').style.display = 'none';
+                document.getElementById('disconnectBtn').style.display = 'inline-block';
+                
+            } catch (error) {
+                console.error('Connection failed:', error);
+                updateStatus('Connection failed: ' + error.message, false);
             }
         }
-        
-        function sendCommand(cmd) {
-            if (window.bleCharacteristic) {
-                const encoder = new TextEncoder();
-                window.bleCharacteristic.writeValue(encoder.encode(cmd));
-            } else {
-                console.log('Would send:', cmd);
+
+        async function disconnectBLE() {
+            if (device && device.gatt.connected) {
+                await device.gatt.disconnect();
+            }
+            updateStatus('Disconnected', false);
+            document.getElementById('connectBtn').style.display = 'inline-block';
+            document.getElementById('disconnectBtn').style.display = 'none';
+        }
+
+        function updateStatus(message, connected) {
+            const status = document.getElementById('status');
+            status.textContent = message;
+            status.className = 'status ' + (connected ? 'connected' : 'disconnected');
+        }
+// Send BLE commands
+        async function sendCommand(cmd) {
+            if (!characteristic) {
+                updateStatus('Not connected to slider', false);
+                return;
+            }
+            try {
+                await characteristic.writeValue(new TextEncoder().encode(cmd));
+                console.log('Sent:', cmd);
+            } catch (error) {
+                console.error('Send failed:', error);
             }
         }
-function sendSetting(key, value) {
-            sendCommand(key + ':' + value);
-        }
+
+        // Motor settings functions
+        function setM1Start() { sendCommand('M1S:' + document.getElementById('m1Start').value); }
+        function setM1End() { sendCommand('M1E:' + document.getElementById('m1End').value); }
+        function setM1Speed() { sendCommand('M1SPD:' + document.getElementById('m1Speed').value); }
+        function setM2Start() { sendCommand('M2S:' + document.getElementById('m2Start').value); }
+        function setM2End() { sendCommand('M2E:' + document.getElementById('m2End').value); }
+        function setM2Speed() { sendCommand('M2SPD:' + document.getElementById('m2Speed').value); }
         
-        function startJog(motor, direction) {
-            const speed = direction * 50; // Adjust speed as needed
-            sendCommand(`JOGSLIDER:${motor}:${speed}`);
-        }
+        function setCycles() { sendCommand('CYCLES:' + document.getElementById('cycles').value); }
         
-        function stopJog() {
-            sendCommand('JOGSLIDER:STOP:0');
+        function toggleReturn() {
+            returnEnabled = !returnEnabled;
+            document.getElementById('returnBtn').textContent = returnEnabled ? 'ON' : 'OFF';
+            document.getElementById('returnBtn').style.background = returnEnabled ? '#4CAF50' : '#f44336';
+            sendCommand('RETURN:' + (returnEnabled ? '1' : '0'));
         }
-        
-        function jogSlider(motor, value) {
-            document.getElementById(motor.toLowerCase() + 'Value').textContent = value;
-            if (motor === 'BOTH') {
-                document.getElementById('m1Value').textContent = value;
-                document.getElementById('m2Value').textContent = value;
+
+        // Control functions
+        function runSlider() { sendCommand('RUN'); }
+        function stopSlider() { sendCommand('STOP'); }
+        function homeSlider() { sendCommand('HOME'); }
+
+        // Jog control
+        function jogMotor(axis, value) {
+            document.getElementById('jog' + axis + 'Value').textContent = value;
+            sendCommand('JOGSLIDER:' + axis + ':' + value);
+            
+            // Auto-reset sliders when released
+            if (value == 0) {
+                setTimeout(() => {
+                    document.getElementById('jog' + axis).value = 0;
+                }, 100);
             }
-            sendCommand(`JOGSLIDER:${motor}:${value}`);
         }
-        
-        // Auto-connect on page load
-        window.addEventListener('load', () => {
-            // Auto-connect after 1 second
-            setTimeout(() => {
-                if (!window.bleCharacteristic) {
-                    connect();
-                }
-            }, 1000);
-        });
+
+        // Handle disconnect events
+        if ('bluetooth' in navigator) {
+            navigator.bluetooth.addEventListener('gattserverdisconnected', () => {
+                updateStatus('Device disconnected', false);
+                document.getElementById('connectBtn').style.display = 'inline-block';
+                document.getElementById('disconnectBtn').style.display = 'none';
+            });
+        } else {
+            document.getElementById('connectBtn').disabled = true;
+            updateStatus('Bluetooth not supported in this browser', false);
+        }
     </script>
 </body>
 </html>
+
 
