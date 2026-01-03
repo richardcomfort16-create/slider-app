@@ -1,276 +1,384 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Slider Control</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f5f5f5;
-        }
-        .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-        }
-        .section h3 {
-            margin-top: 0;
-            color: #0066cc;
-        }
-        .control-group {
-            display: flex;
-            align-items: center;
-            margin: 10px 0;
-        }
-        .control-group label {
-            width: 120px;
-            font-weight: bold;
-        }
-        input[type="number"] {
-            width: 100px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-        }
-        button:hover {
-            background: #0052a3;
-        }
-        .status {
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            text-align: center;
-        }
-        .status.disconnected {
-            background: #ffebee;
-            color: #c62828;
-        }
-        .status.connected {
-            background: #e8f5e8;
-            color: #2e7d32;
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1>Camera Slider Control Panel</h1>
-        
-        <div id="status" class="status disconnected">
-            Disconnected - Click Connect to find your slider
-        </div>
+#include <Wire.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <AccelStepper.h>
+#include <U8g2lib.h>
+#include <EEPROM.h>
 
-        <div class="section">
-            <h3>Connection</h3>
-            <button id="connectBtn" onclick="connectBLE()">Connect to Slider</button>
-            <button id="disconnectBtn" onclick="disconnectBLE()" style="display:none;">Disconnect</button>
-        </div>
-<div class="section">
-            <h3>Motor 1 Settings</h3>
-            <div class="control-group">
-                <label>Start Position:</label>
-                <input type="number" id="m1Start" value="0">
-                <button onclick="setM1Start()">Set</button>
-            </div>
-            <div class="control-group">
-                <label>End Position:</label>
-                <input type="number" id="m1End" value="2000">
-                <button onclick="setM1End()">Set</button>
-            </div>
-            <div class="control-group">
-                <label>Speed:</label>
-                <input type="number" id="m1Speed" value="2000" min="100" max="5000">
-                <button onclick="setM1Speed()">Set</button>
-            </div>
-        </div>
+/* ===================== PINS ===================== */
+#define M1_STEP 26
+#define M1_DIR 27
+#define M1_EN 14
 
-        <div class="section">
-            <h3>Motor 2 Settings</h3>
-            <div class="control-group">
-                <label>Start Position:</label>
-                <input type="number" id="m2Start" value="0">
-                <button onclick="setM2Start()">Set</button>
-            </div>
-            <div class="control-group">
-                <label>End Position:</label>
-                <input type="number" id="m2End" value="2000">
-                <button onclick="setM2End()">Set</button>
-            </div>
-            <div class="control-group">
-                <label>Speed:</label>
-                <input type="number" id="m2Speed" value="2000" min="100" max="5000">
-                <button onclick="setM2Speed()">Set</button>
-            </div>
-        </div>
+#define M2_STEP 12
+#define M2_DIR 13
+#define M2_EN 15
 
-        <div class="section">
-            <h3>Run Settings</h3>
-            <div class="control-group">
-                <label>Cycles:</label>
-                <input type="number" id="cycles" value="0" min="0" max="100">
-                <button onclick="setCycles()">Set</button>
-                <small>(0 = infinite)</small>
-            </div>
-            <div class="control-group">
-                <label>Return Mode:</label>
-                <button id="returnBtn" onclick="toggleReturn()">ON</button>
-            </div>
-        </div>
+#define ENC_CLK 32
+#define ENC_DT 33
+#define ENC_SW 25
 
-        <div class="section">
-            <h3>Controls</h3>
-            <button onclick="runSlider()" style="background: #4CAF50;">RUN</button>
-            <button onclick="stopSlider()" style="background: #f44336;">STOP</button>
-            <button onclick="homeSlider()" style="background: #ff9800;">HOME</button>
-        </div>
-<div class="section">
-            <h3>Manual Jog Control</h3>
-            <div class="control-group">
-                <label>Motor 1:</label>
-                <input type="range" id="jogM1" min="-100" max="100" value="0" 
-                       oninput="jogMotor('M1', this.value)" onchange="jogMotor('M1', 0)">
-                <span id="jogM1Value">0</span>
-            </div>
-            <div class="control-group">
-                <label>Motor 2:</label>
-                <input type="range" id="jogM2" min="-100" max="100" value="0" 
-                       oninput="jogMotor('M2', this.value)" onchange="jogMotor('M2', 0)">
-                <span id="jogM2Value">0</span>
-            </div>
-            <div class="control-group">
-                <label>Both Motors:</label>
-                <input type="range" id="jogBoth" min="-100" max="100" value="0" 
-                       oninput="jogMotor('BOTH', this.value)" onchange="jogMotor('BOTH', 0)">
-                <span id="jogBothValue">0</span>
-            </div>
-        </div>
-    </div>
+// EEPROM addresses
+#define EEPROM_SIZE 64
+#define ADDR_M1_START 0
+#define ADDR_M1_END 4
+#define ADDR_M1_SPEED 8
+#define ADDR_M2_START 12
+#define ADDR_M2_END 16
+#define ADDR_M2_SPEED 20
+#define ADDR_CYCLES 24
+#define ADDR_RETURN 28
 
-    <script>
-        let device = null;
-        let characteristic = null;
-        let returnEnabled = true;
+/* ===================== STEPPERS ===================== */
+AccelStepper step1(AccelStepper::DRIVER, M1_STEP, M1_DIR);
+AccelStepper step2(AccelStepper::DRIVER, M2_STEP, M2_DIR);
 
-        // BLE Connection
-        async function connectBLE() {
-            try {
-                device = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'CameraSlider' }],
-                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-                });
-                
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-                
-                updateStatus('Connected to Camera Slider', true);
-                document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('disconnectBtn').style.display = 'inline-block';
-                
-            } catch (error) {
-                console.error('Connection failed:', error);
-                updateStatus('Connection failed: ' + error.message, false);
-            }
-        }
+/* ===================== OLED ===================== */
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
 
-        async function disconnectBLE() {
-            if (device && device.gatt.connected) {
-                await device.gatt.disconnect();
-            }
-            updateStatus('Disconnected', false);
-            document.getElementById('connectBtn').style.display = 'inline-block';
-            document.getElementById('disconnectBtn').style.display = 'none';
-        }
+/* ===================== MENU ===================== */
+enum MenuItem {
+  MI_RUN,
+  MI_M1_START,
+  MI_M1_END,
+  MI_M1_SPEED,
+  MI_M2_START,
+  MI_M2_END,
+  MI_M2_SPEED,
+  MI_TRACK_M1,
+  MI_TRACK_M2,
+  MI_TRACK_BOTH,
+  MI_RETURN,
+  MI_CYCLES,
+  MI_HOME,
+  MI_COUNT
+};
 
-        function updateStatus(message, connected) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = 'status ' + (connected ? 'connected' : 'disconnected');
-        }
-// Send BLE commands
-        async function sendCommand(cmd) {
-            if (!characteristic) {
-                updateStatus('Not connected to slider', false);
-                return;
-            }
-            try {
-                await characteristic.writeValue(new TextEncoder().encode(cmd));
-                console.log('Sent:', cmd);
-            } catch (error) {
-                console.error('Send failed:', error);
-            }
-        }
+const char* menuItems[MI_COUNT] = {
+  "RUN","M1 START","M1 END","M1 SPEED",
+  "M2 START","M2 END","M2 SPEED",
+  "TRACK M1","TRACK M2","TRACK BOTH",
+  "RETURN","CYCLES","HOME"
+};
 
-        // Motor settings functions
-        function setM1Start() { sendCommand('M1S:' + document.getElementById('m1Start').value); }
-        function setM1End() { sendCommand('M1E:' + document.getElementById('m1End').value); }
-        function setM1Speed() { sendCommand('M1SPD:' + document.getElementById('m1Speed').value); }
-        function setM2Start() { sendCommand('M2S:' + document.getElementById('m2Start').value); }
-        function setM2End() { sendCommand('M2E:' + document.getElementById('m2End').value); }
-        function setM2Speed() { sendCommand('M2SPD:' + document.getElementById('m2Speed').value); }
-        
-        function setCycles() { sendCommand('CYCLES:' + document.getElementById('cycles').value); }
-        
-        function toggleReturn() {
-            returnEnabled = !returnEnabled;
-            document.getElementById('returnBtn').textContent = returnEnabled ? 'ON' : 'OFF';
-            document.getElementById('returnBtn').style.background = returnEnabled ? '#4CAF50' : '#f44336';
-            sendCommand('RETURN:' + (returnEnabled ? '1' : '0'));
-        }
+int menuIndex = 0;
+bool editMode = false;
+int scrollOffset = 0;
+const int OLED_ROWS = 5;
+#include <Wire.h>
+#include <BLEDevice.h>
+#include <BLEServer.h>
+#include <BLEUtils.h>
+#include <AccelStepper.h>
+#include <U8g2lib.h>
+#include <EEPROM.h>
 
-        // Control functions
-        function runSlider() { sendCommand('RUN'); }
-        function stopSlider() { sendCommand('STOP'); }
-        function homeSlider() { sendCommand('HOME'); }
+/* ===================== PINS ===================== */
+#define M1_STEP 26
+#define M1_DIR 27
+#define M1_EN 14
 
-        // Jog control
-        function jogMotor(axis, value) {
-            document.getElementById('jog' + axis + 'Value').textContent = value;
-            sendCommand('JOGSLIDER:' + axis + ':' + value);
-            
-            // Auto-reset sliders when released
-            if (value == 0) {
-                setTimeout(() => {
-                    document.getElementById('jog' + axis).value = 0;
-                }, 100);
-            }
-        }
+#define M2_STEP 12
+#define M2_DIR 13
+#define M2_EN 15
 
-        // Handle disconnect events
-        if ('bluetooth' in navigator) {
-            navigator.bluetooth.addEventListener('gattserverdisconnected', () => {
-                updateStatus('Device disconnected', false);
-                document.getElementById('connectBtn').style.display = 'inline-block';
-                document.getElementById('disconnectBtn').style.display = 'none';
-            });
-        } else {
-            document.getElementById('connectBtn').disabled = true;
-            updateStatus('Bluetooth not supported in this browser', false);
-        }
-    </script>
-</body>
-</html>
+#define ENC_CLK 32
+#define ENC_DT 33
+#define ENC_SW 25
+
+// EEPROM addresses
+#define EEPROM_SIZE 64
+#define ADDR_M1_START 0
+#define ADDR_M1_END 4
+#define ADDR_M1_SPEED 8
+#define ADDR_M2_START 12
+#define ADDR_M2_END 16
+#define ADDR_M2_SPEED 20
+#define ADDR_CYCLES 24
+#define ADDR_RETURN 28
+
+/* ===================== STEPPERS ===================== */
+AccelStepper step1(AccelStepper::DRIVER, M1_STEP, M1_DIR);
+AccelStepper step2(AccelStepper::DRIVER, M2_STEP, M2_DIR);
+
+/* ===================== OLED ===================== */
+U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
+
+/* ===================== MENU ===================== */
+enum MenuItem {
+  MI_RUN,
+  MI_M1_START,
+  MI_M1_END,
+  MI_M1_SPEED,
+  MI_M2_START,
+  MI_M2_END,
+  MI_M2_SPEED,
+  MI_TRACK_M1,
+  MI_TRACK_M2,
+  MI_TRACK_BOTH,
+  MI_RETURN,
+  MI_CYCLES,
+  MI_HOME,
+  MI_COUNT
+};
+
+const char* menuItems[MI_COUNT] = {
+  "RUN","M1 START","M1 END","M1 SPEED",
+  "M2 START","M2 END","M2 SPEED",
+  "TRACK M1","TRACK M2","TRACK BOTH",
+  "RETURN","CYCLES","HOME"
+};
+
+int menuIndex = 0;
+bool editMode = false;
+int scrollOffset = 0;
+const int OLED_ROWS = 5;
+/* ===================== STATE ===================== */
+bool running = false;
+bool paused = false;
+bool returnEnabled = true;
+
+long m1Start=0, m1End=2000, m1Speed=2000;
+long m2Start=0, m2End=2000, m2Speed=2000;
+int cycles = 0;
+int currentCycle = 0;
+bool goingToEnd = true;
+
+/* ===================== TRACKING ===================== */
+bool trackM1Menu = false;
+bool trackM2Menu = false;
+float trackSpeed = 0;
+const float TRACK_MAX_SPEED = 800;
+
+/* ===================== BLE JOG SMOOTHING ===================== */
+float targetSpeedM1=0, targetSpeedM2=0;
+float currentSpeedM1=0, currentSpeedM2=0;
+const float SPEED_STEP=20;
+
+/* ===================== HOMING ===================== */
+bool homingActive = false;
+
+/* ===================== ENCODER ===================== */
+int lastCLK;
+int lastButtonState=HIGH;
+int buttonState=HIGH;
+unsigned long lastDebounce=0;
+const unsigned long debounceDelay=50;
+unsigned long lastDraw=0;
+
+/* ===================== BLE ===================== */
+#define SERVICE_UUID        "12345678-1234-1234-1234-1234567890ab"
+#define CHARACTERISTIC_UUID "abcd1234-1234-1234-1234-abcdef123456"
+BLECharacteristic* pCharacteristic;
+bool bleConnected=false;
+
+/* ===================== PROTOTYPES ===================== */
+void parseBLE(String cmd);
+void handleJogSlider(String cmd);
+void handleEncoder();
+void handleButton();
+void onClick();
+void editValue(int dir);
+void drawMenu();
+void startRun();
+void stopRun();
+void runSequence();
+void enableMotors();
+void disableMotors();
+void startHoming();
+void saveSettings();
+void loadSettings();
+
+/* ===================== BLE CALLBACK ===================== */
+class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
+  void onWrite(BLECharacteristic* pChar) override {
+    String cmd = pChar->getValue().c_str();
+    cmd.trim();
+    Serial.print("BLE RX: "); Serial.println(cmd);
+    parseBLE(cmd);
+  }
+};
+/* ===================== SETUP ===================== */
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+  pinMode(M1_EN, OUTPUT); pinMode(M2_EN, OUTPUT);
+  digitalWrite(M1_EN,HIGH); digitalWrite(M2_EN,HIGH);
+
+  pinMode(ENC_CLK, INPUT_PULLUP);
+  pinMode(ENC_DT, INPUT_PULLUP);
+  pinMode(ENC_SW, INPUT_PULLUP);
+
+  loadSettings();  // Load EEPROM settings
+
+  step1.setMaxSpeed(m1Speed); step1.setAcceleration(1000);
+  step2.setMaxSpeed(m2Speed); step2.setAcceleration(1000);
+
+  lastCLK = digitalRead(ENC_CLK);
+
+  u8g2.begin();
+  drawMenu();
+
+  // BLE setup
+  BLEDevice::init("CameraSlider");
+  BLEServer* server = BLEDevice::createServer();
+  BLEService* service = server->createService(SERVICE_UUID);
+  pCharacteristic = service->createCharacteristic(
+    CHARACTERISTIC_UUID,
+    BLECharacteristic::PROPERTY_WRITE
+  );
+  pCharacteristic->setCallbacks(new MyCharacteristicCallbacks());
+  service->start();
+  BLEDevice::startAdvertising();
+  
+  Serial.println("Setup done");
+}
+
+/* ===================== LOOP ===================== */
+void loop() {
+  handleEncoder();
+  handleButton();
+
+  // Smooth BLE jog ramp
+  if(targetSpeedM1 != 0 || targetSpeedM2 != 0){
+    if(currentSpeedM1 < targetSpeedM1) currentSpeedM1 = min(currentSpeedM1 + SPEED_STEP, targetSpeedM1);
+    else if(currentSpeedM1 > targetSpeedM1) currentSpeedM1 = max(currentSpeedM1 - SPEED_STEP, targetSpeedM1);
+
+    if(currentSpeedM2 < targetSpeedM2) currentSpeedM2 = min(currentSpeedM2 + SPEED_STEP, targetSpeedM2);
+    else if(currentSpeedM2 > targetSpeedM2) currentSpeedM2 = max(currentSpeedM2 - SPEED_STEP, targetSpeedM2);
+
+    step1.setSpeed(currentSpeedM1); step1.runSpeed();
+    step2.setSpeed(currentSpeedM2); step2.runSpeed();
+  }
+  // Menu tracking mode
+  else if(trackM1Menu || trackM2Menu){
+    step1.setSpeed(trackM1Menu ? trackSpeed : 0);
+    step2.setSpeed(trackM2Menu ? trackSpeed : 0);
+    step1.runSpeed();
+    step2.runSpeed();
+  }
+
+  if(running && !paused){
+    runSequence();
+    step1.run();
+    step2.run();
+  }
+
+  // HOMING movement
+  if(homingActive){
+    bool moving1 = step1.run();
+    bool moving2 = step2.run();
+    if(!moving1 && !moving2){
+      homingActive = false;
+      step1.setCurrentPosition(0);
+      step2.setCurrentPosition(0);
+      disableMotors();
+      Serial.println("HOMING complete");
+      drawMenu();
+    }
+  }
+}
+/* ===================== ENCODER ===================== */
+void handleEncoder() {
+  int clk=digitalRead(ENC_CLK);
+  if(clk != lastCLK){
+    int dir=(digitalRead(ENC_DT)!=clk)?1:-1;
+
+    if(trackM1Menu || trackM2Menu){
+      trackSpeed += dir*40;
+      trackSpeed = constrain(trackSpeed,-TRACK_MAX_SPEED,TRACK_MAX_SPEED);
+    }
+    else if(editMode) editValue(dir);
+    else menuIndex=constrain(menuIndex+dir,0,MI_COUNT-1);
+
+    if(millis()-lastDraw>30){
+      drawMenu(); lastDraw=millis();
+    }
+
+    lastCLK = clk;
+  }
+}
+
+/* ===================== BUTTON ===================== */
+void handleButton(){
+  int reading=digitalRead(ENC_SW);
+  if(reading != lastButtonState) lastDebounce=millis();
+  if((millis()-lastDebounce)>debounceDelay){
+    if(reading != buttonState){
+      buttonState=reading;
+      if(buttonState==LOW) onClick();
+    }
+  }
+  lastButtonState=reading;
+}
+
+/* ===================== CLICK ===================== */
+void onClick(){
+  if(trackM1Menu || trackM2Menu){
+    trackM1Menu=trackM2Menu=false;
+    trackSpeed=0;
+    drawMenu(); return;
+  }
+
+  if(editMode){
+    editMode=false; drawMenu(); return;
+  }
+
+  switch(menuIndex){
+    case MI_RUN: if(!running) startRun(); else paused=!paused; break;
+    case MI_M1_START: case MI_M1_END: case MI_M1_SPEED:
+    case MI_M2_START: case MI_M2_END: case MI_M2_SPEED: editMode=true; break;
+    case MI_TRACK_M1: trackM1Menu=true; trackM2Menu=false; break;
+    case MI_TRACK_M2: trackM1Menu=false; trackM2Menu=true; break;
+    case MI_TRACK_BOTH: trackM1Menu=trackM2Menu=true; break;
+    case MI_RETURN: returnEnabled=!returnEnabled; break;
+    case MI_CYCLES: cycles=(cycles+1)%6; break;
+    case MI_HOME: startHoming(); break;
+  }
+
+  drawMenu();
+}
+
+/* ===================== EDIT VALUES ===================== */
+void editValue(int dir){
+  int step=10;
+  switch(menuIndex){
+    case MI_M1_START: m1Start+=dir*step; break;
+    case MI_M1_END:   m1End+=dir*step; break;
+    case MI_M1_SPEED: m1Speed+=dir*step; step1.setMaxSpeed(m1Speed); break;
+    case MI_M2_START: m2Start+=dir*step; break;
+    case MI_M2_END:   m2End+=dir*step; break;
+    case MI_M2_SPEED: m2Speed+=dir*step; step2.setMaxSpeed(m2Speed); break;
+  }
+  saveSettings();
+}
+
+/* ===================== EEPROM FUNCTIONS ===================== */
+void saveSettings() {
+  EEPROM.begin(EEPROM_SIZE);
+  EEPROM.put(ADDR_M1_START, m1Start);
+  EEPROM.put(ADDR_M1_END, m1End);
+  EEPROM.put(ADDR_M1_SPEED, m1Speed);
+  EEPROM.put(ADDR_M2_START, m2Start);
+  EEPROM.put(ADDR_M2_END, m2End);
+  EEPROM.put(ADDR_M2_SPEED, m2Speed);
+  EEPROM.put(ADDR_CYCLES, cycles);
+  EEPROM.put(ADDR_RETURN, returnEnabled);
+  EEPROM.commit();
+  EEPROM.end();
+}
+
+void loadSettings() {
+  EEPROM.begin(EEPROM_SIZE);
+  EEPROM.get(ADDR_M1_START, m1Start);
+  EEPROM.get(ADDR_M1_END, m1End);
+  EEPROM.get(ADDR_M1_SPEED, m1Speed);
+  EEPROM.get(ADDR_M2_START, m2Start);
+  EEPROM.get(ADDR_M2_END, m2End);
+  EEPROM.get(ADDR_M2_SPEED, m2Speed);
+  EEPROM.get(ADDR_CYCLES, cycles);
+  EEPROM.get(ADDR_RETURN, returnEnabled);
+  EEPROM.end();
+}
