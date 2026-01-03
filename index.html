@@ -66,74 +66,7 @@ int menuIndex = 0;
 bool editMode = false;
 int scrollOffset = 0;
 const int OLED_ROWS = 5;
-#include <Wire.h>
-#include <BLEDevice.h>
-#include <BLEServer.h>
-#include <BLEUtils.h>
-#include <AccelStepper.h>
-#include <U8g2lib.h>
-#include <EEPROM.h>
 
-/* ===================== PINS ===================== */
-#define M1_STEP 26
-#define M1_DIR 27
-#define M1_EN 14
-
-#define M2_STEP 12
-#define M2_DIR 13
-#define M2_EN 15
-
-#define ENC_CLK 32
-#define ENC_DT 33
-#define ENC_SW 25
-
-// EEPROM addresses
-#define EEPROM_SIZE 64
-#define ADDR_M1_START 0
-#define ADDR_M1_END 4
-#define ADDR_M1_SPEED 8
-#define ADDR_M2_START 12
-#define ADDR_M2_END 16
-#define ADDR_M2_SPEED 20
-#define ADDR_CYCLES 24
-#define ADDR_RETURN 28
-
-/* ===================== STEPPERS ===================== */
-AccelStepper step1(AccelStepper::DRIVER, M1_STEP, M1_DIR);
-AccelStepper step2(AccelStepper::DRIVER, M2_STEP, M2_DIR);
-
-/* ===================== OLED ===================== */
-U8G2_SH1106_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0);
-
-/* ===================== MENU ===================== */
-enum MenuItem {
-  MI_RUN,
-  MI_M1_START,
-  MI_M1_END,
-  MI_M1_SPEED,
-  MI_M2_START,
-  MI_M2_END,
-  MI_M2_SPEED,
-  MI_TRACK_M1,
-  MI_TRACK_M2,
-  MI_TRACK_BOTH,
-  MI_RETURN,
-  MI_CYCLES,
-  MI_HOME,
-  MI_COUNT
-};
-
-const char* menuItems[MI_COUNT] = {
-  "RUN","M1 START","M1 END","M1 SPEED",
-  "M2 START","M2 END","M2 SPEED",
-  "TRACK M1","TRACK M2","TRACK BOTH",
-  "RETURN","CYCLES","HOME"
-};
-
-int menuIndex = 0;
-bool editMode = false;
-int scrollOffset = 0;
-const int OLED_ROWS = 5;
 /* ===================== STATE ===================== */
 bool running = false;
 bool paused = false;
@@ -189,7 +122,6 @@ void disableMotors();
 void startHoming();
 void saveSettings();
 void loadSettings();
-
 /* ===================== BLE CALLBACK ===================== */
 class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
   void onWrite(BLECharacteristic* pChar) override {
@@ -199,6 +131,7 @@ class MyCharacteristicCallbacks : public BLECharacteristicCallbacks {
     parseBLE(cmd);
   }
 };
+
 /* ===================== SETUP ===================== */
 void setup() {
   Serial.begin(115200);
@@ -211,8 +144,6 @@ void setup() {
   pinMode(ENC_DT, INPUT_PULLUP);
   pinMode(ENC_SW, INPUT_PULLUP);
 
-  loadSettings();  // Load EEPROM settings
-
   step1.setMaxSpeed(m1Speed); step1.setAcceleration(1000);
   step2.setMaxSpeed(m2Speed); step2.setAcceleration(1000);
 
@@ -220,6 +151,7 @@ void setup() {
 
   u8g2.begin();
   drawMenu();
+  loadSettings(); // Load saved settings from EEPROM
 
   // BLE setup
   BLEDevice::init("CameraSlider");
@@ -272,8 +204,6 @@ void loop() {
     bool moving2 = step2.run();
     if(!moving1 && !moving2){
       homingActive = false;
-      step1.setCurrentPosition(0);
-      step2.setCurrentPosition(0);
       disableMotors();
       Serial.println("HOMING complete");
       drawMenu();
@@ -355,7 +285,128 @@ void editValue(int dir){
   saveSettings();
 }
 
-/* ===================== EEPROM FUNCTIONS ===================== */
+/* ===================== RUN ===================== */
+void startRun(){
+  running=true; paused=false; currentCycle=0; goingToEnd=true;
+  enableMotors();
+  step1.setCurrentPosition(m1Start);
+  step2.setCurrentPosition(m2Start);
+  step1.moveTo(m1End);
+  step2.moveTo(m2End);
+  Serial.println("RUN START");
+}
+
+void stopRun(){
+  running=false; paused=false; disableMotors();
+  Serial.println("STOP");
+}
+
+void runSequence(){
+  if(step1.isRunning() || step2.isRunning()) return;
+
+  if(returnEnabled){
+    if(goingToEnd){
+      step1.moveTo(m1Start); step2.moveTo(m2Start);
+      goingToEnd=false; return;
+    } else {
+      goingToEnd=true;
+      if(cycles!=0 && ++currentCycle>=cycles){ stopRun(); return; }
+      step1.moveTo(m1End); step2.moveTo(m2End);
+    }
+  } else {
+    if(cycles!=0 && ++currentCycle>=cycles){ stopRun(); return; }
+    step1.moveTo(m1End); step2.moveTo(m2End);
+  }
+}
+
+/* ===================== HOMING ===================== */
+void startHoming(){
+  running=false; paused=false;
+  digitalWrite(M1_EN,LOW); digitalWrite(M2_EN,LOW);
+  step1.setMaxSpeed(1000); step2.setMaxSpeed(1000);
+  step1.setAcceleration(1000); step2.setAcceleration(1000);
+  step1.moveTo(0); step2.moveTo(0);
+  homingActive=true;
+  Serial.println("HOMING started");
+}
+
+/* ===================== MOTORS ===================== */
+void enableMotors(){digitalWrite(M1_EN,LOW); digitalWrite(M2_EN,LOW);}
+void disableMotors(){digitalWrite(M1_EN,HIGH); digitalWrite(M2_EN,HIGH);}
+/* ===================== OLED ===================== */
+void drawMenu(){
+  u8g2.clearBuffer();
+  u8g2.setFont(u8g2_font_6x13_tf);
+
+  if(menuIndex<scrollOffset) scrollOffset=menuIndex;
+  if(menuIndex>=scrollOffset+OLED_ROWS) scrollOffset=menuIndex-OLED_ROWS+1;
+
+  for(int i=0;i<OLED_ROWS;i++){
+    int itemIndex=i+scrollOffset;
+    if(itemIndex>=MI_COUNT) break;
+    int y=14+i*12;
+
+    if(itemIndex==menuIndex) u8g2.drawStr(0,y,">");
+    u8g2.setCursor(10,y);
+    u8g2.print(menuItems[itemIndex]);
+
+    if(itemIndex==MI_M1_START) u8g2.print(" "), u8g2.print(m1Start);
+    if(itemIndex==MI_M1_END)   u8g2.print(" "), u8g2.print(m1End);
+    if(itemIndex==MI_M1_SPEED) u8g2.print(" "), u8g2.print(m1Speed);
+    if(itemIndex==MI_M2_START) u8g2.print(" "), u8g2.print(m2Start);
+    if(itemIndex==MI_M2_END)   u8g2.print(" "), u8g2.print(m2End);
+    if(itemIndex==MI_M2_SPEED) u8g2.print(" "), u8g2.print(m2Speed);
+
+    if(itemIndex==MI_RETURN)   u8g2.print(returnEnabled?" ON":" OFF");
+    if(itemIndex==MI_CYCLES)   u8g2.print(" "), u8g2.print(cycles==0?"INF":String(cycles));
+
+    if(editMode && itemIndex==menuIndex) u8g2.print(" *");
+    if((itemIndex==MI_TRACK_M1 && trackM1Menu) ||
+       (itemIndex==MI_TRACK_M2 && trackM2Menu) ||
+       (itemIndex==MI_TRACK_BOTH && trackM1Menu && trackM2Menu))
+       u8g2.print(" *");
+
+    if(itemIndex==MI_HOME && homingActive) u8g2.print(" *");
+  }
+
+  u8g2.sendBuffer();
+}
+
+/* ===================== BLE PARSER ===================== */
+void parseBLE(String cmd){
+  if(cmd.startsWith("M1S:")) m1Start=cmd.substring(4).toInt();
+  else if(cmd.startsWith("M1E:")) m1End=cmd.substring(4).toInt();
+  else if(cmd.startsWith("M2S:")) m2Start=cmd.substring(4).toInt();
+  else if(cmd.startsWith("M2E:")) m2End=cmd.substring(4).toInt();
+  else if(cmd.startsWith("M1SPD:")) { m1Speed=cmd.substring(6).toInt(); step1.setMaxSpeed(m1Speed); }
+  else if(cmd.startsWith("M2SPD:")) { m2Speed=cmd.substring(6).toInt(); step2.setMaxSpeed(m2Speed); }
+  else if(cmd.startsWith("CYCLES:")) cycles=cmd.substring(7).toInt();
+  else if(cmd.startsWith("RETURN:")) returnEnabled=cmd.substring(7).toInt();
+  else if(cmd.startsWith("JOGSLIDER:")) handleJogSlider(cmd);
+  else if(cmd=="RUN") startRun();
+  else if(cmd=="STOP") stopRun();
+  else if(cmd=="HOME") startHoming();
+  saveSettings();
+}
+
+/* ===================== BLE JOG ===================== */
+void handleJogSlider(String cmd){
+  int p1=cmd.indexOf(':',10);
+  int p2=cmd.lastIndexOf(':');
+  String axis=cmd.substring(10,p1);
+  int value=cmd.substring(p2+1).toInt();
+
+  float ratio=value/100.0;
+  float speed=ratio*600; // motor max speed
+
+  if(axis=="M1" || axis=="BOTH") targetSpeedM1=speed;
+  if(axis=="M2" || axis=="BOTH") targetSpeedM2=speed;
+  if(axis=="M1") targetSpeedM2=0;
+  if(axis=="M2") targetSpeedM1=0;
+  if(value==0) { targetSpeedM1=targetSpeedM2=0; }
+}
+
+/* ===================== EEPROM ===================== */
 void saveSettings() {
   EEPROM.begin(EEPROM_SIZE);
   EEPROM.put(ADDR_M1_START, m1Start);
@@ -381,4 +432,7 @@ void loadSettings() {
   EEPROM.get(ADDR_CYCLES, cycles);
   EEPROM.get(ADDR_RETURN, returnEnabled);
   EEPROM.end();
+  
+  step1.setMaxSpeed(m1Speed);
+  step2.setMaxSpeed(m2Speed);
 }
