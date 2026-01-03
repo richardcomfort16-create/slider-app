@@ -1,223 +1,134 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Slider Control</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 20px;
-            background-color: #f0f0f0;
-            touch-action: manipulation;
-        }
+        body { font-family: Arial; margin: 20px; background: #f0f0f0; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; }
         
-        .container {
-            max-width: 600px;
-            margin: 0 auto;
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        
-        .section {
-            margin-bottom: 35px;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 10px;
-        }
-        
-        .section h3 {
-            margin: 0 0 20px 0;
-            color: #555;
-            font-size: 18px;
-        }
-        
-        .control-group {
-            margin-bottom: 25px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            color: #666;
-            font-size: 16px;
-        }
-        
-        input[type="number"] {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        
-        /* Enhanced slider styling */
+        /* BIG SLIDERS */
         input[type="range"] {
             -webkit-appearance: none;
-            appearance: none;
             width: 100%;
-            height: 20px;
+            height: 30px;
             background: #ddd;
-            border-radius: 10px;
+            border-radius: 15px;
             outline: none;
-            margin: 15px 0;
-            cursor: pointer;
+            margin: 20px 0;
         }
         
-        /* Webkit (Chrome, Safari) slider thumb */
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            appearance: none;
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             background: #007bff;
             border-radius: 50%;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            transition: all 0.2s ease;
         }
         
-        input[type="range"]::-webkit-slider-thumb:hover {
-            background: #0056b3;
-            transform: scale(1.1);
-        }
-        
-        /* Firefox slider thumb */
         input[type="range"]::-moz-range-thumb {
-            width: 40px;
-            height: 40px;
+            width: 60px;
+            height: 60px;
             background: #007bff;
             border-radius: 50%;
-            cursor: pointer;
             border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         
-        /* Firefox slider track */
-        input[type="range"]::-moz-range-track {
-            height: 20px;
-            background: #ddd;
-            border-radius: 10px;
-        }
-        
-        .slider-value {
-            text-align: center;
-            font-size: 18px;
-            font-weight: bold;
-            color: #007bff;
-            margin-top: 8px;
-            background: #e3f2fd;
-            padding: 8px;
-            border-radius: 5px;
-        }
-        
-        button {
-            width: 100%;
-            padding: 18px;
-            margin: 10px 0;
-            border: none;
-            border-radius: 8px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            touch-action: manipulation;
-        }
-        
+        button { width: 100%; padding: 20px; margin: 10px 0; border: none; border-radius: 8px; font-size: 18px; }
         .btn-primary { background: #007bff; color: white; }
-        .btn-success { background: #28a745; color: white; }
-        .btn-warning { background: #ffc107; color: black; }
-        .btn-danger { background: #dc3545; color: white; }
-        
-        button:hover { opacity: 0.9; transform: translateY(-1px); }
-        button:active { transform: translateY(0); }
-        
-        .status {
-            padding: 15px;
-            margin: 15px 0;
-            border-radius: 8px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 16px;
-        }
-        
-        .status.disconnected { background: #f8d7da; color: #721c24; }
-        .status.connected { background: #d4edda; color: #155724; }
-        
-        .jog-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        @media (max-width: 600px) {
-            .container { padding: 20px; margin: 10px; }
-            .jog-controls { grid-template-columns: 1fr; }
-        }
+        .status { padding: 15px; text-align: center; margin: 15px 0; border-radius: 8px; }
+        .disconnected { background: #f8d7da; color: #721c24; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Camera Slider Control</h1>
         
-        <div class="status disconnected" id="status">
-            Disconnected
-        </div>
+        <div class="status disconnected" id="status">Disconnected</div>
         
         <button class="btn-primary" onclick="connectBLE()">Connect to Slider</button>
         
-        <div class="section">
-            <h3>Motor 1 Settings</h3>
-            
-            <div class="control-group">
-                <label for="m1Start">Start Position:</label>
-                <input type="number" id="m1Start" value="0" onchange="sendCommand('M1S:' + this.value)">
-            </div>
-            
-            <div class="control-group">
-                <label for="m1End">End Position:</label>
-                <input type="number" id="m1End" value="2000" onchange="sendCommand('M1E:' + this.value)">
-            </div>
-            
-            <div class="control-group">
-                <label for="m1Speed">Speed:</label>
-                <input type="number" id="m1Speed" value="2000" onchange="sendCommand('M1SPD:' + this.value)">
-            </div>
-        </div>
+        <h3>Motor 1 Jog</h3>
+        <input type="range" id="m1Slider" min="-100" max="100" value="0" 
+               oninput="sendJog('M1', this.value)">
+        <div id="m1Value">0</div>
         
-        <div class="section">
-            <h3>Motor 2 Settings</h3>
-            
-            <div class="control-group">
-                <label for="m2Start">Start Position:</label>
-                <input type="number" id="m2Start" value="0" onchange="sendCommand('M2S:' + this.value)">
-            </div>
-            
-            <div class="control-group">
-                <label for="m2End">End Position:</label>
-                <input type="number" id="m2End" value="2000" onchange="sendCommand('M2E:' + this.value)">
-            </div>
-            
-            <div class="control-group">
-                <label for="m2Speed">Speed:</label>
-                <input type="number" id="m2Speed" value="2000" onchange="sendCommand('M2SPD:' + this.value)">
-            </div>
-        </div>
+        <h3>Motor 2 Jog</h3>
+        <input type="range" id="m2Slider" min="-100" max="100" value="0" 
+               oninput="sendJog('M2', this.value)">
+        <div id="m2Value">0</div>
+    </div>
+</body>
+</html>
+<script>
+let bleServer;
+let bleCharacteristic;
+let isConnected = false;
+
+// Connect to BLE device
+async function connectBLE() {
+    try {
+        const device = await navigator.bluetooth.requestDevice({
+            filters: [{ name: 'CameraSlider' }],
+            optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+        });
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+        bleCharacteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+
+        isConnected = true;
+        document.getElementById('status').textContent = 'Connected';
+        document.getElementById('status').className = 'status connected';
         
-        <div class="section">
-            <h3>Sequence Settings</h3>
-            
-            <div class="control-group">
-                <label for="cycles">Cycles (0 = infinite):</label>
-                <input type="number" id="cycles" value
+        device.addEventListener('gattserverdisconnected', onDisconnected);
+    } catch (error) {
+        console.error('Connection failed:', error);
+        alert('Connection failed. Make sure device is nearby.');
+    }
+}
+
+function onDisconnected() {
+    isConnected = false;
+    document.getElementById('status').textContent = 'Disconnected';
+    document.getElementById('status').className = 'status disconnected';
+}
+
+// Send BLE command
+function sendCommand(cmd) {
+    if (!isConnected || !bleCharacteristic) return;
+    
+    try {
+        const encoder = new TextEncoder();
+        bleCharacteristic.writeValue(encoder.encode(cmd));
+        console.log('Sent:', cmd);
+    } catch (error) {
+        console.error('Send failed:', error);
+    }
+}
+
+// Handle jog sliders
+function sendJog(motor, value) {
+    const cmd = `JOGSLIDER:${motor}:${value}`;
+    sendCommand(cmd);
+    
+    // Update display
+    if (motor === 'M1') {
+        document.getElementById('m1Value').textContent = value;
+    } else if (motor === 'M2') {
+        document.getElementById('m2Value').textContent = value;
+    }
+}
+
+// Update slider displays
+document.getElementById('m1Slider').oninput = function() {
+    sendJog('M1', this.value);
+};
+
+document.getElementById('m2Slider').oninput = function() {
+    sendJog('M2', this.value);
+};
+</script>
+
