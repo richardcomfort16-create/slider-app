@@ -1,77 +1,150 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Slider Control</title>
     <style>
-        body { 
-            font-family: Arial, sans-serif; 
-            margin: 20px; 
-            background: #f0f0f0; 
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
-        .container { 
-            max-width: 400px; 
-            margin: 0 auto; 
-            background: white; 
-            padding: 20px; 
-            border-radius: 10px; 
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+            padding: 20px;
         }
-        .control-group { 
-            margin: 15px 0; 
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #2d2d2d;
+            padding: 20px;
+            border-radius: 10px;
         }
-        label { 
-            display: block; 
-            margin-bottom: 5px; 
-            font-weight: bold; 
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #4CAF50;
         }
-        input, select { 
-            width: 100%; 
-            padding: 8px; 
-            margin-bottom: 10px; 
-            border: 1px solid #ccc; 
-            border-radius: 5px; 
+
+        .status {
+            padding: 10px;
+            text-align: center;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            font-weight: bold;
         }
-        button { 
-            width: 100%; 
-            padding: 12px; 
-            margin: 5px 0; 
-            border: none; 
-            border-radius: 5px; 
-            font-size: 16px; 
-            cursor: pointer; 
+
+        .status.connected {
+            background-color: #4CAF50;
+            color: white;
         }
-        .btn-primary { 
-            background: #007bff; 
-            color: white; 
+
+        .status.disconnected {
+            background-color: #f44336;
+            color: white;
         }
-        .btn-danger { 
-            background: #dc3545; 
-            color: white; 
+
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            width: calc(100% - 20px);
+            display: block;
         }
-        .btn-secondary { 
-            background: #6c757d; 
-            color: white; 
+
+        .btn-danger {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            width: calc(100% - 20px);
+            display: block;
         }
-        .slider { 
-            width: 100%; 
+
+        .btn-secondary {
+            background-color: #008CBA;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+            width: calc(100% - 20px);
+            display: block;
         }
-        .status { 
-            padding: 10px; 
-            margin: 10px 0; 
-            border-radius: 5px; 
-            text-align: center; 
+
+        .control-group {
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: #3d3d3d;
+            border-radius: 8px;
         }
-        .connected { 
-            background: #d4edda; 
-            color: #155724; 
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #cccccc;
         }
-        .disconnected { 
-            background: #f8d7da; 
-            color: #721c24; 
+
+        input[type="number"], select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: #4d4d4d;
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 40px;
+            border-radius: 20px;
+            background: #555;
+            outline: none;
+            margin: 15px 0;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+        }
+
+        .slider::-moz-range-thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #4CAF50;
+            cursor: pointer;
+            border: none;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>Camera Slider Control</h1>
@@ -79,8 +152,7 @@
         <div id="status" class="status disconnected">Disconnected</div>
         
         <button id="connectBtn" class="btn-primary" onclick="connectBLE()">Connect to Slider</button>
-        
-        <div id="controls" style="display:none;">
+<div id="controls" style="display: none;">
             <div class="control-group">
                 <label>Motor 1 Start:</label>
                 <input type="number" id="m1Start" value="0" onchange="sendCommand('M1S:' + this.value)">
@@ -102,7 +174,8 @@
                 <label>Motor 2 Speed:</label>
                 <input type="number" id="m2Speed" value="2000" onchange="sendCommand('M2SPD:' + this.value)">
             </div>
-<div class="control-group">
+            
+            <div class="control-group">
                 <label>Cycles:</label>
                 <select id="cycles" onchange="sendCommand('CYCLES:' + this.value)">
                     <option value="0">Infinite</option>
@@ -120,6 +193,9 @@
             </div>
             
             <div class="control-group">
+                <label>Jog Speed:</label>
+                <input type="number" id="jogSpeed" value="600" min="100" max="1500" step="50">
+                
                 <label>Jog Control:</label>
                 <select id="jogAxis">
                     <option value="M1">Motor 1</option>
@@ -128,16 +204,16 @@
                 </select>
                 <input type="range" class="slider" id="jogSlider" min="-100" max="100" value="0" oninput="handleJog()">
             </div>
-            
-            <button class="btn-primary" onclick="sendCommand('RUN')">RUN</button>
-            <button class="btn-danger" onclick="sendCommand('STOP')">STOP</button>
-            <button class="btn-secondary" onclick="sendCommand('HOME')">HOME</button>
+<button class="btn-primary" onclick="sendCommand('RUN')">Start/Resume</button>
+            <button class="btn-danger" onclick="sendCommand('STOP')">Stop</button>
+            <button class="btn-secondary" onclick="sendCommand('HOME')">Home Motors</button>
         </div>
+
     </div>
 
     <script>
-        let bleCharacteristic;
         let isConnected = false;
+        let bleCharacteristic = null;
 async function connectBLE() {
             try {
                 const device = await navigator.bluetooth.requestDevice({
@@ -150,56 +226,73 @@ async function connectBLE() {
                 bleCharacteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
 
                 isConnected = true;
+                document.getElementById('status').textContent = 'Connected';
                 document.getElementById('status').className = 'status connected';
-                document.getElementById('status').textContent = 'Connected to ' + device.name;
                 document.getElementById('connectBtn').style.display = 'none';
                 document.getElementById('controls').style.display = 'block';
 
-                device.addEventListener('gattserverdisconnected', onDisconnected);
-            } catch (error) {
-                console.error('Connection failed:', error);
-                alert('Connection failed: ' + error.message);
-            }
-        }
+                device.addEventListener('gattserverdisconnected', () => {
+                    isConnected = false;
+                    document.getElementById('status').textContent = 'Disconnected';
+                    document.getElementById('status').className = 'status disconnected';
+                    document.getElementById('connectBtn').style.display = 'block';
+                    document.getElementById('controls').style.display = 'none';
+                });
 
-        function onDisconnected() {
-            isConnected = false;
-            document.getElementById('status').className = 'status disconnected';
-            document.getElementById('status').textContent = 'Disconnected';
-            document.getElementById('connectBtn').style.display = 'block';
-            document.getElementById('controls').style.display = 'none';
+            } catch (error) {
+                console.error('BLE connection failed:', error);
+                alert('Connection failed. Make sure your device supports Web Bluetooth and the slider is powered on.');
+            }
         }
 
         function sendCommand(command) {
-            if (!isConnected || !bleCharacteristic) return;
-            try {
-                bleCharacteristic.writeValue(new TextEncoder().encode(command));
+            if (isConnected && bleCharacteristic) {
+                const encoder = new TextEncoder();
+                bleCharacteristic.writeValue(encoder.encode(command));
                 console.log('Sent:', command);
-            } catch (error) {
-                console.error('Send failed:', error);
             }
         }
-let jogTimeout;
-        
-        function handleJog() {
-            const slider = document.getElementById('jogSlider');
-            const axis = document.getElementById('jogAxis').value;
-            const value = slider.value;
+function handleJog() {
+            const jogValue = document.getElementById('jogSlider').value;
+            const jogAxis = document.getElementById('jogAxis').value;
+            const jogSpeedValue = document.getElementById('jogSpeed').value;
             
-            sendCommand(`JOGSLIDER:${axis}:${value}`);
+            // Calculate speed based on jog speed setting and slider position
+            const ratio = jogValue / 100.0;
+            const speed = ratio * jogSpeedValue;
             
-            // Auto-return to center after 100ms of no movement
-            clearTimeout(jogTimeout);
-            if (value != 0) {
-                jogTimeout = setTimeout(() => {
-                    slider.value = 0;
-                    sendCommand(`JOGSLIDER:${axis}:0`);
+            const command = `JOGSLIDER:${jogAxis}:${jogValue}`;
+            sendCommand(command);
+            
+            // Reset slider to center when released
+            if (jogValue == 0) {
+                document.getElementById('jogSlider').value = 0;
+            }
+        }
+
+        // Auto-center jog slider on mouse/touch release
+        document.addEventListener('DOMContentLoaded', function() {
+            const jogSlider = document.getElementById('jogSlider');
+            
+            jogSlider.addEventListener('mouseup', function() {
+                setTimeout(() => {
+                    this.value = 0;
+                    handleJog();
                 }, 100);
-            }
-        }
+            });
+            
+            jogSlider.addEventListener('touchend', function() {
+                setTimeout(() => {
+                    this.value = 0;
+                    handleJog();
+                }, 100);
+            });
+        });
     </script>
+
 </body>
 </html>
+
 
 
 
