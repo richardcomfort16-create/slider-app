@@ -304,6 +304,131 @@
             <div class="status disconnected" id="status">⚡ Disconnected</div>
             <button class="connect-btn" id="connectBtn">🔗 Connect</button>
         </div>
+<!-- MOTOR SETTINGS -->
+        <div class="section">
+            <h3>⚙️ Motor Settings</h3>
+            
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="m1Start">Motor 1 Start:</label>
+                    <input type="number" id="m1Start" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="m1End">Motor 1 End:</label>
+                    <input type="number" id="m1End" placeholder="2000">
+                </div>
+                <div class="input-group">
+                    <label for="m1Speed">Motor 1 Speed:</label>
+                    <input type="number" id="m1Speed" placeholder="2000">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="m2Start">Motor 2 Start:</label>
+                    <input type="number" id="m2Start" placeholder="0">
+                </div>
+                <div class="input-group">
+                    <label for="m2End">Motor 2 End:</label>
+                    <input type="number" id="m2End" placeholder="2000">
+                </div>
+                <div class="input-group">
+                    <label for="m2Speed">Motor 2 Speed:</label>
+                    <input type="number" id="m2Speed" placeholder="2000">
+                </div>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="cycles">Cycles:</label>
+                    <input type="number" id="cycles" placeholder="0" min="0">
+                </div>
+                <div class="input-group">
+                    <label for="jogSpeedInput">Jog Speed:</label>
+                    <input type="number" id="jogSpeedInput" placeholder="300" min="50" max="1000">
+                </div>
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="returnEnabled" checked>
+                    <label for="returnEnabled">Return Enabled</label>
+                </div>
+            </div>
+        </div>
+
+        <!-- MAIN CONTROLS -->
+        <div class="section">
+            <h3>🎬 Main Controls</h3>
+            <div class="controls">
+                <button class="btn btn-run" id="runBtn">▶️ RUN</button>
+                <button class="btn btn-stop" id="stopBtn">⏹️ STOP</button>
+                <button class="btn btn-home" id="homeBtn">🏠 HOME</button>
+            </div>
+        </div>
+
+        <!-- JOG CONTROLS -->
+        <div class="section">
+            <h3>🎮 Jog Controls</h3>
+            
+            <div class="jog-buttons">
+                <button class="jog-btn" data-jog="M1:-100">M1 ←</button>
+                <button class="jog-btn" data-jog="BOTH:0">STOP</button>
+                <button class="jog-btn" data-jog="M1:100">M1 →</button>
+                <button class="jog-btn" data-jog="M2:-100">M2 ←</button>
+                <button class="jog-btn" data-jog="BOTH:0">BOTH STOP</button>
+                <button class="jog-btn" data-jog="M2:100">M2 →</button>
+            </div>
+
+            <div class="input-group">
+                <label for="jogSlider">Jog Control (Both Motors):</label>
+                <div class="slider-container">
+                    <input type="range" id="jogSlider" min="-100" max="100" value="0" step="5">
+                    <div class="slider-value" id="jogSliderValue">0%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let characteristic;
+        let isConnected = false;
+
+        // UI Elements
+        const connectBtn = document.getElementById('connectBtn');
+        const status = document.getElementById('status');
+        const jogSlider = document.getElementById('jogSlider');
+        const jogSliderValue = document.getElementById('jogSliderValue');
+
+        // Connect button
+        connectBtn.addEventListener('click', connectBLE);
+
+        // Motor settings inputs
+        const inputs = ['m1Start', 'm1End', 'm1Speed', 'm2Start', 'm2End', 'm2Speed', 'cycles', 'jogSpeedInput'];
+        inputs.forEach(id => {
+            const element = document.getElementById(id);
+            element.addEventListener('change', () => sendMotorSettings(id, element.value));
+        });
+
+        // Return enabled checkbox
+        document.getElementById('returnEnabled').addEventListener('change', function() {
+            sendCommand('RETURN:' + (this.checked ? '1' : '0'));
+        });
+
+        // Control buttons
+        document.getElementById('runBtn').addEventListener('click', () => sendCommand('RUN'));
+        document.getElementById('stopBtn').addEventListener('click', () => sendCommand('STOP'));
+        document.getElementById('homeBtn').addEventListener('click', () => sendCommand('HOME'));
+
+        // Jog buttons
+        document.querySelectorAll('.jog-btn').forEach(btn => {
+            btn.addEventListener('mousedown', () => {
+                const jogCmd = btn.dataset.jog;
+                const [axis, value] = jogCmd.split(':');
+                sendCommand(`JOGSLIDER:${axis}:${value}`);
+            });
+            
+            btn.addEventListener('mouseup', () => {
+                sendCommand('JOGSLIDER:BOTH:0');
+            });
+        });
 // Jog slider with enlarged size
         jogSlider.addEventListener('input', function() {
             const value = this.value;
@@ -414,8 +539,6 @@
     </script>
 </body>
 </html>
-
-
 
 
 
