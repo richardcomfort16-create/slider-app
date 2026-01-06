@@ -315,22 +315,16 @@
     </script>
 </body>
 </html>
-// Auto-reconnect on disconnect
-        window.addEventListener('beforeunload', function() {
-            if (bleDevice && bleDevice.gatt.connected) {
-                bleDevice.gatt.disconnect();
-            }
-        });
-
-        // Handle BLE disconnection
-        if (typeof navigator !== 'undefined' && navigator.bluetooth) {
-            navigator.bluetooth.addEventListener('advertisementreceived', function(event) {
-                console.log('Advertisement received from ' + event.device.name);
-            });
+// Error handling for BLE not supported
+        if (!navigator.bluetooth) {
+            document.getElementById('connectionStatus').textContent = 'BLE Not Supported';
+            document.getElementById('connectionStatus').className = 'disconnected';
         }
 
         // Keyboard shortcuts (optional)
         document.addEventListener('keydown', function(e) {
+            if (e.target.tagName === 'INPUT') return; // Don't interfere with input fields
+            
             switch(e.key) {
                 case ' ':
                     e.preventDefault();
@@ -346,43 +340,14 @@
             }
         });
 
-        // Touch/mobile optimizations
-        document.addEventListener('touchstart', function() {}, {passive: true});
-        
-        // Prevent page zoom on double-tap
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function (event) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                event.preventDefault();
-            }
-            lastTouchEnd = now;
-        }, false);
-
-        // Service Worker for offline capability (optional)
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(function() {
-                // Service worker not available, app will work online only
-            });
-        }
-
-        // Error handling for BLE not supported
-        if (!navigator.bluetooth) {
-            document.getElementById('connectionStatus').textContent = 'BLE Not Supported';
-            document.getElementById('connectionStatus').className = 'disconnected';
-            
-            // Disable connection buttons
-            const buttons = document.querySelectorAll('button');
-            buttons.forEach(btn => {
-                if (btn.textContent.includes('Connect')) {
-                    btn.disabled = true;
-                    btn.textContent = 'BLE Not Available';
-                }
-            });
-        }
+        // Handle BLE disconnection events
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Camera Slider Control Ready');
+        });
     </script>
 </body>
 </html>
+
 
 
 
