@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,269 +8,512 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
+            margin: 0;
             padding: 20px;
-            background: #f5f5f5;
+            background-color: #1a1a1a;
+            color: white;
+            user-select: none;
         }
+        
         .container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+            margin: 0 auto;
         }
+        
         h1 {
             text-align: center;
-            color: #333;
+            color: #4CAF50;
             margin-bottom: 30px;
         }
+        
         .section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
+            background: #2d2d2d;
+            margin: 15px 0;
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #444;
         }
-        .section h3 {
+        
+        .section h2 {
             margin-top: 0;
-            color: #0066cc;
+            color: #4CAF50;
+            font-size: 18px;
         }
-        .control-group {
+        
+        .row {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            margin: 10px 0;
+            margin: 15px 0;
         }
-        .control-group label {
-            width: 120px;
+        
+        label {
             font-weight: bold;
+            min-width: 100px;
         }
+        
         input[type="number"] {
             width: 100px;
-            padding: 5px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        button {
-            background: #0066cc;
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            padding: 10px;
+            border: 2px solid #555;
             border-radius: 5px;
+            background: #333;
+            color: white;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
             cursor: pointer;
             margin: 5px;
+            min-height: 50px;
         }
-        button:hover {
-            background: #0052a3;
+        
+        .btn-primary {
+            background: #4CAF50;
+            color: white;
         }
-        .status {
-            padding: 10px;
-            border-radius: 5px;
-            margin: 10px 0;
-            text-align: center;
+        
+        .btn-secondary {
+            background: #ff9800;
+            color: white;
         }
-        .status.disconnected {
-            background: #ffebee;
-            color: #c62828;
+        
+        .btn-danger {
+            background: #f44336;
+            color: white;
         }
-        .status.connected {
-            background: #e8f5e8;
-            color: #2e7d32;
+        
+        button:active {
+            transform: scale(0.95);
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Camera Slider Control Panel</h1>
+        <h1>📷 Camera Slider Control</h1>
         
-        <div id="status" class="status disconnected">
-            Disconnected - Click Connect to find your slider
-        </div>
-
+        <!-- Connection Status -->
         <div class="section">
-            <h3>Connection</h3>
-            <button id="connectBtn" onclick="connectBLE()">Connect to Slider</button>
-            <button id="disconnectBtn" onclick="disconnectBLE()" style="display:none;">Disconnect</button>
+            <h2>🔗 Connection</h2>
+            <div id="status">Disconnected</div>
+            <button id="connectBtn" class="btn-primary">Connect to Slider</button>
         </div>
-<div class="section">
-            <h3>Motor 1 Settings</h3>
-            <div class="control-group">
-                <label>Start Position:</label>
+<!-- Motor 1 Settings -->
+        <div class="section">
+            <h2>🎯 Motor 1 (Pan/Slide)</h2>
+            
+            <div class="row">
+                <label>Start:</label>
                 <input type="number" id="m1Start" value="0">
-                <button onclick="setM1Start()">Set</button>
+                <button onclick="setM1Start()" class="btn-primary">Set</button>
             </div>
-            <div class="control-group">
-                <label>End Position:</label>
+            
+            <div class="row">
+                <label>End:</label>
                 <input type="number" id="m1End" value="2000">
-                <button onclick="setM1End()">Set</button>
+                <button onclick="setM1End()" class="btn-primary">Set</button>
             </div>
-            <div class="control-group">
+            
+            <div class="row">
                 <label>Speed:</label>
                 <input type="number" id="m1Speed" value="2000" min="100" max="5000">
-                <button onclick="setM1Speed()">Set</button>
+                <button onclick="setM1Speed()" class="btn-primary">Set</button>
             </div>
         </div>
 
+        <!-- Motor 2 Settings -->
         <div class="section">
-            <h3>Motor 2 Settings</h3>
-            <div class="control-group">
-                <label>Start Position:</label>
+            <h2>🔄 Motor 2 (Tilt/Focus)</h2>
+            
+            <div class="row">
+                <label>Start:</label>
                 <input type="number" id="m2Start" value="0">
-                <button onclick="setM2Start()">Set</button>
+                <button onclick="setM2Start()" class="btn-primary">Set</button>
             </div>
-            <div class="control-group">
-                <label>End Position:</label>
+            
+            <div class="row">
+                <label>End:</label>
                 <input type="number" id="m2End" value="2000">
-                <button onclick="setM2End()">Set</button>
+                <button onclick="setM2End()" class="btn-primary">Set</button>
             </div>
-            <div class="control-group">
+            
+            <div class="row">
                 <label>Speed:</label>
                 <input type="number" id="m2Speed" value="2000" min="100" max="5000">
-                <button onclick="setM2Speed()">Set</button>
+                <button onclick="setM2Speed()" class="btn-primary">Set</button>
             </div>
         </div>
 
+        <!-- Sequence Controls -->
         <div class="section">
-            <h3>Run Settings</h3>
-            <div class="control-group">
+            <h2>▶️ Sequence Control</h2>
+            
+            <div class="row">
+                <button id="runBtn" onclick="toggleRun()" class="btn-primary" style="flex: 1; margin-right: 10px;">START</button>
+                <button onclick="stopSlider()" class="btn-danger" style="flex: 1;">STOP</button>
+            </div>
+            
+            <div class="row">
                 <label>Cycles:</label>
-                <input type="number" id="cycles" value="0" min="0" max="100">
-                <button onclick="setCycles()">Set</button>
-                <small>(0 = infinite)</small>
+                <input type="number" id="cycles" value="0" min="0" max="99">
+                <button onclick="setCycles()" class="btn-primary">Set</button>
             </div>
-            <div class="control-group">
-                <label>Return Mode:</label>
-                <button id="returnBtn" onclick="toggleReturn()">ON</button>
+            
+            <div class="row">
+                <label>Return:</label>
+                <button id="returnBtn" onclick="toggleReturn()" class="btn-secondary">ON</button>
+                <button onclick="homeSlider()" class="btn-secondary">HOME</button>
             </div>
         </div>
-
+<!-- Big Jog Controls -->
         <div class="section">
-            <h3>Controls</h3>
-            <button onclick="runSlider()" style="background: #4CAF50;">RUN</button>
-            <button onclick="stopSlider()" style="background: #f44336;">STOP</button>
-            <button onclick="homeSlider()" style="background: #ff9800;">HOME</button>
+            <h2>🕹️ Jog Controls</h2>
+            
+            <!-- Motor 1 Jog -->
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px; font-size: 18px;">Motor 1 (Pan/Slide)</label>
+                <div style="display: flex; gap: 10px;">
+                    <button onmousedown="startJog('M1', -100)" onmouseup="stopJog()" ontouchstart="startJog('M1', -100)" ontouchend="stopJog()" class="btn-secondary" style="flex: 1; height: 80px; font-size: 20px;">◀◀ LEFT</button>
+                    <button onmousedown="startJog('M1', 100)" onmouseup="stopJog()" ontouchstart="startJog('M1', 100)" ontouchend="stopJog()" class="btn-secondary" style="flex: 1; height: 80px; font-size: 20px;">RIGHT ▶▶</button>
+                </div>
+            </div>
+            
+            <!-- Motor 2 Jog -->
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px; font-size: 18px;">Motor 2 (Tilt/Focus)</label>
+                <div style="display: flex; gap: 10px;">
+                    <button onmousedown="startJog('M2', -100)" onmouseup="stopJog()" ontouchstart="startJog('M2', -100)" ontouchend="stopJog()" class="btn-secondary" style="flex: 1; height: 80px; font-size: 20px;">◀◀ DOWN</button>
+                    <button onmousedown="startJog('M2', 100)" onmouseup="stopJog()" ontouchstart="startJog('M2', 100)" ontouchend="stopJog()" class="btn-secondary" style="flex: 1; height: 80px; font-size: 20px;">UP ▶▶</button>
+                </div>
+            </div>
+            
+            <!-- Both Motors Jog -->
+            <div style="margin: 20px 0;">
+                <label style="display: block; margin-bottom: 10px; font-size: 18px;">Both Motors</label>
+                <div style="display: flex; gap: 10px;">
+                    <button onmousedown="startJog('BOTH', -100)" onmouseup="stopJog()" ontouchstart="startJog('BOTH', -100)" ontouchend="stopJog()" class="btn-danger" style="flex: 1; height: 80px; font-size: 20px;">◀◀ BACK</button>
+                    <button onmousedown="startJog('BOTH', 100)" onmouseup="stopJog()" ontouchstart="startJog('BOTH', 100)" ontouchend="stopJog()" class="btn-danger" style="flex: 1; height: 80px; font-size: 20px;">FORWARD ▶▶</button>
+                </div>
+            </div>
+            
+            <!-- Jog Speed Control -->
+            <div class="row">
+                <label>Jog Speed:</label>
+                <input type="range" id="jogSpeed" min="10" max="100" value="50" style="flex: 1; margin: 0 15px;">
+                <span id="jogSpeedValue">50%</span>
+            </div>
         </div>
-<div class="section">
-            <h3>Manual Jog Control</h3>
-            <div class="control-group">
-                <label>Motor 1:</label>
-                <input type="range" id="jogM1" min="-100" max="100" value="0" 
-                       oninput="jogMotor('M1', this.value)" onchange="jogMotor('M1', 0)">
-                <span id="jogM1Value">0</span>
-            </div>
-            <div class="control-group">
-                <label>Motor 2:</label>
-                <input type="range" id="jogM2" min="-100" max="100" value="0" 
-                       oninput="jogMotor('M2', this.value)" onchange="jogMotor('M2', 0)">
-                <span id="jogM2Value">0</span>
-            </div>
-            <div class="control-group">
-                <label>Both Motors:</label>
-                <input type="range" id="jogBoth" min="-100" max="100" value="0" 
-                       oninput="jogMotor('BOTH', this.value)" onchange="jogMotor('BOTH', 0)">
-                <span id="jogBothValue">0</span>
-            </div>
-        </div>
-    </div>
 
-    <script>
+        <!-- Position Display -->
+        <div class="section">
+            <h2>📍 Current Position</h2>
+            <div class="row">
+                <label>Motor 1:</label>
+                <span id="pos1">0</span>
+                <button onclick="setCurrentAsStart('M1')" class="btn-primary">Set as Start</button>
+            </div>
+            <div class="row">
+                <label>Motor 2:</label>
+                <span id="pos2">0</span>
+                <button onclick="setCurrentAsStart('M2')" class="btn-primary">Set as Start</button>
+            </div>
+        </div>
+<script>
+        // BLE Variables
         let device = null;
         let characteristic = null;
-        let returnEnabled = true;
+        let isConnected = false;
+        let jogInterval = null;
+        let isRunning = false;
+        let isReturning = true;
+
+        // Update jog speed display
+        document.getElementById('jogSpeed').addEventListener('input', function() {
+            document.getElementById('jogSpeedValue').textContent = this.value + '%';
+        });
 
         // BLE Connection
-        async function connectBLE() {
+        async function connectToSlider() {
             try {
+                console.log('Requesting Bluetooth Device...');
                 device = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'CameraSlider' }],
                     optionalServices: ['12345678-1234-1234-1234-1234567890ab']
                 });
-                
+
+                console.log('Connecting to GATT Server...');
                 const server = await device.gatt.connect();
+                
                 const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
                 characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
                 
-                updateStatus('Connected to Camera Slider', true);
-                document.getElementById('connectBtn').style.display = 'none';
-                document.getElementById('disconnectBtn').style.display = 'inline-block';
+                isConnected = true;
+                updateConnectionStatus();
+                console.log('Connected to Camera Slider!');
                 
             } catch (error) {
                 console.error('Connection failed:', error);
-                updateStatus('Connection failed: ' + error.message, false);
+                alert('Failed to connect: ' + error.message);
             }
         }
 
-        async function disconnectBLE() {
+        // Update connection status display
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
+            
+            if (isConnected) {
+                statusEl.textContent = '✅ Connected';
+                statusEl.style.color = '#4CAF50';
+                connectBtn.textContent = 'Disconnect';
+                connectBtn.onclick = disconnect;
+            } else {
+                statusEl.textContent = '❌ Disconnected';
+                statusEl.style.color = '#f44336';
+                connectBtn.textContent = 'Connect to Slider';
+                connectBtn.onclick = connectToSlider;
+            }
+        }
+
+        // Disconnect BLE
+        function disconnect() {
             if (device && device.gatt.connected) {
-                await device.gatt.disconnect();
+                device.gatt.disconnect();
             }
-            updateStatus('Disconnected', false);
-            document.getElementById('connectBtn').style.display = 'inline-block';
-            document.getElementById('disconnectBtn').style.display = 'none';
+            isConnected = false;
+            device = null;
+            characteristic = null;
+            updateConnectionStatus();
         }
 
-        function updateStatus(message, connected) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = 'status ' + (connected ? 'connected' : 'disconnected');
-        }
-// Send BLE commands
-        async function sendCommand(cmd) {
+        // Send BLE command
+        async function sendCommand(command) {
             if (!characteristic) {
-                updateStatus('Not connected to slider', false);
+                alert('Please connect to slider first');
                 return;
             }
+            
             try {
-                await characteristic.writeValue(new TextEncoder().encode(cmd));
-                console.log('Sent:', cmd);
+                const encoder = new TextEncoder();
+                await characteristic.writeValue(encoder.encode(command));
+                console.log('Sent:', command);
             } catch (error) {
                 console.error('Send failed:', error);
+                alert('Failed to send command');
+            }
+        }
+<script>
+        // BLE Variables
+        let device = null;
+        let characteristic = null;
+        let isConnected = false;
+        let jogInterval = null;
+        let isRunning = false;
+        let isReturning = true;
+
+        // Update jog speed display
+        document.getElementById('jogSpeed').addEventListener('input', function() {
+            document.getElementById('jogSpeedValue').textContent = this.value + '%';
+        });
+
+        // BLE Connection
+        async function connectToSlider() {
+            try {
+                console.log('Requesting Bluetooth Device...');
+                device = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'CameraSlider' }],
+                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+                });
+
+                console.log('Connecting to GATT Server...');
+                const server = await device.gatt.connect();
+                
+                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+                
+                isConnected = true;
+                updateConnectionStatus();
+                console.log('Connected to Camera Slider!');
+                
+            } catch (error) {
+                console.error('Connection failed:', error);
+                alert('Failed to connect: ' + error.message);
             }
         }
 
-        // Motor settings functions
-        function setM1Start() { sendCommand('M1S:' + document.getElementById('m1Start').value); }
-        function setM1End() { sendCommand('M1E:' + document.getElementById('m1End').value); }
-        function setM1Speed() { sendCommand('M1SPD:' + document.getElementById('m1Speed').value); }
-        function setM2Start() { sendCommand('M2S:' + document.getElementById('m2Start').value); }
-        function setM2End() { sendCommand('M2E:' + document.getElementById('m2End').value); }
-        function setM2Speed() { sendCommand('M2SPD:' + document.getElementById('m2Speed').value); }
-        
-        function setCycles() { sendCommand('CYCLES:' + document.getElementById('cycles').value); }
-        
-        function toggleReturn() {
-            returnEnabled = !returnEnabled;
-            document.getElementById('returnBtn').textContent = returnEnabled ? 'ON' : 'OFF';
-            document.getElementById('returnBtn').style.background = returnEnabled ? '#4CAF50' : '#f44336';
-            sendCommand('RETURN:' + (returnEnabled ? '1' : '0'));
-        }
-
-        // Control functions
-        function runSlider() { sendCommand('RUN'); }
-        function stopSlider() { sendCommand('STOP'); }
-        function homeSlider() { sendCommand('HOME'); }
-
-        // Jog control
-        function jogMotor(axis, value) {
-            document.getElementById('jog' + axis + 'Value').textContent = value;
-            sendCommand('JOGSLIDER:' + axis + ':' + value);
+        // Update connection status display
+        function updateConnectionStatus() {
+            const statusEl = document.getElementById('status');
+            const connectBtn = document.getElementById('connectBtn');
             
-            // Auto-reset sliders when released
-            if (value == 0) {
-                setTimeout(() => {
-                    document.getElementById('jog' + axis).value = 0;
-                }, 100);
+            if (isConnected) {
+                statusEl.textContent = '✅ Connected';
+                statusEl.style.color = '#4CAF50';
+                connectBtn.textContent = 'Disconnect';
+                connectBtn.onclick = disconnect;
+            } else {
+                statusEl.textContent = '❌ Disconnected';
+                statusEl.style.color = '#f44336';
+                connectBtn.textContent = 'Connect to Slider';
+                connectBtn.onclick = connectToSlider;
             }
         }
 
-        // Handle disconnect events
-        if ('bluetooth' in navigator) {
-            navigator.bluetooth.addEventListener('gattserverdisconnected', () => {
-                updateStatus('Device disconnected', false);
-                document.getElementById('connectBtn').style.display = 'inline-block';
-                document.getElementById('disconnectBtn').style.display = 'none';
-            });
-        } else {
-            document.getElementById('connectBtn').disabled = true;
-            updateStatus('Bluetooth not supported in this browser', false);
+        // Disconnect BLE
+        function disconnect() {
+            if (device && device.gatt.connected) {
+                device.gatt.disconnect();
+            }
+            isConnected = false;
+            device = null;
+            characteristic = null;
+            updateConnectionStatus();
+        }
+
+        // Send BLE command
+        async function sendCommand(command) {
+            if (!characteristic) {
+                alert('Please connect to slider first');
+                return;
+            }
+            
+            try {
+                const encoder = new TextEncoder();
+                await characteristic.writeValue(encoder.encode(command));
+                console.log('Sent:', command);
+            } catch (error) {
+                console.error('Send failed:', error);
+                alert('Failed to send command');
+            }
+        }
+// Position Update Loop
+        function startPositionUpdates() {
+            if (!isConnected) return;
+            
+            setInterval(async function() {
+                try {
+                    // Request position data
+                    await sendCommand('POS?');
+                    
+                    // Note: In a real implementation, you'd need to set up
+                    // BLE notifications to receive position data back
+                    // For now, we'll simulate position updates
+                    updatePositionDisplay();
+                } catch (error) {
+                    console.error('Position update failed:', error);
+                }
+            }, 1000); // Update every second
+        }
+
+        // Simulate position updates (replace with actual BLE notification handling)
+        function updatePositionDisplay() {
+            // In a real implementation, parse received position data
+            // For now, just show placeholder values
+            const pos1 = Math.floor(Math.random() * 2000);
+            const pos2 = Math.floor(Math.random() * 2000);
+            
+            document.getElementById('pos1').textContent = pos1;
+            document.getElementById('pos2').textContent = pos2;
+        }
+
+        // Status Update Function
+        function updateSliderStatus(status) {
+            const statusDisplay = document.getElementById('sliderStatus');
+            const runBtn = document.getElementById('runBtn');
+            
+            switch(status) {
+                case 'running':
+                    statusDisplay.textContent = '▶️ Running';
+                    statusDisplay.style.color = '#4CAF50';
+                    runBtn.textContent = 'PAUSE';
+                    runBtn.className = 'btn-danger';
+                    isRunning = true;
+                    break;
+                case 'paused':
+                    statusDisplay.textContent = '⏸️ Paused';
+                    statusDisplay.style.color = '#ff9800';
+                    runBtn.textContent = 'RESUME';
+                    runBtn.className = 'btn-primary';
+                    break;
+                case 'stopped':
+                    statusDisplay.textContent = '⏹️ Stopped';
+                    statusDisplay.style.color = '#666';
+                    runBtn.textContent = 'START';
+                    runBtn.className = 'btn-primary';
+                    isRunning = false;
+                    break;
+                case 'homing':
+                    statusDisplay.textContent = '🏠 Homing';
+                    statusDisplay.style.color = '#2196F3';
+                    break;
+            }
+        }
+
+        // Enhanced BLE command sender with error handling
+        async function sendCommandWithRetry(command, retries = 3) {
+            for (let i = 0; i < retries; i++) {
+                try {
+                    await sendCommand(command);
+                    return true;
+                } catch (error) {
+                    if (i === retries - 1) {
+                        console.error('Command failed after retries:', command, error);
+                        return false;
+                    }
+                    await new Promise(resolve => setTimeout(resolve, 100)); // Wait before retry
+                }
+            }
+        }
+
+        // Touch event prevention for mobile
+        document.addEventListener('touchmove', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+            }
+        }, { passive: false });
+
+        // Prevent context menu on long press for buttons
+        document.addEventListener('contextmenu', function(e) {
+            if (e.target.tagName === 'BUTTON') {
+                e.preventDefault();
+            }
+        });
+
+        // Initialize position updates when connected
+        function onBLEConnected() {
+            startPositionUpdates();
+            updateSliderStatus('stopped');
+        }
+// Mobile orientation handling
+        window.addEventListener('orientationchange', function() {
+            setTimeout(function() {
+                // Recalculate layout after orientation change
+                const viewport = document.querySelector('meta[name="viewport"]');
+                viewport.content = "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no";
+            }, 100);
+        });
+
+        // Prevent zoom on double tap
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function (event) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                event.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+
+        // Initialize connection status display
+        updateConnectionStatus();
+        
+        // Auto-connect if previously paired (optional)
+        if (localStorage.getItem('autoConnect') === 'true') {
+            setTimeout(connectToSlider, 1000);
         }
     </script>
 </body>
