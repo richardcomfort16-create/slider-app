@@ -1,434 +1,712 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Camera Slider Control</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .header h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .status {
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .status.connected {
-            background: rgba(76, 175, 80, 0.3);
-            border: 2px solid #4CAF50;
-        }
-
-        .status.disconnected {
-            background: rgba(244, 67, 54, 0.3);
-            border: 2px solid #f44336;
-        }
-
-        .control-group {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .control-group h3 {
-            margin-bottom: 20px;
-            color: #FFE082;
-            font-size: 1.3em;
-        }
-button {
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            border: none;
-            color: white;
-            padding: 12px 24px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            margin: 5px;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-
-        button:disabled {
-            background: rgba(255, 255, 255, 0.2);
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .emergency {
-            background: linear-gradient(45deg, #FF1744, #FF5722) !important;
-            font-size: 18px !important;
-            padding: 15px 30px !important;
-        }
-
-        .jog-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        .slider-container {
-            text-align: center;
-        }
-
-        .slider-label {
-            margin-bottom: 10px;
-            font-weight: bold;
-            color: #FFE082;
-        }
-
-        .jog-slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.3);
-            outline: none;
-            appearance: none;
-            margin: 10px 0;
-            transition: all 0.3s ease;
-        }
-
-        .jog-slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .jog-slider::-moz-range-thumb {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #FF6B6B, #4ECDC4);
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-        }
-
-        .value-display {
-            font-weight: bold;
-            font-size: 1.1em;
-            color: #4ECDC4;
-            margin-top: 5px;
-        }
-label {
-            display: block;
-            margin: 10px 0 5px 0;
-            font-weight: bold;
-            color: #FFE082;
-        }
-
-        input[type="number"], select {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            font-size: 16px;
-            margin-bottom: 15px;
-        }
-
-        input[type="number"]:focus, select:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        .manual-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-
-        .both-motors {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 20px;
-            }
-            
-            .jog-controls, .manual-controls {
-                grid-template-columns: 1fr;
-            }
-            
-            .header h1 {
-                font-size: 2em;
-            }
-            
-            button {
-                padding: 15px 20px;
-                font-size: 18px;
-            }
-        }
-    </style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Camera Slider Control - Enhanced Responsive</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(255,255,255,0.95);
+      border-radius: 15px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    .status {
+      text-align: center;
+      padding: 18px;
+      border-radius: 12px;
+      margin-bottom: 25px;
+      font-weight: bold;
+      font-size: 1.2em;
+      transition: all 0.3s ease;
+    }
+    .status.disconnected { background: #ffebee; color: #c62828; border: 3px solid #ffcdd2; }
+    .status.connected { background: #e8f5e8; color: #2e7d32; border: 3px solid #c8e6c9; }
+    .status.connecting { background: #fff3e0; color: #f57c00; border: 3px solid #ffcc02; }
+    
+    .section {
+      background: #f8f9fa;
+      padding: 30px;
+      border-radius: 15px;
+      margin-bottom: 25px;
+      border: 2px solid #e9ecef;
+    }
+    .section h3 {
+      margin-top: 0;
+      color: #495057;
+      font-size: 1.4em;
+      border-bottom: 3px solid #dee2e6;
+      padding-bottom: 12px;
+    }
+    
+    .control-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+    .control-row label {
+      font-weight: 600;
+      min-width: 140px;
+      color: #495057;
+      font-size: 1.1em;
+    }
+    .control-row input, .control-row select {
+      flex: 1;
+      min-width: 140px;
+      padding: 15px;
+      border: 2px solid #ced4da;
+      border-radius: 10px;
+      font-size: 17px;
+      transition: all 0.2s ease;
+    }
+    .control-row input:focus, .control-row select:focus {
+      border-color: #667eea;
+      outline: none;
+      box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
+      transform: scale(1.02);
+    }
+    
+    /* ENHANCED BUTTON STYLES - BIGGER & MORE RESPONSIVE */
+    .btn {
+      padding: 16px 32px;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      min-height: 60px;
+    }
+    .btn:hover { 
+      transform: translateY(-3px) scale(1.05); 
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25); 
+    }
+    .btn:active { transform: translateY(-1px) scale(1.02); }
+    
+    .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
+    .btn-success { background: linear-gradient(45deg, #56ab2f, #a8e6cf); color: white; }
+    .btn-danger { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; }
+    .btn-warning { background: linear-gradient(45deg, #f7971e, #ffd200); color: white; }
+    .btn-secondary { background: linear-gradient(45deg, #6c757d, #495057); color: white; }
+    
+    .button-row {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 25px;
+    }
+    .button-row .btn {
+      flex: 1;
+      min-width: 150px;
+    }
+/* ENHANCED JOG CONTROLS - BIGGER SLIDERS WITH INSTANT RESPONSE */
+    .jog-container {
+      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+      padding: 35px;
+      border-radius: 20px;
+      color: white;
+      margin-bottom: 30px;
+    }
+    .jog-container h3 { 
+      color: white; 
+      border-color: rgba(255,255,255,0.3); 
+      font-size: 1.5em;
+      margin-bottom: 25px;
+    }
+    
+    .jog-control {
+      margin-bottom: 35px;
+      background: rgba(255,255,255,0.1);
+      padding: 25px;
+      border-radius: 15px;
+      backdrop-filter: blur(10px);
+    }
+    .jog-control label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 1.3em;
+      text-align: center;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    
+    /* BIGGER, MORE RESPONSIVE SLIDERS */
+    .slider-container {
+      position: relative;
+      margin: 20px 0;
+      padding: 15px 0;
+    }
+    .slider {
+      width: 100%;
+      height: 20px; /* INCREASED from 8px */
+      border-radius: 15px;
+      background: rgba(255,255,255,0.4);
+      outline: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: all 0.1s ease; /* FASTER response */
+    }
+    .slider:hover {
+      background: rgba(255,255,255,0.6);
+      transform: scale(1.02);
+    }
+    
+    /* BIGGER SLIDER THUMBS */
+    .slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 40px; /* INCREASED from 25px */
+      height: 40px; /* INCREASED from 25px */
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ffffff, #f0f0f0);
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      border: 3px solid rgba(255,255,255,0.8);
+      transition: all 0.1s ease; /* INSTANT response */
+    }
+    .slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    .slider::-webkit-slider-thumb:active {
+      transform: scale(1.25);
+      background: linear-gradient(45deg, #e0e0e0, #ffffff);
+    }
+    
+    .slider::-moz-range-thumb {
+      width: 40px; /* INCREASED from 25px */
+      height: 40px; /* INCREASED from 25px */
+      border-radius: 50%;
+      background: linear-gradient(45deg, #ffffff, #f0f0f0);
+      cursor: pointer;
+      border: 3px solid rgba(255,255,255,0.8);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      transition: all 0.1s ease; /* INSTANT response */
+    }
+    .slider::-moz-range-thumb:hover {
+      transform: scale(1.15);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+    }
+    
+    /* ENHANCED SPEED DISPLAY */
+    .speed-display {
+      text-align: center;
+      font-size: 1.4em; /* BIGGER text */
+      font-weight: bold;
+      margin-top: 15px;
+      background: rgba(255,255,255,0.25);
+      padding: 15px;
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.3);
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
+      transition: all 0.2s ease;
+    }
+    .speed-display.active {
+      background: rgba(255,255,255,0.4);
+      border-color: rgba(255,255,255,0.6);
+      transform: scale(1.05);
+    }
+    
+    /* ENHANCED SLIDER TRACK STYLING */
+    .slider::-webkit-slider-runnable-track {
+      width: 100%;
+      height: 20px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 15px;
+    }
+    .slider::-moz-range-track {
+      width: 100%;
+      height: 20px;
+      background: rgba(255,255,255,0.4);
+      border-radius: 15px;
+      border: none;
+    }
+    
+    /* SLIDER LABELS WITH BETTER VISIBILITY */
+    .slider-labels {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 8px;
+      font-size: 0.9em;
+      opacity: 0.8;
+    }
+    .slider-labels span {
+      background: rgba(0,0,0,0.2);
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+/* Responsive Design */
+    @media (max-width: 600px) {
+      .container { padding: 20px; }
+      .control-row { flex-direction: column; align-items: stretch; }
+      .control-row label { min-width: auto; }
+      .button-row { flex-direction: column; }
+      .slider { height: 25px; } /* Even bigger on mobile */
+      .slider::-webkit-slider-thumb { width: 45px; height: 45px; }
+      .slider::-moz-range-thumb { width: 45px; height: 45px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h1>📸 Camera Slider Control</h1>
-            <div id="status" class="status disconnected">📱 Disconnected - Click Connect to start</div>
-            <button id="connectBtn" onclick="connectBLE()">🔗 Connect</button>
-            <button id="disconnectBtn" onclick="disconnectBLE()" disabled>❌ Disconnect</button>
-        </div>
-
-        <!-- Enhanced Jog Controls with Auto-Center -->
-        <div class="control-group">
-            <h3>🎮 Jog Controls</h3>
-            <div class="jog-controls">
-                <div class="slider-container">
-                    <div class="slider-label">Motor 1</div>
-                    <input type="range" id="jogM1" class="jog-slider" 
-                           min="-100" max="100" value="0" 
-                           oninput="handleJogSlider('M1', this.value)"
-                           onchange="autoCenter('M1')"
-                           onmouseup="autoCenter('M1')"
-                           ontouchend="autoCenter('M1')">
-                    <div class="value-display" id="jogM1Value">0%</div>
-                </div>
-                <div class="slider-container">
-                    <div class="slider-label">Motor 2</div>
-                    <input type="range" id="jogM2" class="jog-slider" 
-                           min="-100" max="100" value="0" 
-                           oninput="handleJogSlider('M2', this.value)"
-                           onchange="autoCenter('M2')"
-                           onmouseup="autoCenter('M2')"
-                           ontouchend="autoCenter('M2')">
-                    <div class="value-display" id="jogM2Value">0%</div>
-                </div>
-            </div>
-            <div class="both-motors">
-                <div class="slider-label">Both Motors</div>
-                <input type="range" id="jogBOTH" class="jog-slider" 
-                       min="-100" max="100" value="0" 
-                       oninput="handleJogSlider('BOTH', this.value)"
-                       onchange="autoCenter('BOTH')"
-                       onmouseup="autoCenter('BOTH')"
-                       ontouchend="autoCenter('BOTH')">
-                <div class="value-display" id="jogBOTHValue">0%</div>
-            </div>
-        </div>
-<!-- Manual Controls -->
-        <div class="control-group">
-            <h3>⚙️ Manual Controls</h3>
-            <div class="manual-controls">
-                <div>
-                    <label for="m1Start">Motor 1 Start:</label>
-                    <input type="number" id="m1Start" value="0" onchange="sendBLE('M1S:' + this.value)">
-                    
-                    <label for="m1End">Motor 1 End:</label>
-                    <input type="number" id="m1End" value="2000" onchange="sendBLE('M1E:' + this.value)">
-                    
-                    <label for="m1Speed">Motor 1 Speed:</label>
-                    <input type="number" id="m1Speed" value="2000" onchange="sendBLE('M1SPD:' + this.value)">
-                </div>
-                <div>
-                    <label for="m2Start">Motor 2 Start:</label>
-                    <input type="number" id="m2Start" value="0" onchange="sendBLE('M2S:' + this.value)">
-                    
-                    <label for="m2End">Motor 2 End:</label>
-                    <input type="number" id="m2End" value="2000" onchange="sendBLE('M2E:' + this.value)">
-                    
-                    <label for="m2Speed">Motor 2 Speed:</label>
-                    <input type="number" id="m2Speed" value="2000" onchange="sendBLE('M2SPD:' + this.value)">
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px;">
-                <label for="cycles">Cycles:</label>
-                <select id="cycles" onchange="sendBLE('CYCLES:' + this.value)">
-                    <option value="0">Infinite</option>
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-                
-                <label for="returnMode" style="margin-top: 10px;">
-                    <input type="checkbox" id="returnMode" checked onchange="sendBLE('RETURN:' + (this.checked ? '1' : '0'))">
-                    Return Mode
-                </label>
-            </div>
-        </div>
-
-        <!-- Control Buttons -->
-        <div class="control-group">
-            <h3>🎬 Sequence Control</h3>
-            <div style="text-align: center;">
-                <button onclick="sendBLE('RUN')" style="margin: 10px;">▶️ Start</button>
-                <button onclick="sendBLE('STOP')" style="margin: 10px;">⏹️ Stop</button>
-                <button onclick="sendBLE('HOME')" style="margin: 10px;">🏠 Home</button>
-                <br>
-                <button onclick="emergencyStop()" class="emergency" style="margin: 20px;">🚨 EMERGENCY STOP</button>
-            </div>
-        </div>
+  <div class="container">
+    <h1>🎥 Camera Slider Control</h1>
+    
+    <div id="status" class="status disconnected">
+      📡 Disconnected - Click Connect to begin
+    </div>
+    
+    <div class="section">
+      <h3>🔌 Connection</h3>
+      <div class="button-row">
+        <button class="btn btn-primary" onclick="connectBLE()">Connect</button>
+        <button class="btn btn-secondary" onclick="disconnectBLE()">Disconnect</button>
+      </div>
     </div>
 
-    <!-- JavaScript -->
-    <script>
-let characteristic = null;
-        let device = null;
+    <div class="section">
+      <h3>⚙️ Motor Configuration</h3>
+      
+      <div class="control-row">
+        <label>Motor 1 Start:</label>
+        <input type="number" id="m1Start" value="0" onchange="updateValue('M1S', this.value)">
+      </div>
+      <div class="control-row">
+        <label>Motor 1 End:</label>
+        <input type="number" id="m1End" value="2000" onchange="updateValue('M1E', this.value)">
+      </div>
+      <div class="control-row">
+        <label>Motor 1 Speed:</label>
+        <input type="number" id="m1Speed" value="2000" onchange="updateValue('M1SPD', this.value)">
+      </div>
+      
+      <div class="control-row">
+        <label>Motor 2 Start:</label>
+        <input type="number" id="m2Start" value="0" onchange="updateValue('M2S', this.value)">
+      </div>
+      <div class="control-row">
+        <label>Motor 2 End:</label>
+        <input type="number" id="m2End" value="2000" onchange="updateValue('M2E', this.value)">
+      </div>
+      <div class="control-row">
+        <label>Motor 2 Speed:</label>
+        <input type="number" id="m2Speed" value="2000" onchange="updateValue('M2SPD', this.value)">
+      </div>
+      
+      <div class="control-row">
+        <label>Cycles:</label>
+        <select id="cycles" onchange="updateValue('CYCLES', this.value)">
+          <option value="0">Infinite</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+      
+      <div class="control-row">
+        <label>Return Mode:</label>
+        <select id="returnMode" onchange="updateValue('RETURN', this.value)">
+          <option value="1">Enabled</option>
+          <option value="0">Disabled</option>
+        </select>
+      </div>
+    </div>
 
-        // Connection status update
-        function updateStatus(message, connected) {
-            const status = document.getElementById('status');
-            status.textContent = message;
-            status.className = `status ${connected ? 'connected' : 'disconnected'}`;
-            
-            document.getElementById('connectBtn').disabled = connected;
-            document.getElementById('disconnectBtn').disabled = !connected;
-        }
+    <div class="section jog-container">
+      <h3>🕹️ Manual Jog Control - ENHANCED RESPONSIVE</h3>
+      
+      <!-- MOTOR 1 ENHANCED SLIDER -->
+      <div class="jog-control">
+        <label>🔧 Motor 1 Jog</label>
+        <div class="slider-container">
+          <input type="range" min="-100" max="100" value="0" 
+                 class="slider" id="m1Jog" 
+                 oninput="jogMotor('M1', this.value)" 
+                 onchange="jogMotor('M1', this.value)">
+          <div class="slider-labels">
+            <span>← Reverse</span>
+            <span>Stop</span>
+            <span>Forward →</span>
+          </div>
+        </div>
+        <div class="speed-display" id="m1Speed">Speed: 0</div>
+      </div>
 
-        // Connect to BLE device
-        async function connectBLE() {
-            try {
-                updateStatus('🔍 Searching for device...', false);
-                
-                device = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'CameraSlider' }],
-                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-                });
-                
-                updateStatus('🔗 Connecting...', false);
-                const server = await device.gatt.connect();
-                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-                
-                updateStatus('✅ Connected to Camera Slider', true);
-                
-                // Handle disconnect events
-                device.addEventListener('gattserverdisconnected', () => {
-                    updateStatus('📱 Disconnected', false);
-                    characteristic = null;
-                    device = null;
-                });
-                
-            } catch (error) {
-                console.error('Connection failed:', error);
-                updateStatus('❌ Connection failed - Try again', false);
-            }
-        }
+      <!-- MOTOR 2 ENHANCED SLIDER -->
+      <div class="jog-control">
+        <label>🔩 Motor 2 Jog</label>
+        <div class="slider-container">
+          <input type="range" min="-100" max="100" value="0" 
+                 class="slider" id="m2Jog"
+                 oninput="jogMotor('M2', this.value)"
+                 onchange="jogMotor('M2', this.value)">
+          <div class="slider-labels">
+            <span>← Reverse</span>
+            <span>Stop</span>
+            <span>Forward →</span>
+          </div>
+        </div>
+        <div class="speed-display" id="m2Speed">Speed: 0</div>
+      </div>
 
-        // Disconnect BLE
-        async function disconnectBLE() {
-            if (device && device.gatt.connected) {
-                await device.gatt.disconnect();
-            }
-            updateStatus('📱 Disconnected', false);
-            characteristic = null;
-            device = null;
-        }
+      <!-- BOTH MOTORS ENHANCED SLIDER -->
+      <div class="jog-control">
+        <label>⚡ Both Motors Jog</label>
+        <div class="slider-container">
+          <input type="range" min="-100" max="100" value="0" 
+                 class="slider" id="bothJog"
+                 oninput="jogMotor('BOTH', this.value)"
+                 onchange="jogMotor('BOTH', this.value)">
+          <div class="slider-labels">
+            <span>← Reverse</span>
+            <span>Stop</span>
+            <span>Forward →</span>
+          </div>
+        </div>
+        <div class="speed-display" id="bothSpeed">Speed: 0</div>
+      </div>
+    </div>
+<div class="section">
+      <h3>🎮 Movement Control</h3>
+      <div class="button-row">
+        <button class="btn btn-success" onclick="sendCommand('RUN')">▶️ Start</button>
+        <button class="btn btn-danger" onclick="sendCommand('STOP')">⏹️ Stop</button>
+        <button class="btn btn-warning" onclick="sendCommand('HOME')">🏠 Home</button>
+      </div>
+    </div>
+  </div>
 
-        // Send BLE command
-        async function sendBLE(command) {
-            if (!characteristic) {
-                alert('⚠️ Not connected! Please connect first.');
-                return;
-            }
-            
-            try {
-                const encoder = new TextEncoder();
-                await characteristic.writeValue(encoder.encode(command));
-                console.log('Sent:', command);
-            } catch (error) {
-                console.error('Send failed:', error);
-                updateStatus('❌ Send failed - Check connection', false);
-            }
-        }
-// Jog slider handlers with auto-center
-        function handleJogSlider(axis, value) {
-            document.getElementById(`jog${axis}Value`).textContent = value + '%';
-            sendBLE(`JOGSLIDER:${axis}:${value}`);
-        }
-
-        function autoCenter(axis) {
-            setTimeout(() => {
-                const slider = document.getElementById(`jog${axis}`);
-                slider.value = 0;
-                document.getElementById(`jog${axis}Value`).textContent = '0%';
-                sendBLE(`JOGSLIDER:${axis}:0`);
-            }, 100);
-        }
-
-        // Emergency stop function
-        function emergencyStop() {
-            if (confirm('🚨 EMERGENCY STOP - Are you sure?')) {
-                sendBLE('STOP');
-                // Reset all jog sliders
-                ['M1', 'M2', 'BOTH'].forEach(axis => {
-                    const slider = document.getElementById(`jog${axis}`);
-                    slider.value = 0;
-                    document.getElementById(`jog${axis}Value`).textContent = '0%';
-                });
-                alert('✅ Emergency stop activated!');
-            }
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function() {
-            // Set initial slider values
-            ['M1', 'M2', 'BOTH'].forEach(axis => {
-                document.getElementById(`jog${axis}Value`).textContent = '0%';
-            });
-            
-            // Check if browser supports Web Bluetooth
-            if (!navigator.bluetooth) {
-                alert('❌ Web Bluetooth not supported in this browser. Use Chrome/Edge on desktop or Android.');
-                document.getElementById('connectBtn').disabled = true;
-            }
+  <script>
+    let device = null;
+    let characteristic = null;
+    
+    // ENHANCED RESPONSE TRACKING
+    let lastCommandTime = 0;
+    const COMMAND_THROTTLE = 10; // Reduced from 50ms to 10ms for instant response
+    let commandQueue = [];
+    let isProcessingQueue = false;
+    
+    // SLIDER ENHANCEMENT VARIABLES
+    let sliderUpdateTimers = {
+      m1Jog: null,
+      m2Jog: null,
+      bothJog: null
+    };
+    
+    // INSTANT BLE CONNECTION
+    async function connectBLE() {
+      updateStatus('connecting', '🔄 Connecting to Camera Slider...');
+      
+      try {
+        device = await navigator.bluetooth.requestDevice({
+          filters: [{ name: 'CameraSlider' }],
+          optionalServices: ['12345678-1234-1234-1234-1234567890ab']
         });
-    </script>
+
+        const server = await device.gatt.connect();
+        const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+        characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+        
+        updateStatus('connected', '✅ Connected to Camera Slider');
+        console.log('BLE Connected successfully');
+        
+        // Reset all sliders to center position on connect
+        resetAllSliders();
+        
+      } catch (error) {
+        updateStatus('disconnected', '❌ Connection failed: ' + error.message);
+        console.error('BLE Connection error:', error);
+      }
+    }
+
+    async function disconnectBLE() {
+      if (device && device.gatt.connected) {
+        // Stop all motors before disconnect
+        await stopAllMotors();
+        device.gatt.disconnect();
+        updateStatus('disconnected', '📡 Disconnected');
+        resetAllSliders();
+      }
+    }
+
+    // ENHANCED COMMAND SENDING WITH INSTANT RESPONSE
+    async function sendCommand(command) {
+      if (!characteristic) {
+        console.log('Not connected');
+        return;
+      }
+
+      const now = Date.now();
+      if (now - lastCommandTime < COMMAND_THROTTLE) {
+        // Queue command for later processing
+        commandQueue.push(command);
+        processCommandQueue();
+        return;
+      }
+
+      try {
+        const encoder = new TextEncoder();
+        await characteristic.writeValue(encoder.encode(command));
+        console.log('Sent:', command);
+        lastCommandTime = now;
+        
+        // Visual feedback for button presses
+        highlightActiveCommand(command);
+        
+      } catch (error) {
+        console.error('Send error:', error);
+        updateStatus('disconnected', '❌ Communication error');
+      }
+    }
+
+    // ENHANCED COMMAND QUEUE PROCESSING
+    async function processCommandQueue() {
+      if (isProcessingQueue || commandQueue.length === 0) return;
+      
+      isProcessingQueue = true;
+      
+      while (commandQueue.length > 0) {
+        const command = commandQueue.shift();
+        const now = Date.now();
+        
+        if (now - lastCommandTime >= COMMAND_THROTTLE) {
+          await sendCommand(command);
+          await new Promise(resolve => setTimeout(resolve, COMMAND_THROTTLE));
+        }
+      }
+      
+      isProcessingQueue = false;
+    }
+
+    // ENHANCED JOG MOTOR WITH INSTANT FEEDBACK
+    function jogMotor(axis, value) {
+      const speed = parseInt(value);
+      
+      // INSTANT UI FEEDBACK
+      updateSpeedDisplay(axis, speed);
+      
+      // Clear existing timer for this slider
+      if (sliderUpdateTimers[axis.toLowerCase() + 'Jog']) {
+        clearTimeout(sliderUpdateTimers[axis.toLowerCase() + 'Jog']);
+      }
+      
+      // Set new timer for smoother updates
+      sliderUpdateTimers[axis.toLowerCase() + 'Jog'] = setTimeout(() => {
+        const command = `JOGSLIDER:${axis}:${speed}`;
+        sendCommand(command);
+      }, 5); // Ultra-fast 5ms delay for near-instant response
+      
+      // Visual feedback enhancement
+      highlightActiveSlider(axis, Math.abs(speed));
+    }
+
+    // ENHANCED SPEED DISPLAY WITH ANIMATIONS
+    function updateSpeedDisplay(axis, speed) {
+      let displayId;
+      if (axis === 'M1') displayId = 'm1Speed';
+      else if (axis === 'M2') displayId = 'm2Speed';
+      else if (axis === 'BOTH') displayId = 'bothSpeed';
+      
+      const display = document.getElementById(displayId);
+      if (display) {
+        const direction = speed > 0 ? ' →' : speed < 0 ? ' ←' : '';
+        const speedText = `Speed: ${Math.abs(speed)}${direction}`;
+        
+        display.textContent = speedText;
+        
+        // Enhanced visual feedback
+        if (speed !== 0) {
+          display.classList.add('active');
+          display.style.backgroundColor = `rgba(255,255,255,${0.3 + Math.abs(speed) / 200})`;
+        } else {
+          display.classList.remove('active');
+          display.style.backgroundColor = 'rgba(255,255,255,0.25)';
+        }
+      }
+    }
+// ENHANCED VISUAL FEEDBACK FUNCTIONS
+    function highlightActiveCommand(command) {
+      const buttons = document.querySelectorAll('.btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('btn-active');
+        if (btn.textContent.includes('Start') && command === 'RUN') {
+          btn.classList.add('btn-active');
+          setTimeout(() => btn.classList.remove('btn-active'), 200);
+        }
+        if (btn.textContent.includes('Stop') && command === 'STOP') {
+          btn.classList.add('btn-active');
+          setTimeout(() => btn.classList.remove('btn-active'), 200);
+        }
+        if (btn.textContent.includes('Home') && command === 'HOME') {
+          btn.classList.add('btn-active');
+          setTimeout(() => btn.classList.remove('btn-active'), 200);
+        }
+      });
+    }
+
+    function highlightActiveSlider(axis, intensity) {
+      const sliders = document.querySelectorAll('.slider');
+      sliders.forEach(slider => {
+        const container = slider.parentElement;
+        if ((axis === 'M1' && slider.id === 'm1Jog') ||
+            (axis === 'M2' && slider.id === 'm2Jog') ||
+            (axis === 'BOTH' && slider.id === 'bothJog')) {
+          
+          // Enhanced glow effect based on speed
+          const glowIntensity = Math.min(intensity / 100 * 0.8, 0.8);
+          container.style.boxShadow = `0 0 ${20 + intensity/5}px rgba(255,255,255,${glowIntensity})`;
+          
+          // Auto-reset glow after movement
+          setTimeout(() => {
+            if (slider.value == 0) {
+              container.style.boxShadow = 'none';
+            }
+          }, 100);
+        }
+      });
+    }
+
+    // ENHANCED UTILITY FUNCTIONS
+    function updateValue(key, value) {
+      if (!characteristic) {
+        console.log('Not connected - value not sent');
+        return;
+      }
+      
+      const command = `${key}:${value}`;
+      sendCommand(command);
+      
+      // Immediate UI feedback
+      console.log(`Updated ${key} to ${value}`);
+    }
+
+    function updateStatus(state, message) {
+      const statusDiv = document.getElementById('status');
+      statusDiv.className = `status ${state}`;
+      statusDiv.textContent = message;
+      
+      // Enhanced status animations
+      statusDiv.style.transform = 'scale(1.05)';
+      setTimeout(() => {
+        statusDiv.style.transform = 'scale(1)';
+      }, 150);
+    }
+
+    // ENHANCED SLIDER RESET FUNCTIONS
+    function resetAllSliders() {
+      const sliders = ['m1Jog', 'm2Jog', 'bothJog'];
+      sliders.forEach(sliderId => {
+        const slider = document.getElementById(sliderId);
+        if (slider) {
+          slider.value = 0;
+          updateSpeedDisplay(getAxisFromSlider(sliderId), 0);
+        }
+      });
+    }
+
+    function getAxisFromSlider(sliderId) {
+      if (sliderId === 'm1Jog') return 'M1';
+      if (sliderId === 'm2Jog') return 'M2';
+      if (sliderId === 'bothJog') return 'BOTH';
+      return 'M1';
+    }
+
+    async function stopAllMotors() {
+      // Reset all sliders and stop motors
+      resetAllSliders();
+      
+      // Send stop commands
+      await sendCommand('JOGSLIDER:M1:0');
+      await sendCommand('JOGSLIDER:M2:0');
+      await sendCommand('STOP');
+      
+      console.log('All motors stopped');
+    }
+
+    // ENHANCED KEYBOARD SHORTCUTS (BONUS FEATURE)
+    document.addEventListener('keydown', function(event) {
+      if (!characteristic) return;
+      
+      switch(event.key) {
+        case ' ': // Spacebar for emergency stop
+          event.preventDefault();
+          stopAllMotors();
+          updateStatus('connected', '🛑 Emergency Stop Activated');
+          break;
+        case 'r': // R for run
+          sendCommand('RUN');
+          break;
+        case 's': // S for stop
+          sendCommand('STOP');
+          break;
+        case 'h': // H for home
+          sendCommand('HOME');
+          break;
+      }
+    });
+
+    // AUTO-CENTER SLIDERS ON MOUSE RELEASE
+    document.addEventListener('DOMContentLoaded', function() {
+      const sliders = document.querySelectorAll('.slider');
+      sliders.forEach(slider => {
+        let isMouseDown = false;
+        
+        slider.addEventListener('mousedown', () => isMouseDown = true);
+        slider.addEventListener('mouseup', () => isMouseDown = false);
+        
+        // Auto-center when mouse leaves slider area
+        slider.addEventListener('mouseleave', () => {
+          if (!isMouseDown) {
+            setTimeout(() => {
+              slider.value = 0;
+              const axis = getAxisFromSlider(slider.id);
+              jogMotor(axis, 0);
+            }, 100);
+          }
+        });
+      });
+    });
+
+    // ENHANCED ERROR HANDLING
+    window.addEventListener('error', function(event) {
+      console.error('JavaScript Error:', event.error);
+      updateStatus('disconnected', '❌ Application Error - Refresh Page');
+    });
+
+    // ENHANCED BLUETOOTH DISCONNECT HANDLER
+    document.addEventListener('visibilitychange', function() {
+      if (document.hidden && characteristic) {
+        // Page hidden - stop all motors for safety
+        stopAllMotors();
+      }
+    });
+
+    console.log('🚀 Enhanced Camera Slider Control Loaded - Ultra Responsive Mode Active!');
+  </script>
 </body>
 </html>
+
 
 
 
