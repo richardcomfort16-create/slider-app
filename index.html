@@ -1,834 +1,685 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Camera Slider Control - Enhanced</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none;
-      -webkit-user-select: none;
-    }
-
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-      color: white;
-      min-height: 100vh;
-      overflow-x: hidden;
-    }
-
-    .container {
-      max-width: 800px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
-    }
-
-    .section {
-      background: rgba(255,255,255,0.1);
-      backdrop-filter: blur(10px);
-      border-radius: 15px;
-      padding: 25px;
-      margin-bottom: 25px;
-      border: 1px solid rgba(255,255,255,0.2);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-    }
-
-    .section h3 {
-      margin-bottom: 20px;
-      font-size: 1.4em;
-      color: #ffc107;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    /* STATUS STYLES */
-    .status {
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-      font-weight: bold;
-      font-size: 1.1em;
-      margin-bottom: 25px;
-      transition: all 0.3s ease;
-    }
-
-    .status.connected {
-      background: rgba(40,167,69,0.3);
-      border: 2px solid #28a745;
-      box-shadow: 0 0 20px rgba(40,167,69,0.3);
-    }
-
-    .status.disconnected {
-      background: rgba(220,53,69,0.3);
-      border: 2px solid #dc3545;
-      box-shadow: 0 0 20px rgba(220,53,69,0.3);
-    }
-
-    /* ENHANCED BIG SLIDER STYLES */
-    .big-slider-container {
-      margin: 25px 0;
-      background: rgba(0,0,0,0.2);
-      border-radius: 15px;
-      padding: 30px;
-      border: 2px solid rgba(255,255,255,0.1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .big-slider-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: linear-gradient(45deg, rgba(255,255,255,0.05) 0%, transparent 100%);
-      pointer-events: none;
-    }
-
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-
-    .slider-title {
-      font-size: 1.3em;
-      font-weight: bold;
-      color: #ffc107;
-      text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
-    }
-
-    .value-display {
-      font-size: 1.4em;
-      font-weight: bold;
-      color: #00ff88;
-      text-shadow: 0 0 10px rgba(0,255,136,0.5);
-      min-width: 100px;
-      text-align: right;
-    }
-/* BIG SLIDER TRACK */
-    .big-slider {
-      width: 100%;
-      height: 60px;
-      -webkit-appearance: none;
-      appearance: none;
-      background: linear-gradient(to right, #ff4757 0%, #ffc107 50%, #2ed573 100%);
-      border-radius: 30px;
-      outline: none;
-      position: relative;
-      cursor: pointer;
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.3), 0 2px 20px rgba(255,255,255,0.1);
-      border: 3px solid rgba(255,255,255,0.2);
-      transition: all 0.2s ease;
-    }
-
-    .big-slider:hover {
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.4), 0 4px 30px rgba(255,255,255,0.2);
-      transform: translateY(-2px);
-    }
-
-    .big-slider:active {
-      transform: translateY(0px) scale(0.98);
-    }
-
-    /* BIG SLIDER THUMB */
-    .big-slider::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 80px;
-      height: 80px;
-      background: radial-gradient(circle, #ffffff 0%, #e0e0e0 100%);
-      border-radius: 50%;
-      cursor: grab;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4), inset 0 2px 4px rgba(255,255,255,0.8);
-      border: 4px solid rgba(255,255,255,0.9);
-      transition: all 0.1s ease;
-    }
-
-    .big-slider::-webkit-slider-thumb:hover {
-      background: radial-gradient(circle, #f8f9fa 0%, #dee2e6 100%);
-      transform: scale(1.1);
-      box-shadow: 0 6px 25px rgba(0,0,0,0.5), inset 0 2px 4px rgba(255,255,255,0.9);
-    }
-
-    .big-slider::-webkit-slider-thumb:active {
-      cursor: grabbing;
-      transform: scale(1.05);
-      background: radial-gradient(circle, #ffc107 0%, #fd7e14 100%);
-    }
-
-    /* CENTER INDICATOR */
-    .center-indicator {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 6px;
-      height: 40px;
-      background: rgba(255,255,255,0.8);
-      border-radius: 3px;
-      pointer-events: none;
-      z-index: 1;
-      box-shadow: 0 0 10px rgba(255,255,255,0.5);
-    }
-
-    /* SLIDER RANGE INPUTS */
-    .range-inputs {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 15px;
-      gap: 15px;
-    }
-
-    .range-input {
-      flex: 1;
-      text-align: center;
-    }
-
-    .range-input label {
-      display: block;
-      font-size: 0.9em;
-      color: #aaa;
-      margin-bottom: 5px;
-    }
-
-    .range-input input {
-      width: 100%;
-      padding: 8px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      background: rgba(0,0,0,0.3);
-      color: white;
-      text-align: center;
-      font-size: 1em;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .range-input input:focus {
-      border-color: #ffc107;
-      box-shadow: 0 0 15px rgba(255,193,7,0.3);
-      background: rgba(0,0,0,0.5);
-    }
-
-    /* EDITABLE VALUE DISPLAY */
-    .editable-value {
-      background: rgba(0,0,0,0.3);
-      border: 2px solid rgba(0,255,136,0.3);
-      border-radius: 8px;
-      padding: 8px 12px;
-      cursor: text;
-      transition: all 0.3s ease;
-      min-width: 120px;
-    }
-
-    .editable-value:hover {
-      border-color: rgba(0,255,136,0.5);
-      background: rgba(0,0,0,0.4);
-    }
-
-    .editable-value:focus {
-      outline: none;
-      border-color: #00ff88;
-      box-shadow: 0 0 15px rgba(0,255,136,0.3);
-      background: rgba(0,0,0,0.6);
-    }
-/* BUTTON STYLES */
-    .btn {
-      padding: 15px 25px;
-      border: none;
-      border-radius: 10px;
-      font-size: 1.1em;
-      font-weight: bold;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      background: rgba(255,255,255,0.2);
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s ease, height 0.3s ease;
-    }
-
-    .btn:active::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-primary {
-      background: linear-gradient(45deg, #007bff, #0056b3);
-      color: white;
-      border: 2px solid rgba(255,255,255,0.2);
-    }
-
-    .btn-primary:hover {
-      background: linear-gradient(45deg, #0056b3, #004085);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(0,123,255,0.3);
-    }
-
-    .btn-success {
-      background: linear-gradient(45deg, #28a745, #1e7e34);
-      color: white;
-    }
-
-    .btn-success:hover {
-      background: linear-gradient(45deg, #1e7e34, #155724);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(40,167,69,0.3);
-    }
-
-    .btn-warning {
-      background: linear-gradient(45d45eg, #ffc107, #e0a800);
-      color: #212529;
-    }
-
-    .btn-warning:hover {
-      background: linear-gradient(45deg, #e0a800, #d39e00);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(255,193,7,0.3);
-    }
-
-    .btn-danger {
-      background: linear-gradient(45deg, #dc3545, #bd2130);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: linear-gradient(45deg, #bd2130, #a71e2a);
-      transform: translateY(-3px);
-      box-shadow: 0 6px 20px rgba(220,53,69,0.3);
-    }
-
-    /* GRID LAYOUTS */
-    .controls-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-      gap: 15px;
-      margin: 20px 0;
-    }
-
-    .connection-grid {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 15px;
-      align-items: end;
-    }
-
-    .input-group {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .input-group label {
-      margin-bottom: 8px;
-      font-weight: bold;
-      color: #ffc107;
-    }
-
-    .input-group input {
-      padding: 12px;
-      border: 2px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      background: rgba(0,0,0,0.3);
-      color: white;
-      font-size: 1.1em;
-      outline: none;
-      transition: all 0.3s ease;
-    }
-
-    .input-group input:focus {
-      border-color: #ffc107;
-      box-shadow: 0 0 15px rgba(255,193,7,0.3);
-      background: rgba(0,0,0,0.5);
-    }
-
-    /* RESPONSIVE DESIGN */
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      h1 {
-        font-size: 2em;
-      }
-
-      .connection-grid {
-        grid-template-columns: 1fr;
-        gap: 10px;
-      }
-
-      .controls-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .big-slider {
-        height: 50px;
-      }
-
-      .big-slider::-webkit-slider-thumb {
-        width: 60px;
-        height: 60px;
-      }
-
-      .range-inputs {
-        flex-direction: column;
-        gap: 10px;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Slider Control</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        
+        .connection-section {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .status {
+            font-weight: bold;
+            font-size: 16px;
+            margin: 10px 0;
+            padding: 8px 15px;
+            border-radius: 5px;
+            display: inline-block;
+        }
+        
+        .status.connected {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .status.error {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        
+        .control-group {
+            margin: 25px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+        
+        .control-group h3 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .input-row {
+            display: flex;
+            align-items: center;
+            margin: 15px 0;
+            gap: 10px;
+        }
+        
+        label {
+            min-width: 120px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input[type="number"], input[type="text"] {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            width: 100px;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            margin: 0 15px;
+            height: 8px;
+            border-radius: 4px;
+            background: #ddd;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0056b3;
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #1e7e34;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .btn-warning:hover {
+            background-color: #e0a800;
+            transform: translateY(-2px);
+        }
+.button-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .jog-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto 1fr 1fr;
+            gap: 10px;
+            align-items: center;
+            margin: 20px 0;
+        }
+        
+        .stop-btn {
+            grid-column: 3;
+            font-size: 18px;
+            padding: 15px 20px;
+            background-color: #dc3545;
+            border: 3px solid #721c24;
+        }
+        
+        .quick-positions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            margin: 15px 0;
+        }
+        
+        .preset-btn {
+            background-color: #6c757d;
+            color: white;
+            font-size: 12px;
+            padding: 8px 12px;
+        }
+        
+        .preset-btn:hover {
+            background-color: #5a6268;
+        }
+        
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 15px 0;
+            padding: 10px;
+            background-color: white;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+        
+        .slider-label {
+            min-width: 80px;
+            font-weight: bold;
+            color: #333;
+            text-align: left;
+        }
+        
+        .slider-input {
+            width: 60px;
+            text-align: center;
+            border: 1px solid #007bff;
+        }
+        
+        .center-btn {
+            background-color: #17a2b8;
+            color: white;
+            padding: 6px 12px;
+            font-size: 12px;
+            min-width: 60px;
+        }
+        
+        .center-btn:hover {
+            background-color: #138496;
+        }
+        
+        .connection-inputs {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        
+        .ip-input {
+            padding: 8px 12px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 150px;
+            text-align: center;
+        }
+        
+        .quick-ip-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .quick-ip-btn {
+            background-color: #e9ecef;
+            color: #495057;
+            border: 1px solid #ced4da;
+            font-size: 11px;
+            padding: 5px 8px;
+        }
+        
+        .quick-ip-btn:hover {
+            background-color: #dee2e6;
+        }
+        
+        .parameter-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .param-box {
+            padding: 15px;
+            background-color: white;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+        }
+        
+        .param-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 15px;
+            text-align: center;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .param-input {
+            width: 70px;
+            margin: 0 5px;
+            text-align: center;
+            font-size: 12px;
+        }
+        
+        .param-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 0;
+            font-size: 13px;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin: 15px 0;
+            flex-wrap: wrap;
+        }
+        
+        .indicator {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .indicator.active {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .indicator.inactive {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                margin: 10px;
+                padding: 15px;
+            }
+            
+            .parameter-section {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .jog-grid {
+                grid-template-columns: 1fr 1fr;
+                grid-template-rows: auto auto auto;
+            }
+            
+            .stop-btn {
+                grid-column: 1 / -1;
+                grid-row: 2;
+            }
+            
+            .button-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            input[type="number"], input[type="text"] {
+                width: 80px;
+            }
+        }
+    </style>
 </head>
-
 <body>
-  <div class="container">
-    <h1>🎬 Camera Slider Control</h1>
-
-    <!-- CONNECTION SECTION -->
-    <div class="section">
-      <h3>📡 Connection</h3>
-      <div id="status" class="status disconnected">🔴 Disconnected</div>
-      
-      <div class="connection-grid">
-        <div class="input-group">
-          <label for="ipAddress">ESP32 IP Address</label>
-          <input type="text" id="ipAddress" placeholder="192.168.1.100" value="">
+<div class="container">
+        <h1>🎥 Camera Slider Control</h1>
+        
+        <!-- Connection Section -->
+        <div class="connection-section">
+            <h3>📡 BLE Connection</h3>
+            <div class="status-indicators">
+                <div id="status" class="status disconnected">🔴 Disconnected</div>
+                <div id="bleStatus" class="indicator inactive">BLE: Not Connected</div>
+            </div>
+            
+            <div class="connection-inputs">
+                <label for="deviceName">Device:</label>
+                <input type="text" id="deviceName" class="ip-input" value="CameraSlider" placeholder="Device Name">
+                <button class="btn-success" onclick="connectBLE()">🔗 Connect BLE</button>
+                <button class="btn-danger" onclick="disconnectBLE()">🔌 Disconnect</button>
+            </div>
+            
+            <div class="quick-ip-grid">
+                <button class="quick-ip-btn" onclick="setDeviceName('CameraSlider')">Default Device</button>
+                <button class="quick-ip-btn" onclick="setDeviceName('ESP32Slider')">ESP32 Slider</button>
+            </div>
         </div>
-        <button class="btn btn-success" onclick="connect()">Connect</button>
-        <button class="btn btn-danger" onclick="disconnect()">Disconnect</button>
-      </div>
-      
-      <div class="controls-grid" style="margin-top: 15px;">
-        <button class="btn btn-warning" onclick="setIP('192.168.1.100')">Home WiFi</button>
-        <button class="btn btn-warning" onclick="setIP('192.168.4.1')">AP Mode</button>
-        <button class="btn btn-warning" onclick="setIP('10.0.0.100')">Office</button>
-      </div>
+
+        <!-- Motor 1 Controls -->
+        <div class="control-group">
+            <h3>🎯 Motor 1 (M1) Controls</h3>
+            
+            <div class="slider-container">
+                <label class="slider-label">Position:</label>
+                <input type="number" id="m1PosInput" class="slider-input" value="1000" min="0" max="4000" 
+                       onchange="updateM1FromInput()" onkeypress="handleEnterKey(event, updateM1FromInput)">
+                <input type="range" id="m1PosSlider" min="0" max="4000" value="1000" 
+                       oninput="updateM1Display()" onchange="sendM1Position()">
+                <button class="center-btn" onclick="centerM1Slider()">Center</button>
+            </div>
+            
+            <div class="slider-container">
+                <label class="slider-label">Speed:</label>
+                <input type="number" id="m1SpeedInput" class="slider-input" value="2000" min="100" max="5000" 
+                       onchange="updateM1SpeedFromInput()" onkeypress="handleEnterKey(event, updateM1SpeedFromInput)">
+                <input type="range" id="m1SpeedSlider" min="100" max="5000" value="2000" 
+                       oninput="updateM1SpeedDisplay()" onchange="sendM1Speed()">
+                <button class="center-btn" onclick="centerM1SpeedSlider()">Default</button>
+            </div>
+            
+            <div class="parameter-section">
+                <div class="param-box">
+                    <div class="param-title">M1 Range Settings</div>
+                    <div class="param-row">
+                        <span>Start:</span>
+                        <input type="number" id="m1Start" class="param-input" value="0" onchange="sendM1Start()">
+                    </div>
+                    <div class="param-row">
+                        <span>End:</span>
+                        <input type="number" id="m1End" class="param-input" value="4000" onchange="sendM1End()">
+                    </div>
+                </div>
+                
+                <div class="param-box">
+                    <div class="param-title">Quick M1 Positions</div>
+                    <div class="quick-positions">
+                        <button class="preset-btn" onclick="setM1Position(0)">Start</button>
+                        <button class="preset-btn" onclick="setM1Position(1000)">25%</button>
+                        <button class="preset-btn" onclick="setM1Position(2000)">50%</button>
+                        <button class="preset-btn" onclick="setM1Position(4000)">End</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Motor 2 Controls -->
+        <div class="control-group">
+            <h3>🎯 Motor 2 (M2) Controls</h3>
+            
+            <div class="slider-container">
+                <label class="slider-label">Position:</label>
+                <input type="number" id="m2PosInput" class="slider-input" value="1000" min="0" max="4000" 
+                       onchange="updateM2FromInput()" onkeypress="handleEnterKey(event, updateM2FromInput)">
+                <input type="range" id="m2PosSlider" min="0" max="4000" value="1000" 
+                       oninput="updateM2Display()" onchange="sendM2Position()">
+                <button class="center-btn" onclick="centerM2Slider()">Center</button>
+            </div>
+            
+            <div class="slider-container">
+                <label class="slider-label">Speed:</label>
+                <input type="number" id="m2SpeedInput" class="slider-input" value="2000" min="100" max="5000" 
+                       onchange="updateM2SpeedFromInput()" onkeypress="handleEnterKey(event, updateM2SpeedFromInput)">
+                <input type="range" id="m2SpeedSlider" min="100" max="5000" value="2000" 
+                       oninput="updateM2SpeedDisplay()" onchange="sendM2Speed()">
+                <button class="center-btn" onclick="centerM2SpeedSlider()">Default</button>
+            </div>
+            
+            <div class="parameter-section">
+                <div class="param-box">
+                    <div class="param-title">M2 Range Settings</div>
+                    <div class="param-row">
+                        <span>Start:</span>
+                        <input type="number" id="m2Start" class="param-input" value="0" onchange="sendM2Start()">
+                    </div>
+                    <div class="param-row">
+                        <span>End:</span>
+                        <input type="number" id="m2End" class="param-input" value="4000" onchange="sendM2End()">
+                    </div>
+                </div>
+                
+                <div class="param-box">
+                    <div class="param-title">Quick M2 Positions</div>
+                    <div class="quick-positions">
+                        <button class="preset-btn" onclick="setM2Position(0)">Start</button>
+                        <button class="preset-btn" onclick="setM2Position(1000)">25%</button>
+                        <button class="preset-btn" onclick="setM2Position(2000)">50%</button>
+                        <button class="preset-btn" onclick="setM2Position(4000)">End</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- Jog Controls -->
+        <div class="control-group">
+            <h3>🕹️ Manual Jog Controls</h3>
+            
+            <div class="jog-grid">
+                <button class="btn-primary" onmousedown="startContinuousJog('M1', 'left')" 
+                        onmouseup="stopJog()" ontouchstart="startContinuousJog('M1', 'left')" 
+                        ontouchend="stopJog()">◀◀ M1 Left</button>
+                        
+                <button class="btn-primary" onmousedown="startContinuousJog('M1', 'right')" 
+                        onmouseup="stopJog()" ontouchstart="startContinuousJog('M1', 'right')" 
+                        ontouchend="stopJog()">M1 Right ▶▶</button>
+                        
+                <button class="stop-btn btn-danger" onclick="emergencyStop()">🛑 STOP</button>
+                
+                <button class="btn-primary" onmousedown="startContinuousJog('M2', 'left')" 
+                        onmouseup="stopJog()" ontouchstart="startContinuousJog('M2', 'left')" 
+                        ontouchend="stopJog()">◀◀ M2 Left</button>
+                        
+                <button class="btn-primary" onmousedown="startContinuousJog('M2', 'right')" 
+                        onmouseup="stopJog()" ontouchstart="startContinuousJog('M2', 'right')" 
+                        ontouchend="stopJog()">M2 Right ▶▶</button>
+            </div>
+            
+            <div class="parameter-section">
+                <div class="param-box">
+                    <div class="param-title">M1 Jog Speeds</div>
+                    <div class="param-row">
+                        <span>Slow:</span>
+                        <input type="number" id="m1JogSlow" class="param-input" value="20" min="5" max="100">
+                    </div>
+                    <div class="param-row">
+                        <span>Fast:</span>
+                        <input type="number" id="m1JogFast" class="param-input" value="80" min="20" max="100">
+                    </div>
+                </div>
+                
+                <div class="param-box">
+                    <div class="param-title">M2 Jog Speeds</div>
+                    <div class="param-row">
+                        <span>Slow:</span>
+                        <input type="number" id="m2JogSlow" class="param-input" value="20" min="5" max="100">
+                    </div>
+                    <div class="param-row">
+                        <span>Fast:</span>
+                        <input type="number" id="m2JogFast" class="param-input" value="80" min="20" max="100">
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- Sequence Controls -->
+        <div class="control-group">
+            <h3>🎬 Sequence Controls</h3>
+            
+            <div class="button-grid">
+                <button class="btn-success" onclick="startSequence()">▶️ START</button>
+                <button class="btn-warning" onclick="pauseSequence()">⏸️ PAUSE</button>
+                <button class="btn-danger" onclick="stopSequence()">⏹️ STOP</button>
+                <button class="btn-primary" onclick="homeMotors()">🏠 HOME</button>
+                <button class="btn-primary" onclick="testRun()">🧪 TEST</button>
+                <button class="btn-primary" onclick="savePreset()">💾 SAVE</button>
+            </div>
+            
+            <div class="parameter-section">
+                <div class="param-box">
+                    <div class="param-title">Sequence Settings</div>
+                    <div class="param-row">
+                        <span>Cycles:</span>
+                        <input type="number" id="cycles" class="param-input" value="1" min="0" max="99" 
+                               onchange="sendCycles()">
+                        <small>(0=∞)</small>
+                    </div>
+                    <div class="param-row">
+                        <span>Return:</span>
+                        <label class="switch">
+                            <input type="checkbox" id="returnEnabled" checked onchange="sendReturn()">
+                            <span class="slider-switch"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="param-box">
+                    <div class="param-title">Status Display</div>
+                    <div class="param-row">
+                        <span>M1 Pos:</span>
+                        <span id="m1CurrentPos">0</span>
+                    </div>
+                    <div class="param-row">
+                        <span>M2 Pos:</span>
+                        <span id="m2CurrentPos">0</span>
+                    </div>
+                    <div class="param-row">
+                        <span>Cycle:</span>
+                        <span id="currentCycle">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Combined Controls -->
+        <div class="control-group">
+            <h3>⚡ Combined Motor Controls</h3>
+            
+            <div class="slider-container">
+                <label class="slider-label">Both Pos:</label>
+                <input type="number" id="bothPosInput" class="slider-input" value="1000" min="0" max="4000" 
+                       onchange="updateBothFromInput()" onkeypress="handleEnterKey(event, updateBothFromInput)">
+                <input type="range" id="bothPosSlider" min="0" max="4000" value="1000" 
+                       oninput="updateBothDisplay()" onchange="sendBothPosition()">
+                <button class="center-btn" onclick="centerBothSlider()">Center</button>
+            </div>
+            
+            <div class="button-grid">
+                <button class="btn-primary" onmousedown="startContinuousJog('BOTH', 'left')" 
+                        onmouseup="stopJog()">◀◀ Both Left</button>
+                <button class="btn-primary" onmousedown="startContinuousJog('BOTH', 'right')" 
+                        onmouseup="stopJog()">Both Right ▶▶</button>
+                <button class="btn-warning" onclick="syncMotors()">🔄 SYNC</button>
+            </div>
+        </div>
+        
+        <!-- Toggle Switch CSS -->
+        <style>
+            .switch {
+                position: relative;
+                display: inline-block;
+                width: 40px;
+                height: 20px;
+            }
+            
+            .switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+            
+            .slider-switch {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: .4s;
+                border-radius: 20px;
+            }
+            
+            .slider-switch:before {
+                position: absolute;
+                content: "";
+                height: 16px;
+                width: 16px;
+                left: 2px;
+                bottom: 2px;
+                background-color: white;
+                transition: .4s;
+                border-radius: 50%;
+            }
+            
+            input:checked + .slider-switch {
+                background-color: #2196F3;
+            }
+            
+            input:checked + .slider-switch:before {
+                transform: translateX(20px);
+            }
+        </style>
     </div>
-<!-- POSITION CONTROL SECTION -->
-    <div class="section">
-      <h3>📍 Position Control</h3>
-      
-      <div class="big-slider-container">
-        <div class="slider-header">
-          <span class="slider-title">Position</span>
-          <input type="number" class="editable-value" id="positionValue" value="512" 
-                 onchange="updatePositionFromInput()" onkeypress="handleEnterKey(event, updatePositionFromInput)">
-        </div>
-        <div style="position: relative;">
-          <div class="center-indicator"></div>
-          <input type="range" class="big-slider" id="positionSlider" 
-                 min="0" max="1024" value="512" step="1"
-                 oninput="updatePositionDisplay()" onchange="sendPosition(); centerSlider('positionSlider')">
-        </div>
-        <div class="range-inputs">
-          <div class="range-input">
-            <label>Start Position</label>
-            <input type="number" id="startPos" value="0" min="0" max="1024" onchange="updateSliderRange('position')">
-          </div>
-          <div class="range-input">
-            <label>Center Position</label>
-            <input type="number" id="centerPos" value="512" min="0" max="1024" onchange="updateSliderRange('position')">
-          </div>
-          <div class="range-input">
-            <label>End Position</label>
-            <input type="number" id="endPos" value="1024" min="0" max="1024" onchange="updateSliderRange('position')">
-          </div>
-        </div>
-      </div>
-
-      <div class="controls-grid">
-        <button class="btn btn-primary" onclick="setPositionFromInput('startPos')">Go to Start</button>
-        <button class="btn btn-primary" onclick="setPositionFromInput('centerPos')">Go to Center</button>
-        <button class="btn btn-primary" onclick="setPositionFromInput('endPos')">Go to End</button>
-        <button class="btn btn-warning" onclick="sendCommand('home')">🏠 Home</button>
-      </div>
-    </div>
-
-    <!-- SPEED CONTROL SECTION -->
-    <div class="section">
-      <h3>⚡ Speed Control</h3>
-      
-      <div class="big-slider-container">
-        <div class="slider-header">
-          <span class="slider-title">Speed</span>
-          <input type="number" class="editable-value" id="speedValue" value="128" 
-                 onchange="updateSpeedFromInput()" onkeypress="handleEnterKey(event, updateSpeedFromInput)">
-        </div>
-        <div style="position: relative;">
-          <div class="center-indicator"></div>
-          <input type="range" class="big-slider" id="speedSlider" 
-                 min="10" max="255" value="128" step="1"
-                 oninput="updateSpeedDisplay()" onchange="sendSpeed(); centerSlider('speedSlider')">
-        </div>
-        <div class="range-inputs">
-          <div class="range-input">
-            <label>Min Speed</label>
-            <input type="number" id="minSpeed" value="10" min="1" max="255" onchange="updateSliderRange('speed')">
-          </div>
-          <div class="range-input">
-            <label>Normal Speed</label>
-            <input type="number" id="normalSpeed" value="128" min="1" max="255" onchange="updateSliderRange('speed')">
-          </div>
-          <div class="range-input">
-            <label>Max Speed</label>
-            <input type="number" id="maxSpeed" value="255" min="1" max="255" onchange="updateSliderRange('speed')">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ACCELERATION CONTROL SECTION -->
-    <div class="section">
-      <h3>🚀 Acceleration Control</h3>
-      
-      <div class="big-slider-container">
-        <div class="slider-header">
-          <span class="slider-title">Acceleration</span>
-          <input type="number" class="editable-value" id="accelValue" value="50" 
-                 onchange="updateAccelFromInput()" onkeypress="handleEnterKey(event, updateAccelFromInput)">
-        </div>
-        <div style="position: relative;">
-          <div class="center-indicator"></div>
-          <input type="range" class="big-slider" id="accelSlider" 
-                 min="1" max="100" value="50" step="1"
-                 oninput="updateAccelDisplay()" onchange="sendAccel(); centerSlider('accelSlider')">
-        </div>
-        <div class="range-inputs">
-          <div class="range-input">
-            <label>Slow Accel</label>
-            <input type="number" id="slowAccel" value="10" min="1" max="100" onchange="updateSliderRange('accel')">
-          </div>
-          <div class="range-input">
-            <label>Medium Accel</label>
-            <input type="number" id="mediumAccel" value="50" min="1" max="100" onchange="updateSliderRange('accel')">
-          </div>
-          <div class="range-input">
-            <label>Fast Accel</label>
-            <input type="number" id="fastAccel" value="100" min="1" max="100" onchange="updateSliderRange('accel')">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- JOG CONTROL SECTION -->
-    <div class="section">
-      <h3>🕹️ Jog Controls</h3>
-      
-      <div class="range-inputs" style="margin-bottom: 20px;">
-        <div class="range-input">
-          <label>Slow Jog Speed</label>
-          <input type="number" id="jogSlow" value="30" min="1" max="255">
-        </div>
-        <div class="range-input">
-          <label>Medium Jog Speed</label>
-          <input type="number" id="jogMedium" value="80" min="1" max="255">
-        </div>
-        <div class="range-input">
-          <label>Fast Jog Speed</label>
-          <input type="number" id="jogFast" value="150" min="1" max="255">
-        </div>
-        <div class="range-input">
-          <label>Max Jog Speed</label>
-          <input type="number" id="jogMax" value="255" min="1" max="255">
-        </div>
-      </div>
-<div class="controls-grid">
-        <button class="btn btn-primary" onclick="jogLeft('slow')" onmousedown="startContinuousJog('left', 'slow')" onmouseup="stopJog()" ontouchstart="startContinuousJog('left', 'slow')" ontouchend="stopJog()">◀◀ Slow</button>
-        <button class="btn btn-primary" onclick="jogLeft('medium')" onmousedown="startContinuousJog('left', 'medium')" onmouseup="stopJog()" ontouchstart="startContinuousJog('left', 'medium')" ontouchend="stopJog()">◀ Medium</button>
-        <button class="btn btn-warning" onclick="sendCommand('stop')">⏹ STOP</button>
-        <button class="btn btn-primary" onclick="jogRight('medium')" onmousedown="startContinuousJog('right', 'medium')" onmouseup="stopJog()" ontouchstart="startContinuousJog('right', 'medium')" ontouchend="stopJog()">Medium ▶</button>
-        <button class="btn btn-primary" onclick="jogRight('fast')" onmousedown="startContinuousJog('right', 'fast')" onmouseup="stopJog()" ontouchstart="startContinuousJog('right', 'fast')" ontouchend="stopJog()">Fast ▶▶</button>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    let websocket;
-    let connected = false;
-    let jogInterval;
-
-    // Auto-center slider function with smooth animation
-    function centerSlider(sliderId) {
-      setTimeout(() => {
-        const slider = document.getElementById(sliderId);
-        const min = parseInt(slider.min);
-        const max = parseInt(slider.max);
-        const center = Math.round((min + max) / 2);
-        
-        // Smooth animation to center
-        let current = parseInt(slider.value);
-        const step = (center - current) / 10;
-        
-        function animateToCenter() {
-          current += step;
-          if (Math.abs(current - center) > 1) {
-            slider.value = Math.round(current);
-            updateDisplayFromSlider(sliderId);
-            requestAnimationFrame(animateToCenter);
-          } else {
-            slider.value = center;
-            updateDisplayFromSlider(sliderId);
-          }
-        }
-        animateToCenter();
-      }, 300);
-    }
-
-    // Update display from slider movement
-    function updateDisplayFromSlider(sliderId) {
-      const slider = document.getElementById(sliderId);
-      const value = slider.value;
-      
-      if (sliderId === 'positionSlider') {
-        document.getElementById('positionValue').value = value;
-      } else if (sliderId === 'speedSlider') {
-        document.getElementById('speedValue').value = value;
-      } else if (sliderId === 'accelSlider') {
-        document.getElementById('accelValue').value = value;
-      }
-    }
-
-    // Enhanced slider update functions
-    function updatePositionDisplay() {
-      const value = document.getElementById('positionSlider').value;
-      document.getElementById('positionValue').value = value;
-    }
-
-    function updateSpeedDisplay() {
-      const value = document.getElementById('speedSlider').value;
-      document.getElementById('speedValue').value = value;
-    }
-
-    function updateAccelDisplay() {
-      const value = document.getElementById('accelSlider').value;
-      document.getElementById('accelValue').value = value;
-    }
-
-    // Update slider from input field
-    function updatePositionFromInput() {
-      const value = document.getElementById('positionValue').value;
-      const slider = document.getElementById('positionSlider');
-      slider.value = Math.max(slider.min, Math.min(slider.max, value));
-      sendPosition();
-    }
-
-    function updateSpeedFromInput() {
-      const value = document.getElementById('speedValue').value;
-      const slider = document.getElementById('speedSlider');
-      slider.value = Math.max(slider.min, Math.min(slider.max, value));
-      sendSpeed();
-    }
-
-    function updateAccelFromInput() {
-      const value = document.getElementById('accelValue').value;
-      const slider = document.getElementById('accelSlider');
-      slider.value = Math.max(slider.min, Math.min(slider.max, value));
-      sendAccel();
-    }
-// Update slider ranges dynamically
-    function updateSliderRange(type) {
-      if (type === 'position') {
-        const start = parseInt(document.getElementById('startPos').value);
-        const end = parseInt(document.getElementById('endPos').value);
-        const center = parseInt(document.getElementById('centerPos').value);
-        const slider = document.getElementById('positionSlider');
-        slider.min = start;
-        slider.max = end;
-        if (slider.value < start || slider.value > end) {
-          slider.value = center;
-          updatePositionDisplay();
-        }
-      } else if (type === 'speed') {
-        const min = parseInt(document.getElementById('minSpeed').value);
-        const max = parseInt(document.getElementById('maxSpeed').value);
-        const normal = parseInt(document.getElementById('normalSpeed').value);
-        const slider = document.getElementById('speedSlider');
-        slider.min = min;
-        slider.max = max;
-        if (slider.value < min || slider.value > max) {
-          slider.value = normal;
-          updateSpeedDisplay();
-        }
-      } else if (type === 'accel') {
-        const slow = parseInt(document.getElementById('slowAccel').value);
-        const fast = parseInt(document.getElementById('fastAccel').value);
-        const medium = parseInt(document.getElementById('mediumAccel').value);
-        const slider = document.getElementById('accelSlider');
-        slider.min = slow;
-        slider.max = fast;
-        if (slider.value < slow || slider.value > fast) {
-          slider.value = medium;
-          updateAccelDisplay();
-        }
-      }
-    }
-
-    // Enhanced jog controls
-    function jogLeft(speed) {
-      const jogSpeed = getJogSpeed(speed);
-      sendCommand(`jog_left:${jogSpeed}`);
-    }
-
-    function jogRight(speed) {
-      const jogSpeed = getJogSpeed(speed);
-      sendCommand(`jog_right:${jogSpeed}`);
-    }
-
-    function getJogSpeed(speedType) {
-      switch(speedType) {
-        case 'slow': return document.getElementById('jogSlow').value;
-        case 'medium': return document.getElementById('jogMedium').value;
-        case 'fast': return document.getElementById('jogFast').value;
-        case 'max': return document.getElementById('jogMax').value;
-        default: return document.getElementById('jogMedium').value;
-      }
-    }
-
-    // Continuous jog for hold-to-jog functionality
-    function startContinuousJog(direction, speed) {
-      stopJog();
-      const jogSpeed = getJogSpeed(speed);
-      const command = direction === 'left' ? `jog_left:${jogSpeed}` : `jog_right:${jogSpeed}`;
-      
-      sendCommand(command);
-      jogInterval = setInterval(() => {
-        sendCommand(command);
-      }, 100);
-    }
-
-    function stopJog() {
-      if (jogInterval) {
-        clearInterval(jogInterval);
-        jogInterval = null;
-      }
-      sendCommand('stop');
-    }
-
-    // Connection & WebSocket functions
-    function connect() {
-      const ip = document.getElementById('ipAddress').value || '192.168.4.1';
-      try {
-        websocket = new WebSocket(`ws://${ip}/ws`);
-        
-        websocket.onopen = () => {
-          connected = true;
-          updateStatus('connected', '🟢 Connected');
-          console.log('Connected to ESP32');
-        };
-        
-        websocket.onmessage = (event) => {
-          console.log('Received:', event.data);
-        };
-        
-        websocket.onclose = () => {
-          connected = false;
-          updateStatus('disconnected', '🔴 Disconnected');
-          console.log('Disconnected from ESP32');
-        };
-        
-        websocket.onerror = (error) => {
-          connected = false;
-          updateStatus('error', '⚠️ Connection Error');
-          console.error('WebSocket error:', error);
-        };
-        
-      } catch (error) {
-        updateStatus('error', '⚠️ Invalid IP Address');
-        console.error('Connection failed:', error);
-      }
-    }
-
-    function disconnect() {
-      if (websocket) {
-        websocket.close();
-      }
-      connected = false;
-      updateStatus('disconnected', '🔴 Disconnected');
-    }
-
-    function updateStatus(status, text) {
-      const statusElement = document.getElementById('status');
-      statusElement.className = `status ${status}`;
-      statusElement.textContent = text;
-    }
-
-    function setIP(ip) {
-      document.getElementById('ipAddress').value = ip;
-    }
-
-    // Command sending functions
-    function sendCommand(command) {
-      if (connected && websocket) {
-        websocket.send(command);
-        console.log('Sent:', command);
-      } else {
-        console.warn('Not connected - command not sent:', command);
-      }
-    }
-
-    function sendPosition() {
-      const position = document.getElementById('positionSlider').value;
-      sendCommand(`position:${position}`);
-    }
-
-    function sendSpeed() {
-      const speed = document.getElementById('speedSlider').value;
-      sendCommand(`speed:${speed}`);
-    }
-
-    function sendAccel() {
-      const accel = document.getElementById('accelSlider').value;
-      sendCommand(`accel:${accel}`);
-    }
-
-    function setPositionFromInput(inputId) {
-      const position = document.getElementById(inputId).value;
-      document.getElementById('positionSlider').value = position;
-      updatePositionDisplay();
-      sendPosition();
-    }
-
-    function handleEnterKey(event, callback) {
-      if (event.key === 'Enter') {
-        callback();
-      }
-    }
-
-    // Initialize on page load
-    window.addEventListener('load', () => {
-      // Set default IP if empty
-      if (!document.getElementById('ipAddress').value) {
-        document.getElementById('ipAddress').value = '192.168.4.1';
-      }
-    });
-  </script>
 </body>
 </html>
+
 
 
 
