@@ -1,709 +1,773 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Camera Slider Control - Enhanced Responsive</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Camera Slider Control - Enhanced</title>
   <style>
+    /* BASE STYLING */
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1e3c72, #2a5298);
+      color: white;
       margin: 0;
       padding: 20px;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
     }
+    
     .container {
-      max-width: 900px;
+      max-width: 600px;
       margin: 0 auto;
-      background: rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.1);
       border-radius: 15px;
-      padding: 30px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      padding: 25px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.2);
     }
+    
     h1 {
       text-align: center;
-      color: #333;
       margin-bottom: 30px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-    }
-    .status {
-      text-align: center;
-      padding: 18px;
-      border-radius: 12px;
-      margin-bottom: 25px;
-      font-weight: bold;
-      font-size: 1.2em;
-      transition: all 0.3s ease;
-    }
-    .status.disconnected { background: #ffebee; color: #c62828; border: 3px solid #ffcdd2; }
-    .status.connected { background: #e8f5e8; color: #2e7d32; border: 3px solid #c8e6c9; }
-    .status.connecting { background: #fff3e0; color: #f57c00; border: 3px solid #ffcc02; }
-    
-    .section {
-      background: #f8f9fa;
-      padding: 30px;
-      border-radius: 15px;
-      margin-bottom: 25px;
-      border: 2px solid #e9ecef;
-    }
-    .section h3 {
-      margin-top: 0;
-      color: #495057;
-      font-size: 1.4em;
-      border-bottom: 3px solid #dee2e6;
-      padding-bottom: 12px;
-    }
-    
-    .control-row {
-      display: flex;
-      align-items: center;
-      margin-bottom: 25px;
-      flex-wrap: wrap;
-      gap: 20px;
-    }
-    .control-row label {
-      font-weight: 600;
-      min-width: 140px;
-      color: #495057;
-      font-size: 1.1em;
-    }
-    .control-row input, .control-row select {
-      flex: 1;
-      min-width: 140px;
-      padding: 15px;
-      border: 2px solid #ced4da;
-      border-radius: 10px;
-      font-size: 17px;
-      transition: all 0.2s ease;
-    }
-    .control-row input:focus, .control-row select:focus {
-      border-color: #667eea;
-      outline: none;
-      box-shadow: 0 0 0 4px rgba(102,126,234,0.15);
-      transform: scale(1.02);
-    }
-    
-    /* ENHANCED BUTTON STYLES - BIGGER & MORE RESPONSIVE */
-    .btn {
-      padding: 16px 32px;
-      border: none;
-      border-radius: 12px;
-      font-size: 18px;
-      font-weight: 700;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-      min-height: 60px;
-    }
-    .btn:hover { 
-      transform: translateY(-3px) scale(1.05); 
-      box-shadow: 0 8px 25px rgba(0,0,0,0.25); 
-    }
-    .btn:active { transform: translateY(-1px) scale(1.02); }
-    
-    .btn-primary { background: linear-gradient(45deg, #667eea, #764ba2); color: white; }
-    .btn-success { background: linear-gradient(45deg, #56ab2f, #a8e6cf); color: white; }
-    .btn-danger { background: linear-gradient(45deg, #ff416c, #ff4b2b); color: white; }
-    .btn-warning { background: linear-gradient(45deg, #f7971e, #ffd200); color: white; }
-    .btn-secondary { background: linear-gradient(45deg, #6c757d, #495057); color: white; }
-    
-    .button-row {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-      margin-top: 25px;
-    }
-    .button-row .btn {
-      flex: 1;
-      min-width: 150px;
-    }
-/* ENHANCED JOG CONTROLS - BIGGER SLIDERS WITH INSTANT RESPONSE */
-    .jog-container {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      padding: 35px;
-      border-radius: 20px;
-      color: white;
-      margin-bottom: 30px;
-    }
-    .jog-container h3 { 
-      color: white; 
-      border-color: rgba(255,255,255,0.3); 
-      font-size: 1.5em;
-      margin-bottom: 25px;
-    }
-    
-    .jog-control {
-      margin-bottom: 35px;
-      background: rgba(255,255,255,0.1);
-      padding: 25px;
-      border-radius: 15px;
-      backdrop-filter: blur(10px);
-    }
-    .jog-control label {
-      display: block;
-      font-weight: bold;
-      margin-bottom: 15px;
-      font-size: 1.3em;
-      text-align: center;
+      font-size: 28px;
       text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
     
-    /* BIGGER, MORE RESPONSIVE SLIDERS */
-    .slider-container {
-      position: relative;
-      margin: 20px 0;
-      padding: 15px 0;
-    }
-    .slider {
-      width: 100%;
-      height: 20px; /* INCREASED from 8px */
-      border-radius: 15px;
-      background: rgba(255,255,255,0.4);
-      outline: none;
-      -webkit-appearance: none;
-      cursor: pointer;
-      transition: all 0.1s ease; /* FASTER response */
-    }
-    .slider:hover {
-      background: rgba(255,255,255,0.6);
-      transform: scale(1.02);
+    /* STATUS STYLES */
+    .status {
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      margin-bottom: 25px;
+      font-weight: bold;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
     }
     
-    /* BIGGER SLIDER THUMBS */
+    .status.disconnected {
+      background: rgba(220, 53, 69, 0.8);
+      border-color: #dc3545;
+    }
+    
+    .status.connecting {
+      background: rgba(255, 193, 7, 0.8);
+      border-color: #ffc107;
+      color: #000;
+    }
+    
+    .status.connected {
+      background: rgba(40, 167, 69, 0.8);
+      border-color: #28a745;
+    }
+    
+    /* SECTION STYLES */
+    .section {
+      margin-bottom: 30px;
+      padding: 20px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.15);
+    }
+    
+    .section h3 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      color: #fff;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+/* BUTTON STYLES */
+    .button-row {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+    
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 120px;
+      justify-content: center;
+    }
+    
+    .btn-primary { background: #007bff; color: white; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    .btn-warning { background: #ffc107; color: black; }
+    
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    }
+    
+    .btn:active {
+      transform: translateY(0);
+    }
+    
+    /* JOG SPEED CONTROL */
+    .jog-speed-section {
+      background: rgba(255,255,255,0.12);
+      border: 2px solid rgba(255,193,7,0.4);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+    
+    .speed-control-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr 1fr;
+      gap: 15px;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .speed-label {
+      font-weight: bold;
+      font-size: 16px;
+      color: #ffc107;
+    }
+    
+    .speed-value {
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      padding: 8px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.2);
+    }
+    
+    .speed-presets {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 15px;
+    }
+    
+    .preset-btn {
+      padding: 8px 16px;
+      background: rgba(255,193,7,0.2);
+      border: 1px solid #ffc107;
+      border-radius: 6px;
+      color: #ffc107;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.2s ease;
+    }
+    
+    .preset-btn:hover {
+      background: rgba(255,193,7,0.4);
+      transform: translateY(-1px);
+    }
+    
+    .preset-btn.active {
+      background: #ffc107;
+      color: #000;
+    }
+/* ENHANCED SLIDER CONTAINERS */
+    .slider-container {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 12px;
+      border: 2px solid rgba(255,255,255,0.1);
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .slider-container:hover {
+      border-color: rgba(255,255,255,0.3);
+      background: rgba(255,255,255,0.12);
+    }
+    
+    .slider-container.active {
+      border-color: #ffc107;
+      box-shadow: 0 0 20px rgba(255,193,7,0.3);
+    }
+    
+    .slider-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+    
+    .speed-display {
+      background: rgba(0,0,0,0.4);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-family: 'Courier New', monospace;
+      font-size: 14px;
+      color: #ffc107;
+      border: 1px solid rgba(255,255,255,0.2);
+      min-width: 80px;
+      text-align: center;
+    }
+    
+    /* ULTRA-BIG RESPONSIVE SLIDERS */
+    .slider {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 25px;
+      background: linear-gradient(to right, #dc3545 0%, #ffc107 50%, #28a745 100%);
+      border-radius: 15px;
+      outline: none;
+      transition: all 0.1s ease;
+      cursor: pointer;
+      border: 2px solid rgba(255,255,255,0.3);
+    }
+    
+    .slider:hover {
+      height: 28px;
+      box-shadow: 0 0 15px rgba(255,255,255,0.4);
+    }
+    
+    .slider:active {
+      box-shadow: 0 0 25px rgba(255,193,7,0.6);
+    }
+    
+    /* ULTRA-BIG SLIDER THUMBS - WEBKIT */
     .slider::-webkit-slider-thumb {
       -webkit-appearance: none;
       appearance: none;
-      width: 40px; /* INCREASED from 25px */
-      height: 40px; /* INCREASED from 25px */
+      height: 50px;
+      width: 50px;
       border-radius: 50%;
-      background: linear-gradient(45deg, #ffffff, #f0f0f0);
+      background: linear-gradient(145deg, #ffffff, #e0e0e0);
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      border: 3px solid rgba(255,255,255,0.8);
-      transition: all 0.1s ease; /* INSTANT response */
+      border: 3px solid #007bff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.1s ease;
     }
+    
     .slider::-webkit-slider-thumb:hover {
-      transform: scale(1.15);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      border-color: #ffc107;
     }
+    
     .slider::-webkit-slider-thumb:active {
-      transform: scale(1.25);
-      background: linear-gradient(45deg, #e0e0e0, #ffffff);
-    }
-    
-    .slider::-moz-range-thumb {
-      width: 40px; /* INCREASED from 25px */
-      height: 40px; /* INCREASED from 25px */
-      border-radius: 50%;
-      background: linear-gradient(45deg, #ffffff, #f0f0f0);
-      cursor: pointer;
-      border: 3px solid rgba(255,255,255,0.8);
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-      transition: all 0.1s ease; /* INSTANT response */
-    }
-    .slider::-moz-range-thumb:hover {
       transform: scale(1.15);
-      box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+      background: linear-gradient(145deg, #ffc107, #ffb300);
+      border-color: #ff6b00;
+    }
+/* ULTRA-BIG SLIDER THUMBS - FIREFOX */
+    .slider::-moz-range-thumb {
+      height: 50px;
+      width: 50px;
+      border-radius: 50%;
+      background: linear-gradient(145deg, #ffffff, #e0e0e0);
+      cursor: pointer;
+      border: 3px solid #007bff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      transition: all 0.1s ease;
     }
     
-    /* ENHANCED SPEED DISPLAY */
-    .speed-display {
-      text-align: center;
-      font-size: 1.4em; /* BIGGER text */
-      font-weight: bold;
-      margin-top: 15px;
-      background: rgba(255,255,255,0.25);
-      padding: 15px;
-      border-radius: 12px;
-      border: 2px solid rgba(255,255,255,0.3);
-      box-shadow: inset 0 2px 10px rgba(0,0,0,0.1);
-      transition: all 0.2s ease;
-    }
-    .speed-display.active {
-      background: rgba(255,255,255,0.4);
-      border-color: rgba(255,255,255,0.6);
-      transform: scale(1.05);
+    .slider::-moz-range-thumb:hover {
+      transform: scale(1.1);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+      border-color: #ffc107;
     }
     
-    /* ENHANCED SLIDER TRACK STYLING */
-    .slider::-webkit-slider-runnable-track {
-      width: 100%;
-      height: 20px;
-      background: rgba(255,255,255,0.4);
-      border-radius: 15px;
-    }
-    .slider::-moz-range-track {
-      width: 100%;
-      height: 20px;
-      background: rgba(255,255,255,0.4);
-      border-radius: 15px;
-      border: none;
+    .slider::-moz-range-thumb:active {
+      transform: scale(1.15);
+      background: linear-gradient(145deg, #ffc107, #ffb300);
+      border-color: #ff6b00;
     }
     
-    /* SLIDER LABELS WITH BETTER VISIBILITY */
-    .slider-labels {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 8px;
-      font-size: 0.9em;
-      opacity: 0.8;
+    /* CENTER INDICATOR FOR SLIDERS */
+    .center-indicator {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 4px;
+      height: 35px;
+      background: rgba(255,255,255,0.8);
+      border-radius: 2px;
+      pointer-events: none;
+      z-index: 1;
+      box-shadow: 0 0 10px rgba(255,255,255,0.5);
     }
-    .slider-labels span {
-      background: rgba(0,0,0,0.2);
-      padding: 4px 8px;
-      border-radius: 6px;
+    
+    /* MOBILE RESPONSIVE */
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+        margin: 10px;
+      }
+      
+      h1 {
+        font-size: 24px;
+      }
+      
+      .section h3 {
+        font-size: 18px;
+      }
+      
+      .button-row {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .btn {
+        width: 100%;
+        max-width: 250px;
+        margin-bottom: 10px;
+      }
+      
+      .speed-control-grid {
+        grid-template-columns: 1fr;
+        text-align: center;
+        gap: 10px;
+      }
+      
+      .speed-presets {
+        flex-direction: column;
+        gap: 10px;
+      }
+      
+      .preset-btn {
+        width: 100%;
+        padding: 12px;
+      }
+      
+      .slider {
+        height: 30px;
+      }
+      
+      .slider::-webkit-slider-thumb {
+        height: 60px;
+        width: 60px;
+      }
+      
+      .slider::-moz-range-thumb {
+        height: 60px;
+        width: 60px;
+      }
+      
+      .slider-label {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+      }
+      
+      .speed-display {
+        width: 100%;
+        max-width: 120px;
+        margin: 0 auto;
+      }
     }
-/* Responsive Design */
-    @media (max-width: 600px) {
-      .container { padding: 20px; }
-      .control-row { flex-direction: column; align-items: stretch; }
-      .control-row label { min-width: auto; }
-      .button-row { flex-direction: column; }
-      .slider { height: 25px; } /* Even bigger on mobile */
-      .slider::-webkit-slider-thumb { width: 45px; height: 45px; }
-      .slider::-moz-range-thumb { width: 45px; height: 45px; }
+    
+    /* ULTRA-SMALL MOBILE */
+    @media (max-width: 480px) {
+      .container {
+        margin: 5px;
+        padding: 10px;
+      }
+      
+      .slider::-webkit-slider-thumb,
+      .slider::-moz-range-thumb {
+        height: 45px;
+        width: 45px;
+      }
     }
-  </style>
+</style>
 </head>
 <body>
   <div class="container">
-    <h1>🎥 Camera Slider Control</h1>
+    <h1>🎥 Camera Slider Control - Enhanced</h1>
     
+    <!-- CONNECTION STATUS -->
     <div id="status" class="status disconnected">
-      📡 Disconnected - Click Connect to begin
+      🔴 Disconnected - Enter IP address below
     </div>
     
+    <!-- CONNECTION SECTION -->
     <div class="section">
-      <h3>🔌 Connection</h3>
-      <div class="button-row">
-        <button class="btn btn-primary" onclick="connectBLE()">Connect</button>
-        <button class="btn btn-secondary" onclick="disconnectBLE()">Disconnect</button>
+      <h3>🔗 Connection Settings</h3>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+        <input type="text" id="ipAddress" placeholder="192.168.1.100" 
+               style="flex: 1; padding: 12px; border-radius: 8px; border: 2px solid rgba(255,255,255,0.3); 
+               background: rgba(0,0,0,0.3); color: white; font-size: 16px; min-width: 200px;">
+        <button onclick="connect()" class="btn btn-primary">🔗 Connect</button>
+        <button onclick="disconnect()" class="btn btn-secondary">❌ Disconnect</button>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button onclick="setIP('192.168.1.100')" class="preset-btn">🏠 Home</button>
+        <button onclick="setIP('192.168.4.1')" class="preset-btn">📡 AP Mode</button>
+        <button onclick="setIP('10.0.0.100')" class="preset-btn">🏢 Office</button>
       </div>
     </div>
-
+    
+    <!-- JOG SPEED CONTROL SECTION -->
+    <div class="jog-speed-section">
+      <h3 style="color: #ffc107; margin-bottom: 20px;">⚡ Jog Speed Control</h3>
+      <div class="speed-control-grid">
+        <div class="speed-label">Speed:</div>
+        <div id="jogSpeedValue" class="speed-value">50%</div>
+        <div></div>
+      </div>
+      <div class="speed-presets">
+        <div class="preset-btn" onclick="setJogSpeed(10)">🐌 Slow (10%)</div>
+        <div class="preset-btn" onclick="setJogSpeed(25)">🚶 Walk (25%)</div>
+        <div class="preset-btn active" onclick="setJogSpeed(50)">🏃 Normal (50%)</div>
+        <div class="preset-btn" onclick="setJogSpeed(75)">🏃‍♂‍ Fast (75%)</div>
+        <div class="preset-btn" onclick="setJogSpeed(100)">🚀 Max (100%)</div>
+      </div>
+    </div>
+    
+    <!-- MOVEMENT CONTROLS -->
     <div class="section">
-      <h3>⚙️ Motor Configuration</h3>
-      
-      <div class="control-row">
-        <label>Motor 1 Start:</label>
-        <input type="number" id="m1Start" value="0" onchange="updateValue('M1S', this.value)">
-      </div>
-      <div class="control-row">
-        <label>Motor 1 End:</label>
-        <input type="number" id="m1End" value="2000" onchange="updateValue('M1E', this.value)">
-      </div>
-      <div class="control-row">
-        <label>Motor 1 Speed:</label>
-        <input type="number" id="m1Speed" value="2000" onchange="updateValue('M1SPD', this.value)">
-      </div>
-      
-      <div class="control-row">
-        <label>Motor 2 Start:</label>
-        <input type="number" id="m2Start" value="0" onchange="updateValue('M2S', this.value)">
-      </div>
-      <div class="control-row">
-        <label>Motor 2 End:</label>
-        <input type="number" id="m2End" value="2000" onchange="updateValue('M2E', this.value)">
-      </div>
-      <div class="control-row">
-        <label>Motor 2 Speed:</label>
-        <input type="number" id="m2Speed" value="2000" onchange="updateValue('M2SPD', this.value)">
-      </div>
-      
-      <div class="control-row">
-        <label>Cycles:</label>
-        <select id="cycles" onchange="updateValue('CYCLES', this.value)">
-          <option value="0">Infinite</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
-      </div>
-      
-      <div class="control-row">
-        <label>Return Mode:</label>
-        <select id="returnMode" onchange="updateValue('RETURN', this.value)">
-          <option value="1">Enabled</option>
-          <option value="0">Disabled</option>
-        </select>
-      </div>
-    </div>
-
-    <div class="section jog-container">
-      <h3>🕹️ Manual Jog Control - ENHANCED RESPONSIVE</h3>
-      
-      <!-- MOTOR 1 ENHANCED SLIDER -->
-      <div class="jog-control">
-        <label>🔧 Motor 1 Jog</label>
-        <div class="slider-container">
-          <input type="range" min="-100" max="100" value="0" 
-                 class="slider" id="m1Jog" 
-                 oninput="jogMotor('M1', this.value)" 
-                 onchange="jogMotor('M1', this.value)">
-          <div class="slider-labels">
-            <span>← Reverse</span>
-            <span>Stop</span>
-            <span>Forward →</span>
-          </div>
-        </div>
-        <div class="speed-display" id="m1Speed">Speed: 0</div>
-      </div>
-
-      <!-- MOTOR 2 ENHANCED SLIDER -->
-      <div class="jog-control">
-        <label>🔩 Motor 2 Jog</label>
-        <div class="slider-container">
-          <input type="range" min="-100" max="100" value="0" 
-                 class="slider" id="m2Jog"
-                 oninput="jogMotor('M2', this.value)"
-                 onchange="jogMotor('M2', this.value)">
-          <div class="slider-labels">
-            <span>← Reverse</span>
-            <span>Stop</span>
-            <span>Forward →</span>
-          </div>
-        </div>
-        <div class="speed-display" id="m2Speed">Speed: 0</div>
-      </div>
-
-      <!-- BOTH MOTORS ENHANCED SLIDER -->
-      <div class="jog-control">
-        <label>⚡ Both Motors Jog</label>
-        <div class="slider-container">
-          <input type="range" min="-100" max="100" value="0" 
-                 class="slider" id="bothJog"
-                 oninput="jogMotor('BOTH', this.value)"
-                 onchange="jogMotor('BOTH', this.value)">
-          <div class="slider-labels">
-            <span>← Reverse</span>
-            <span>Stop</span>
-            <span>Forward →</span>
-          </div>
-        </div>
-        <div class="speed-display" id="bothSpeed">Speed: 0</div>
-      </div>
-    </div>
-<div class="section">
-      <h3>🎮 Movement Control</h3>
+      <h3>🎮 Movement Controls</h3>
       <div class="button-row">
-        <button class="btn btn-success" onclick="sendCommand('RUN')">▶️ Start</button>
-        <button class="btn btn-danger" onclick="sendCommand('STOP')">⏹️ Stop</button>
-        <button class="btn btn-warning" onclick="sendCommand('HOME')">🏠 Home</button>
+        <button onmousedown="startJog('left')" onmouseup="stopJog()" 
+                ontouchstart="startJog('left')" ontouchend="stopJog()" 
+                class="btn btn-primary">⬅️ Jog Left</button>
+        <button onclick="sendCommand('home')" class="btn btn-warning">🏠 Home</button>
+        <button onmousedown="startJog('right')" onmouseup="stopJog()" 
+                ontouchstart="startJog('right')" ontouchend="stopJog()" 
+                class="btn btn-primary">➡️ Jog Right</button>
+      </div>
+      <div class="button-row">
+        <button onclick="sendCommand('stop')" class="btn btn-danger">⏹️ Emergency Stop</button>
+        <button onclick="sendCommand('enable')" class="btn btn-success">✅ Enable Motors</button>
+        <button onclick="sendCommand('disable')" class="btn btn-secondary">❌ Disable Motors</button>
       </div>
     </div>
-  </div>
-
-  <script>
-    let device = null;
-    let characteristic = null;
+<!-- POSITION CONTROLS -->
+    <div class="section">
+      <h3>📍 Position Controls</h3>
+      
+      <!-- POSITION SLIDER -->
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>🎯 Target Position</span>
+          <div class="speed-display" id="positionValue">0 mm</div>
+        </div>
+        <div style="position: relative;">
+          <input type="range" id="positionSlider" class="slider" 
+                 min="-500" max="500" value="0" step="1"
+                 oninput="updatePositionDisplay()" 
+                 onchange="sendPosition()">
+          <div class="center-indicator"></div>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px;">
+          <span>-500mm</span>
+          <span>CENTER</span>
+          <span>+500mm</span>
+        </div>
+      </div>
+      
+      <!-- SPEED SLIDER -->
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>🚀 Move Speed</span>
+          <div class="speed-display" id="speedValue">50%</div>
+        </div>
+        <input type="range" id="speedSlider" class="slider" 
+               min="1" max="100" value="50" step="1"
+               oninput="updateSpeedDisplay()" 
+               onchange="sendSpeed()">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px;">
+          <span>1%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
+      </div>
+      
+      <!-- ACCELERATION SLIDER -->
+      <div class="slider-container">
+        <div class="slider-label">
+          <span>⚡ Acceleration</span>
+          <div class="speed-display" id="accelValue">50%</div>
+        </div>
+        <input type="range" id="accelSlider" class="slider" 
+               min="1" max="100" value="50" step="1"
+               oninput="updateAccelDisplay()" 
+               onchange="sendAccel()">
+        <div style="display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-top: 5px;">
+          <span>1%</span>
+          <span>50%</span>
+          <span>100%</span>
+        </div>
+      </div>
+      
+      <!-- POSITION PRESETS -->
+      <div style="margin-top: 20px;">
+        <h4 style="color: #ffc107; margin-bottom: 15px;">📌 Position Presets</h4>
+        <div class="button-row">
+          <button onclick="setPosition(-500)" class="btn btn-secondary">⬅️ Far Left</button>
+          <button onclick="setPosition(-250)" class="btn btn-secondary">↖️ Left</button>
+          <button onclick="setPosition(0)" class="btn btn-warning">🎯 Center</button>
+          <button onclick="setPosition(250)" class="btn btn-secondary">↗️ Right</button>
+          <button onclick="setPosition(500)" class="btn btn-secondary">➡️ Far Right</button>
+        </div>
+      </div>
+    </div>
     
-    // ENHANCED RESPONSE TRACKING
-    let lastCommandTime = 0;
-    const COMMAND_THROTTLE = 10; // Reduced from 50ms to 10ms for instant response
-    let commandQueue = [];
-    let isProcessingQueue = false;
-    
-    // SLIDER ENHANCEMENT VARIABLES
-    let sliderUpdateTimers = {
-      m1Jog: null,
-      m2Jog: null,
-      bothJog: null
-    };
-    
-    // INSTANT BLE CONNECTION
-    async function connectBLE() {
-      updateStatus('connecting', '🔄 Connecting to Camera Slider...');
+    <!-- AUTOMATED SEQUENCES -->
+    <div class="section">
+      <h3>🎬 Automated Sequences</h3>
+      <div class="button-row">
+        <button onclick="startSequence('sweep')" class="btn btn-success">🔄 Sweep Mode</button>
+        <button onclick="startSequence('timelapse')" class="btn btn-success">⏰ Timelapse</button>
+        <button onclick="stopSequence()" class="btn btn-danger">⏹️ Stop Sequence</button>
+      </div>
       
-      try {
-        device = await navigator.bluetooth.requestDevice({
-          filters: [{ name: 'CameraSlider' }],
-          optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-        });
+      <!-- SEQUENCE STATUS -->
+      <div id="sequenceStatus" style="margin-top: 15px; padding: 10px; 
+           background: rgba(0,0,0,0.3); border-radius: 8px; text-align: center;">
+        🔘 No sequence running
+      </div>
+    </div>
+</div>
 
-        const server = await device.gatt.connect();
-        const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-        characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-        
-        updateStatus('connected', '✅ Connected to Camera Slider');
-        console.log('BLE Connected successfully');
-        
-        // Reset all sliders to center position on connect
-        resetAllSliders();
-        
-      } catch (error) {
-        updateStatus('disconnected', '❌ Connection failed: ' + error.message);
-        console.error('BLE Connection error:', error);
-      }
-    }
+<script>
+let connected = false;
+let baseURL = '';
+let jogInterval = null;
+let currentJogSpeed = 50;
 
-    async function disconnectBLE() {
-      if (device && device.gatt.connected) {
-        // Stop all motors before disconnect
-        await stopAllMotors();
-        device.gatt.disconnect();
-        updateStatus('disconnected', '📡 Disconnected');
-        resetAllSliders();
-      }
-    }
+// CONNECTION FUNCTIONS
+function setIP(ip) {
+  document.getElementById('ipAddress').value = ip;
+}
 
-    // ENHANCED COMMAND SENDING WITH INSTANT RESPONSE
-    async function sendCommand(command) {
-      if (!characteristic) {
-        console.log('Not connected');
-        return;
-      }
-
-      const now = Date.now();
-      if (now - lastCommandTime < COMMAND_THROTTLE) {
-        // Queue command for later processing
-        commandQueue.push(command);
-        processCommandQueue();
-        return;
-      }
-
-      try {
-        const encoder = new TextEncoder();
-        await characteristic.writeValue(encoder.encode(command));
-        console.log('Sent:', command);
-        lastCommandTime = now;
-        
-        // Visual feedback for button presses
-        highlightActiveCommand(command);
-        
-      } catch (error) {
-        console.error('Send error:', error);
-        updateStatus('disconnected', '❌ Communication error');
-      }
-    }
-
-    // ENHANCED COMMAND QUEUE PROCESSING
-    async function processCommandQueue() {
-      if (isProcessingQueue || commandQueue.length === 0) return;
-      
-      isProcessingQueue = true;
-      
-      while (commandQueue.length > 0) {
-        const command = commandQueue.shift();
-        const now = Date.now();
-        
-        if (now - lastCommandTime >= COMMAND_THROTTLE) {
-          await sendCommand(command);
-          await new Promise(resolve => setTimeout(resolve, COMMAND_THROTTLE));
-        }
-      }
-      
-      isProcessingQueue = false;
-    }
-
-    // ENHANCED JOG MOTOR WITH INSTANT FEEDBACK
-    function jogMotor(axis, value) {
-      const speed = parseInt(value);
-      
-      // INSTANT UI FEEDBACK
-      updateSpeedDisplay(axis, speed);
-      
-      // Clear existing timer for this slider
-      if (sliderUpdateTimers[axis.toLowerCase() + 'Jog']) {
-        clearTimeout(sliderUpdateTimers[axis.toLowerCase() + 'Jog']);
-      }
-      
-      // Set new timer for smoother updates
-      sliderUpdateTimers[axis.toLowerCase() + 'Jog'] = setTimeout(() => {
-        const command = `JOGSLIDER:${axis}:${speed}`;
-        sendCommand(command);
-      }, 5); // Ultra-fast 5ms delay for near-instant response
-      
-      // Visual feedback enhancement
-      highlightActiveSlider(axis, Math.abs(speed));
-    }
-
-    // ENHANCED SPEED DISPLAY WITH ANIMATIONS
-    function updateSpeedDisplay(axis, speed) {
-      let displayId;
-      if (axis === 'M1') displayId = 'm1Speed';
-      else if (axis === 'M2') displayId = 'm2Speed';
-      else if (axis === 'BOTH') displayId = 'bothSpeed';
-      
-      const display = document.getElementById(displayId);
-      if (display) {
-        const direction = speed > 0 ? ' →' : speed < 0 ? ' ←' : '';
-        const speedText = `Speed: ${Math.abs(speed)}${direction}`;
-        
-        display.textContent = speedText;
-        
-        // Enhanced visual feedback
-        if (speed !== 0) {
-          display.classList.add('active');
-          display.style.backgroundColor = `rgba(255,255,255,${0.3 + Math.abs(speed) / 200})`;
-        } else {
-          display.classList.remove('active');
-          display.style.backgroundColor = 'rgba(255,255,255,0.25)';
-        }
-      }
-    }
-// ENHANCED VISUAL FEEDBACK FUNCTIONS
-    function highlightActiveCommand(command) {
-      const buttons = document.querySelectorAll('.btn');
-      buttons.forEach(btn => {
-        btn.classList.remove('btn-active');
-        if (btn.textContent.includes('Start') && command === 'RUN') {
-          btn.classList.add('btn-active');
-          setTimeout(() => btn.classList.remove('btn-active'), 200);
-        }
-        if (btn.textContent.includes('Stop') && command === 'STOP') {
-          btn.classList.add('btn-active');
-          setTimeout(() => btn.classList.remove('btn-active'), 200);
-        }
-        if (btn.textContent.includes('Home') && command === 'HOME') {
-          btn.classList.add('btn-active');
-          setTimeout(() => btn.classList.remove('btn-active'), 200);
-        }
-      });
-    }
-
-    function highlightActiveSlider(axis, intensity) {
-      const sliders = document.querySelectorAll('.slider');
-      sliders.forEach(slider => {
-        const container = slider.parentElement;
-        if ((axis === 'M1' && slider.id === 'm1Jog') ||
-            (axis === 'M2' && slider.id === 'm2Jog') ||
-            (axis === 'BOTH' && slider.id === 'bothJog')) {
-          
-          // Enhanced glow effect based on speed
-          const glowIntensity = Math.min(intensity / 100 * 0.8, 0.8);
-          container.style.boxShadow = `0 0 ${20 + intensity/5}px rgba(255,255,255,${glowIntensity})`;
-          
-          // Auto-reset glow after movement
-          setTimeout(() => {
-            if (slider.value == 0) {
-              container.style.boxShadow = 'none';
-            }
-          }, 100);
-        }
-      });
-    }
-
-    // ENHANCED UTILITY FUNCTIONS
-    function updateValue(key, value) {
-      if (!characteristic) {
-        console.log('Not connected - value not sent');
-        return;
-      }
-      
-      const command = `${key}:${value}`;
-      sendCommand(command);
-      
-      // Immediate UI feedback
-      console.log(`Updated ${key} to ${value}`);
-    }
-
-    function updateStatus(state, message) {
-      const statusDiv = document.getElementById('status');
-      statusDiv.className = `status ${state}`;
-      statusDiv.textContent = message;
-      
-      // Enhanced status animations
-      statusDiv.style.transform = 'scale(1.05)';
-      setTimeout(() => {
-        statusDiv.style.transform = 'scale(1)';
-      }, 150);
-    }
-
-    // ENHANCED SLIDER RESET FUNCTIONS
-    function resetAllSliders() {
-      const sliders = ['m1Jog', 'm2Jog', 'bothJog'];
-      sliders.forEach(sliderId => {
-        const slider = document.getElementById(sliderId);
-        if (slider) {
-          slider.value = 0;
-          updateSpeedDisplay(getAxisFromSlider(sliderId), 0);
-        }
-      });
-    }
-
-    function getAxisFromSlider(sliderId) {
-      if (sliderId === 'm1Jog') return 'M1';
-      if (sliderId === 'm2Jog') return 'M2';
-      if (sliderId === 'bothJog') return 'BOTH';
-      return 'M1';
-    }
-
-    async function stopAllMotors() {
-      // Reset all sliders and stop motors
-      resetAllSliders();
-      
-      // Send stop commands
-      await sendCommand('JOGSLIDER:M1:0');
-      await sendCommand('JOGSLIDER:M2:0');
-      await sendCommand('STOP');
-      
-      console.log('All motors stopped');
-    }
-
-    // ENHANCED KEYBOARD SHORTCUTS (BONUS FEATURE)
-    document.addEventListener('keydown', function(event) {
-      if (!characteristic) return;
-      
-      switch(event.key) {
-        case ' ': // Spacebar for emergency stop
-          event.preventDefault();
-          stopAllMotors();
-          updateStatus('connected', '🛑 Emergency Stop Activated');
-          break;
-        case 'r': // R for run
-          sendCommand('RUN');
-          break;
-        case 's': // S for stop
-          sendCommand('STOP');
-          break;
-        case 'h': // H for home
-          sendCommand('HOME');
-          break;
-      }
+function connect() {
+  const ip = document.getElementById('ipAddress').value;
+  if (!ip) {
+    alert('Please enter an IP address');
+    return;
+  }
+  
+  baseURL = `http://${ip}`;
+  
+  // Test connection
+  fetch(`${baseURL}/status`)
+    .then(response => response.text())
+    .then(data => {
+      connected = true;
+      updateStatus('🟢 Connected to ' + ip, 'connected');
+    })
+    .catch(error => {
+      connected = false;
+      updateStatus('🔴 Failed to connect to ' + ip, 'disconnected');
     });
+}
 
-    // AUTO-CENTER SLIDERS ON MOUSE RELEASE
-    document.addEventListener('DOMContentLoaded', function() {
-      const sliders = document.querySelectorAll('.slider');
-      sliders.forEach(slider => {
-        let isMouseDown = false;
-        
-        slider.addEventListener('mousedown', () => isMouseDown = true);
-        slider.addEventListener('mouseup', () => isMouseDown = false);
-        
-        // Auto-center when mouse leaves slider area
-        slider.addEventListener('mouseleave', () => {
-          if (!isMouseDown) {
-            setTimeout(() => {
-              slider.value = 0;
-              const axis = getAxisFromSlider(slider.id);
-              jogMotor(axis, 0);
-            }, 100);
-          }
-        });
-      });
-    });
+function disconnect() {
+  connected = false;
+  baseURL = '';
+  updateStatus('🔴 Disconnected', 'disconnected');
+}
 
-    // ENHANCED ERROR HANDLING
-    window.addEventListener('error', function(event) {
-      console.error('JavaScript Error:', event.error);
-      updateStatus('disconnected', '❌ Application Error - Refresh Page');
-    });
+function updateStatus(message, className) {
+  const status = document.getElementById('status');
+  status.textContent = message;
+  status.className = `status ${className}`;
+}
 
-    // ENHANCED BLUETOOTH DISCONNECT HANDLER
-    document.addEventListener('visibilitychange', function() {
-      if (document.hidden && characteristic) {
-        // Page hidden - stop all motors for safety
-        stopAllMotors();
-      }
-    });
+// COMMAND SENDING
+function sendCommand(cmd) {
+  if (!connected) {
+    alert('Not connected! Please connect first.');
+    return;
+  }
+  
+  fetch(`${baseURL}/${cmd}`)
+    .catch(error => console.log('Command failed:', error));
+}
 
-    console.log('🚀 Enhanced Camera Slider Control Loaded - Ultra Responsive Mode Active!');
-  </script>
+// JOG CONTROLS
+function setJogSpeed(speed) {
+  currentJogSpeed = speed;
+  document.getElementById('jogSpeedValue').textContent = speed + '%';
+  
+  // Update active preset button
+  document.querySelectorAll('.speed-presets .preset-btn').forEach(btn => {
+    btn.classList.remove('active');
+  });
+  event.target.classList.add('active');
+}
+
+function startJog(direction) {
+  if (!connected) return;
+  
+  const speed = Math.round((currentJogSpeed / 100) * 255);
+  const cmd = direction === 'left' ? `jog_left?speed=${speed}` : `jog_right?speed=${speed}`;
+  
+  sendCommand(cmd);
+  
+  // Visual feedback
+  event.target.style.transform = 'scale(0.95)';
+  event.target.style.background = '#ffc107';
+}
+
+function stopJog() {
+  if (!connected) return;
+  
+  sendCommand('stop');
+  
+  // Reset button appearance
+  document.querySelectorAll('.btn-primary').forEach(btn => {
+    btn.style.transform = 'scale(1)';
+    btn.style.background = '';
+  });
+}
+
+// SLIDER FUNCTIONS
+function updatePositionDisplay() {
+  const slider = document.getElementById('positionSlider');
+  const value = slider.value;
+  document.getElementById('positionValue').textContent = value + ' mm';
+  
+  // Add active class for visual feedback
+  slider.parentElement.parentElement.classList.add('active');
+  setTimeout(() => {
+    slider.parentElement.parentElement.classList.remove('active');
+  }, 300);
+}
+
+function updateSpeedDisplay() {
+  const slider = document.getElementById('speedSlider');
+  const value = slider.value;
+  document.getElementById('speedValue').textContent = value + '%';
+  
+  slider.parentElement.parentElement.classList.add('active');
+  setTimeout(() => {
+    slider.parentElement.parentElement.classList.remove('active');
+  }, 300);
+}
+
+function updateAccelDisplay() {
+  const slider = document.getElementById('accelSlider');
+  const value = slider.value;
+  document.getElementById('accelValue').textContent = value + '%';
+  
+  slider.parentElement.parentElement.classList.add('active');
+  setTimeout(() => {
+    slider.parentElement.parentElement.classList.remove('active');
+  }, 300);
+}
+// POSITION FUNCTIONS
+function sendPosition() {
+  if (!connected) return;
+  
+  const position = document.getElementById('positionSlider').value;
+  sendCommand(`move?pos=${position}`);
+}
+
+function sendSpeed() {
+  if (!connected) return;
+  
+  const speed = document.getElementById('speedSlider').value;
+  sendCommand(`speed?val=${speed}`);
+}
+
+function sendAccel() {
+  if (!connected) return;
+  
+  const accel = document.getElementById('accelSlider').value;
+  sendCommand(`accel?val=${accel}`);
+}
+
+function setPosition(pos) {
+  document.getElementById('positionSlider').value = pos;
+  updatePositionDisplay();
+  sendPosition();
+}
+
+// SEQUENCE FUNCTIONS
+function startSequence(type) {
+  if (!connected) {
+    alert('Not connected! Please connect first.');
+    return;
+  }
+  
+  sendCommand(`sequence?type=${type}`);
+  
+  const status = document.getElementById('sequenceStatus');
+  if (type === 'sweep') {
+    status.innerHTML = '🔄 <strong>Sweep Mode Active</strong> - Moving between endpoints';
+    status.style.background = 'rgba(0,123,255,0.2)';
+  } else if (type === 'timelapse') {
+    status.innerHTML = '⏰ <strong>Timelapse Active</strong> - Slow continuous movement';
+    status.style.background = 'rgba(40,167,69,0.2)';
+  }
+}
+
+function stopSequence() {
+  if (!connected) return;
+  
+  sendCommand('stop');
+  
+  const status = document.getElementById('sequenceStatus');
+  status.innerHTML = '🔘 No sequence running';
+  status.style.background = 'rgba(0,0,0,0.3)';
+}
+
+// KEYBOARD SHORTCUTS
+document.addEventListener('keydown', function(event) {
+  if (!connected) return;
+  
+  switch(event.key) {
+    case 'ArrowLeft':
+      event.preventDefault();
+      startJog('left');
+      break;
+    case 'ArrowRight':
+      event.preventDefault();
+      startJog('right');
+      break;
+    case ' ':
+      event.preventDefault();
+      sendCommand('stop');
+      break;
+    case 'h':
+      event.preventDefault();
+      sendCommand('home');
+      break;
+  }
+});
+
+document.addEventListener('keyup', function(event) {
+  if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
+    stopJog();
+  }
+});
+
+// INITIALIZE ON LOAD
+window.onload = function() {
+  updatePositionDisplay();
+  updateSpeedDisplay();
+  updateAccelDisplay();
+  
+  // Auto-connect if IP is pre-filled
+  const ip = document.getElementById('ipAddress').value;
+  if (ip) {
+    connect();
+  }
+};
+</script>
+
 </body>
 </html>
 
