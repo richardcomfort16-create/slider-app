@@ -18,7 +18,8 @@
             min-height: 100vh;
             padding: 20px;
         }
-.container {
+
+        .container {
             max-width: 1200px;
             margin: 0 auto;
         }
@@ -45,35 +46,8 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         }
-.panel h3 {
-            margin-bottom: 15px;
-            color: #fff;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
-            padding-bottom: 8px;
-        }
 
-        .control-group {
-            margin-bottom: 15px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: 600;
-            color: #e0e6ff;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.9);
-            color: #333;
-            font-size: 14px;
-            transition: all 0.3s ease;
-        }
-.panel h3 {
+        .panel h3 {
             margin-bottom: 15px;
             color: #fff;
             border-bottom: 2px solid rgba(255, 255, 255, 0.2);
@@ -107,388 +81,1662 @@
             background: rgba(255, 255, 255, 1);
             box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
         }
-input:focus, select:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
-        }
 
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .btn {
+            background: linear-gradient(45deg, #4a90e2, #357abd);
             color: white;
             border: none;
             padding: 12px 20px;
             border-radius: 8px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 600;
             transition: all 0.3s ease;
             margin: 5px;
-            min-width: 120px;
+            min-width: 100px;
         }
 
-        button:hover {
+        .btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-input:focus, select:focus {
-            outline: none;
-            background: rgba(255, 255, 255, 1);
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        button {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            margin: 5px;
-            min-width: 120px;
-        }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-button:active {
+        .btn:active {
             transform: translateY(0);
         }
 
-        .status {
-            background: rgba(0, 255, 0, 0.1);
-            border: 1px solid rgba(0, 255, 0, 0.3);
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .success {
+            background: linear-gradient(45deg, #28a745, #20c997);
+        }
+
+        .danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .warning {
+            background: linear-gradient(45deg, #ffc107, #e0a800);
+            color: #000;
+        }
+
+        .secondary {
+            background: linear-gradient(45deg, #6c757d, #545b62);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+
+        .slider-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .slider-group input[type="range"] {
+            flex: 1;
+        }
+
+        .slider-value {
+            min-width: 60px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+            border-radius: 5px;
+            padding: 5px;
+        }
+.status {
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .status.connected {
+            background: rgba(40, 167, 69, 0.2);
+            border: 2px solid #28a745;
+            color: #28a745;
+        }
+
+        .status.disconnected {
+            background: rgba(220, 53, 69, 0.2);
+            border: 2px solid #dc3545;
+            color: #dc3545;
+        }
+
+        .jog-controls {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 10px;
+            align-items: center;
+            margin: 15px 0;
+        }
+
+        .jog-controls .btn {
+            min-width: 60px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .jog-up { grid-column: 2; grid-row: 1; }
+        .jog-left { grid-column: 1; grid-row: 2; }
+        .jog-stop { grid-column: 2; grid-row: 2; background: #dc3545; }
+        .jog-right { grid-column: 3; grid-row: 2; }
+        .jog-down { grid-column: 2; grid-row: 3; }
+
+        .preset-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .preset-btn {
+            padding: 15px 10px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: #fff;
+        }
+
+        .preset-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: #4a90e2;
+        }
+
+        .preset-btn.set {
+            background: rgba(40, 167, 69, 0.3);
+            border-color: #28a745;
+        }
+
+        .quick-actions-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .log-panel {
+            background: rgba(0, 0, 0, 0.8);
             border-radius: 8px;
             padding: 15px;
-            margin-bottom: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
         }
 
-        .status h4 {
-            margin-bottom: 10px;
-            color: #4ade80;
+        .log-entry {
+            margin-bottom: 5px;
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .progress-bar {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-.progress-fill {
-            background: linear-gradient(90deg, #4ade80, #22d3ee);
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.3s ease;
+        .log-entry:last-child {
+            border-bottom: none;
         }
 
-        .emergency-stop {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-            font-size: 18px !important;
-            padding: 15px 30px !important;
-            animation: pulse 2s infinite;
+        .debug-panel {
+            display: none;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-.progress-fill {
-            background: linear-gradient(90deg, #4ade80, #22d3ee);
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.3s ease;
-        }
-
-        .emergency-stop {
-            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
-            font-size: 18px !important;
-            padding: 15px 30px !important;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        .button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
-        }
-.button-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-            gap: 10px;
-            margin-top: 10px;
+        .debug-panel.active {
+            display: block;
         }
 
         @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+                margin-bottom: 20px;
+            }
+
             .grid {
                 grid-template-columns: 1fr;
+                gap: 15px;
+                margin-bottom: 100px;
             }
-            
-            h1 {
-                font-size: 2em;
-            }
-            
+
             .panel {
                 padding: 15px;
             }
-            
-            button {
-                min-width: 100px;
-                font-size: 14px;
+
+            .jog-controls .btn {
+                min-width: 50px;
+                min-height: 50px;
+                font-size: 16px;
+            }
+
+            .quick-actions-bar {
+                position: fixed;
+                top: 10px;
+                right: 10px;
+                left: 10px;
+                bottom: auto;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .quick-actions-bar .btn {
+                flex: 1;
+                margin: 2px;
+                min-width: auto;
             }
         }
     </style>
 </head>
- <body>
+<body>
     <div class="container">
-        <h1>🎥 Camera Slider Controller</h1>
+        <h1>🎬 Camera Slider Controller</h1>
         
-        <div class="status" id="statusPanel">
-            <h4>Status: <span id="connectionStatus">Connecting...</span></h4>
-            <div class="progress-bar">
-                <div class="progress-fill" id="progressFill" style="width: 0%"></div>
-            </div>
-            <p>Position: <span id="currentPosition">0</span>mm | Speed: <span id="currentSpeed">0</span>%</p>
-        </div>
-
         <div class="grid">
+            <!-- Connection Panel -->
             <div class="panel">
-                <h3>🎯 Manual Control</h3>  
-      <div class="button-grid">
-                    <button onclick="moveLeft()">⬅️ Left</button>
-                    <button onclick="moveRight()">➡️ Right</button>
-                    <button onclick="stopMotor()">⏹️ Stop</button>
-                    <button onclick="goHome()">🏠 Home</button>
+                <h3>📡 Connection</h3>
+                <div id="connectionStatus" class="status disconnected">
+                    Disconnected
+                </div>
+                <button class="btn" onclick="connectToSlider()">
+                    Connect to Slider
+                </button>
+                <button class="btn secondary" onclick="disconnectFromSlider()">
+                    Disconnect
+                </button>
+                
+                <div class="control-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="debugMode" onchange="toggleDebugMode()">
+                        <label for="debugMode">Debug Mode</label>
+                    </div>
+                </div>
+            </div>
+<!-- Motor 1 Controls -->
+            <div class="panel">
+                <h3>🎯 Motor 1 (Pan/Tilt)</h3>
+                
+                <div class="control-group">
+                    <label for="m1Start">Start Position:</label>
+                    <input type="number" id="m1Start" value="0" step="10" 
+                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M1S:' + this.value)">
                 </div>
                 
                 <div class="control-group">
-                    <label for="manualSpeed">Speed (%)</label>
-                    <input type="range" id="manualSpeed" min="10" max="100" value="50" oninput="updateSpeedDisplay(this.value)">
-                    <span id="speedDisplay">50%</span>
+                    <label for="m1End">End Position:</label>
+                    <input type="number" id="m1End" value="2000" step="10" 
+                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M1E:' + this.value)">
+                </div>
+                
+                <div class="control-group">
+                    <label for="m1Speed">Speed (steps/sec):</label>
+                    <div class="slider-group">
+                        <input type="range" id="m1Speed" min="100" max="6000" value="2000" step="100" 
+                               oninput="updateSpeedDisplay('m1', this.value); updateEstimatedTime(); sendIfConnected('M1SPD:' + Math.round(this.value * currentSpeedMultiplier))">
+                        <span class="slider-value" id="m1SpeedValue">2000</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m1Start')">
+                        Set Current as Start
+                    </button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m1End')">
+                        Set Current as End
+                    </button>
                 </div>
             </div>
 
+            <!-- Motor 2 Controls -->
             <div class="panel">
-                <h3>📏 Position Control</h3>
-      <div class="control-group">
-                    <label for="targetPosition">Target Position (mm)</label>
-                    <input type="number" id="targetPosition" min="0" max="1000" value="0">
+                <h3>🎯 Motor 2 (Slider)</h3>
+                
+                <div class="control-group">
+                    <label for="m2Start">Start Position:</label>
+                    <input type="number" id="m2Start" value="0" step="10" 
+                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M2S:' + this.value)">
                 </div>
                 
                 <div class="control-group">
-                    <label for="moveSpeed">Move Speed (%)</label>
-                    <input type="range" id="moveSpeed" min="10" max="100" value="30" oninput="updateMoveSpeedDisplay(this.value)">
-                    <span id="moveSpeedDisplay">30%</span>
+                    <label for="m2End">End Position:</label>
+                    <input type="number" id="m2End" value="2000" step="10" 
+                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M2E:' + this.value)">
                 </div>
                 
-                <button onclick="moveToPosition()">🎯 Move to Position</button>
+                <div class="control-group">
+                    <label for="m2Speed">Speed (steps/sec):</label>
+                    <div class="slider-group">
+                        <input type="range" id="m2Speed" min="100" max="6000" value="2000" step="100" 
+                               oninput="updateSpeedDisplay('m2', this.value); updateEstimatedTime(); sendIfConnected('M2SPD:' + Math.round(this.value * currentSpeedMultiplier))">
+                        <span class="slider-value" id="m2SpeedValue">2000</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m2Start')">
+                        Set Current as Start
+                    </button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m2End')">
+                        Set Current as End
+                    </button>
+                </div>
             </div>
 
+            <!-- Sequence Controls -->
             <div class="panel">
-                <h3>🎬 Automated Sequences</h3>
-<div class="control-group">
-                    <label for="sequenceType">Sequence Type</label>
-                    <select id="sequenceType">
-                        <option value="linear">Linear Movement</option>
-                        <option value="timelapse">Time-lapse</option>
-                        <option value="focus-stack">Focus Stacking</option>
-                        <option value="panorama">Panorama</option>
-                    </select>
+                <h3>🎬 Sequence Settings</h3>
+                
+                <div class="control-group">
+                    <label for="cycles">Cycles (0 = infinite):</label>
+                    <input type="number" id="cycles" min="0" max="999" value="1" 
+                           onchange="updateEstimatedTime()" oninput="sendIfConnected('CYCLES:' + this.value)">
                 </div>
                 
                 <div class="control-group">
-                    <label for="sequenceDistance">Distance (mm)</label>
-                    <input type="number" id="sequenceDistance" min="10" max="1000" value="100">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="returnHome" checked 
+                               onchange="updateEstimatedTime(); sendIfConnected('RETURN:' + (this.checked ? '1' : '0'))">
+                        <label for="returnHome">Return to Start Position</label>
+                    </div>
                 </div>
                 
                 <div class="control-group">
-                    <label for="sequenceSteps">Number of Steps</label>
-                    <input type="number" id="sequenceSteps" min="2" max="100" value="10">
+                    <label>Estimated Time: <span id="estimatedTime">0:00</span></label>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn success" onclick="startSequence()">
+                        ▶️ Start Sequence
+                    </button>
+                    <button class="btn danger" onclick="stopSequence()">
+                        ⏹️ Stop
+                    </button>
+                    <button class="btn secondary" onclick="homeMotors()">
+                        🏠 Home
+                    </button>
+                </div>
+            </div>
+<!-- Manual Controls -->
+            <div class="panel">
+                <h3>🕹️ Manual Control</h3>
+                
+                <div class="control-group">
+                    <label for="speedMultiplier">Speed Multiplier:</label>
+                    <div class="slider-group">
+                        <input type="range" id="speedMultiplier" min="0.1" max="3" value="1" step="0.1" 
+                               oninput="updateSpeedMultiplier(this.value)">
+                        <span class="slider-value" id="speedMultiplierValue">1.0x</span>
+                    </div>
+                </div>
+
+                <div class="jog-controls">
+                    <button class="btn jog-up" onmousedown="startJog('M1', 100)" onmouseup="stopJog()" 
+                            ontouchstart="startJog('M1', 100)" ontouchend="stopJog()">↑</button>
+                    <button class="btn jog-left" onmousedown="startJog('M2', -100)" onmouseup="stopJog()" 
+                            ontouchstart="startJog('M2', -100)" ontouchend="stopJog()">←</button>
+                    <button class="btn danger jog-stop" onclick="emergencyStop()">STOP</button>
+                    <button class="btn jog-right" onmousedown="startJog('M2', 100)" onmouseup="stopJog()" 
+                            ontouchstart="startJog('M2', 100)" ontouchend="stopJog()">→</button>
+                    <button class="btn jog-down" onmousedown="startJog('M1', -100)" onmouseup="stopJog()" 
+                            ontouchstart="startJog('M1', -100)" ontouchend="stopJog()">↓</button>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn secondary" onclick="getCurrentPositions()">
+                        📍 Get Current Positions
+                    </button>
+                </div>
+            </div>
+
+            <!-- Preset Positions -->
+            <div class="panel">
+                <h3>💾 Preset Positions</h3>
+                
+                <div class="preset-grid">
+                    <div class="preset-btn" onclick="savePreset(1)" oncontextmenu="loadPreset(1); return false;">
+                        <div><strong>Preset 1</strong></div>
+                        <div id="preset1Text">Empty</div>
+                        <small>Click: Save | Right-click: Load</small>
+                    </div>
+                    <div class="preset-btn" onclick="savePreset(2)" oncontextmenu="loadPreset(2); return false;">
+                        <div><strong>Preset 2</strong></div>
+                        <div id="preset2Text">Empty</div>
+                        <small>Click: Save | Right-click: Load</small>
+                    </div>
+                    <div class="preset-btn" onclick="savePreset(3)" oncontextmenu="loadPreset(3); return false;">
+                        <div><strong>Preset 3</strong></div>
+                        <div id="preset3Text">Empty</div>
+                        <small>Click: Save | Right-click: Load</small>
+                    </div>
+                </div>
+            </div>
+                          </div>
+                </div>
+                <script>
+// Enhanced preset management
+let presets = JSON.parse(localStorage.getItem('sliderPresets') || '{}');
+
+function savePreset(slot) {
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        name: `Preset ${slot}`,
+        timestamp: new Date().toLocaleString()
+    };
+    
+    presets[slot] = preset;
+    localStorage.setItem('sliderPresets', JSON.stringify(presets));
+    updatePresetDisplay(slot);
+    logMessage(`Preset ${slot} saved: ${preset.name}`);
+}
+
+function saveNamedPreset() {
+    const name = document.getElementById('presetName').value.trim();
+    if (!name) {
+        alert('Please enter a preset name');
+        return;
+    }
+    
+    // Find next available slot
+    let slot = 1;
+    while (presets[slot] && slot <= 10) slot++;
+    
+    if (slot > 10) {
+        alert('Maximum 10 presets allowed');
+        return;
+    }
+    
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        name: name,
+        timestamp: new Date().toLocaleString()
+    };
+    
+    presets[slot] = preset;
+    localStorage.setItem('sliderPresets', JSON.stringify(presets));
+    updatePresetDisplay(slot);
+    document.getElementById('presetName').value = '';
+    logMessage(`Named preset saved: ${name}`);
+}
+
+function loadPreset(slot) {
+    const preset = presets[slot];
+    if (!preset) {
+        logMessage(`Preset ${slot} is empty`);
+        return;
+    }
+    
+    // Update UI
+    document.getElementById('m1Start').value = preset.m1Start;
+    document.getElementById('m1End').value = preset.m1End;
+    document.getElementById('m1Speed').value = preset.m1Speed;
+    document.getElementById('m2Start').value = preset.m2Start;
+    document.getElementById('m2End').value = preset.m2End;
+    document.getElementById('m2Speed').value = preset.m2Speed;
+    document.getElementById('cycles').value = preset.cycles;
+    document.getElementById('returnHome').checked = preset.returnHome;
+    
+    // Update displays
+    updateSpeedDisplay('m1', preset.m1Speed);
+    updateSpeedDisplay('m2', preset.m2Speed);
+    updateEstimatedTime();
+    
+    // Send to ESP32
+    if (isConnected) {
+        sendCommand(`M1S:${preset.m1Start}`);
+        sendCommand(`M1E:${preset.m1End}`);
+        sendCommand(`M1SPD:${preset.m1Speed}`);
+        sendCommand(`M2S:${preset.m2Start}`);
+        sendCommand(`M2E:${preset.m2End}`);
+        sendCommand(`M2SPD:${preset.m2Speed}`);
+        sendCommand(`CYCLES:${preset.cycles}`);
+        sendCommand(`RETURN:${preset.returnHome ? '1' : '0'}`);
+    }
+    
+    logMessage(`Loaded: ${preset.name}`);
+}
+
+function updatePresetDisplay(slot) {
+    const preset = presets[slot];
+    const textElement = document.getElementById(`preset${slot}Text`);
+    
+    if (preset) {
+        textElement.textContent = `${preset.name}\n${preset.timestamp}`;
+        textElement.parentElement.classList.add('set');
+    } else {
+        textElement.textContent = 'Empty';
+        textElement.parentElement.classList.remove('set');
+    }
+}
+
+function clearAllPresets() {
+    if (confirm('Clear all presets? This cannot be undone.')) {
+        presets = {};
+        localStorage.removeItem('sliderPresets');
+        for (let i = 1; i <= 3; i++) {
+            updatePresetDisplay(i);
+        }
+        logMessage('All presets cleared');
+    }
+}
+
+function exportPresets() {
+    const data = JSON.stringify(presets, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `slider_presets_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    logMessage('Presets exported');
+}
+
+function importPresets() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                presets = {...presets, ...imported};
+                localStorage.setItem('sliderPresets', JSON.stringify(presets));
+                for (let i = 1; i <= 3; i++) {
+                    updatePresetDisplay(i);
+                }
+                logMessage('Presets imported successfully');
+            } catch (error) {
+                alert('Invalid preset file');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// Load presets on startup
+window.addEventListener('load', function() {
+    for (let i = 1; i <= 3; i++) {
+        updatePresetDisplay(i);
+    }
+});
+</script>
+                <!-- Enhanced Preset Controls -->
+                <div class="control-group">
+                    <label for="presetName">Preset Name:</label>
+                    <input type="text" id="presetName" placeholder="Enter preset name..." maxlength="20">
                 </div>
                 
-                <button onclick="startSequence()">▶️ Start Sequence</button>
+                <div class="control-group">
+                    <button class="btn" onclick="saveNamedPreset()">
+                        💾 Save Current as Named Preset
+                    </button>
+                    <button class="btn secondary" onclick="clearAllPresets()">
+                        🗑️ Clear All Presets
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn warning" onclick="exportPresets()">📤 Export</button>
+                    <button class="btn warning" onclick="importPresets()">📥 Import</button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+                        <small>Click: Save | Right-click: Load</small>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Preset Controls -->
+                <div class="control-group">
+                    <label for="presetName">Preset Name:</label>
+                    <input type="text" id="presetName" placeholder="Enter preset name..." maxlength="20">
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="saveNamedPreset()">
+                        💾 Save Current as Named Preset
+                    </button>
+                    <button class="btn secondary" onclick="clearAllPresets()">
+                        🗑️ Clear All Presets
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn warning" onclick="exportPresets()">📤 Export</button>
+                    <button class="btn warning" onclick="importPresets()">📥 Import</button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+            <!-- Settings -->
+            <div class="panel">
+                <h3>⚙️ Settings</h3>
+                
+                <div class="control-group">
+                    <button class="btn secondary" onclick="exportSettings()">
+                        📤 Export Settings
+                    </button>
+                    <button class="btn secondary" onclick="importSettings()">
+                        📥 Import Settings
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <button class="btn warning" onclick="resetToDefaults()">
+                        🔄 Reset to Defaults
+                    </button>
+                </div>
+
+                <div class="control-group">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="autoConnect" onchange="toggleAutoConnect()">
+                        <label for="autoConnect">Auto-connect on load</label>
+                    </div>
+                </div>
             </div>
         </div>
-<div class="panel">
-            <h3>🚨 Emergency Controls</h3>
-            <button class="emergency-stop" onclick="emergencyStop()">🛑 EMERGENCY STOP</button>
-            <button onclick="resetSystem()">🔄 Reset System</button>
-        </div>
 
-        <div class="panel">
-            <h3>⚙️ Settings</h3>
-            <div class="control-group">
-                <label for="maxSpeed">Max Speed Limit (%)</label>
-                <input type="range" id="maxSpeed" min="20" max="100" value="80" oninput="updateMaxSpeedDisplay(this.value)">
-                <span id="maxSpeedDisplay">80%</span>
+        <!-- Debug Panel -->
+        <div class="panel debug-panel" id="debugPanel">
+            <h3>🐛 Debug Console</h3>
+            <div class="log-panel" id="logPanel">
+                <div class="log-entry">Debug mode enabled</div>
             </div>
-            
-            <div class="control-group">
-                <label for="acceleration">Acceleration</label>
-                <input type="range" id="acceleration" min="1" max="10" value="5" oninput="updateAccelDisplay(this.value)">
-                <span id="accelDisplay">5</span>
-            </div>
+            <button class="btn secondary" onclick="clearLog()">Clear Log</button>
         </div>
     </div>
-      <script>
+
+    <!-- Quick Actions Bar -->
+    <div class="quick-actions-bar">
+        <button class="btn success" onclick="startSequence()" title="Start/Pause (Space)">
+            ▶️
+        </button>
+        <button class="btn danger" onclick="stopSequence()" title="Stop (Esc)">
+            ⏹️
+        </button>
+        <button class="btn secondary" onclick="homeMotors()" title="Home (H)">
+            🏠
+        </button>
+        <button class="btn warning" onclick="emergencyStop()" title="Emergency Stop">
+            🛑
+        </button>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="fileInput" style="display: none" accept=".json" onchange="handleFileImport(event)">
+<script>
         // Global variables
         let isConnected = false;
-        let currentPos = 0;
-        let isMoving = false;
-        let sequenceRunning = false;
-        let esp32IP = '192.168.1.100'; // Change to your ESP32's IP
-        
-        // Connection management
-        async function connectToESP32() {
-            try {
-                const response = await fetch(`http://${esp32IP}/status`);
-                if (response.ok) {
-                    isConnected = true;
-                    document.getElementById('connectionStatus').textContent = 'Connected';
-                    document.getElementById('statusPanel').style.borderColor = 'rgba(0, 255, 0, 0.3)';
-                    startStatusUpdates();
-                } else {
-                    throw new Error('Connection failed');
-                }
-            } catch (error) {
-                isConnected = false;
-                document.getElementById('connectionStatus').textContent = 'Disconnected';
-                document.getElementById('statusPanel').style.borderColor = 'rgba(255, 0, 0, 0.3)';
-                setTimeout(connectToESP32, 3000); // Retry in 3 seconds
-            }
-        }
-// Manual control functions
-        async function moveLeft() {
-            if (!isConnected) return;
-            const speed = document.getElementById('manualSpeed').value;
-            await sendCommand(`/move?dir=left&speed=${speed}`);
-        }
-        
-        async function moveRight() {
-            if (!isConnected) return;
-            const speed = document.getElementById('manualSpeed').value;
-            await sendCommand(`/move?dir=right&speed=${speed}`);
-        }
-        
-        async function stopMotor() {
-            if (!isConnected) return;
-            await sendCommand('/stop');
-        }
-        
-        async function goHome() {
-            if (!isConnected) return;
-            await sendCommand('/home');
-        }
-        
-        async function moveToPosition() {
-            if (!isConnected) return;
-            const position = document.getElementById('targetPosition').value;
-            const speed = document.getElementById('moveSpeed').value;
-            await sendCommand(`/position?target=${position}&speed=${speed}`);
-        }
-// Sequence automation functions
-        async function startSequence() {
-            if (!isConnected || sequenceRunning) return;
-            
-            const type = document.getElementById('sequenceType').value;
-            const distance = document.getElementById('sequenceDistance').value;
-            const steps = document.getElementById('sequenceSteps').value;
-            
-            sequenceRunning = true;
-            await sendCommand(`/sequence?type=${type}&distance=${distance}&steps=${steps}`);
-        }
-        
-        async function emergencyStop() {
-            await sendCommand('/emergency');
-            sequenceRunning = false;
-            isMoving = false;
-        }
-        
-        async function resetSystem() {
-            if (!isConnected) return;
-            await sendCommand('/reset');
-            currentPos = 0;
-            updateDisplay();
-        }
-        
-        // Utility functions
-        async function sendCommand(endpoint) {
-            try {
-                const response = await fetch(`http://${esp32IP}${endpoint}`);
-                return await response.text();
-            } catch (error) {
-                console.error('Command failed:', error);
-            }
-        }
-// Status updates and display functions
-        async function startStatusUpdates() {
-            setInterval(async () => {
-                if (isConnected) {
-                    try {
-                        const response = await fetch(`http://${esp32IP}/status`);
-                        const data = await response.json();
-                        updateDisplay(data);
-                    } catch (error) {
-                        console.error('Status update failed:', error);
-                    }
-                }
-            }, 1000);
-        }
-        
-        function updateDisplay(data = {}) {
-            if (data.position !== undefined) {
-                currentPos = data.position;
-                document.getElementById('currentPosition').textContent = currentPos;
-            }
-            
-            if (data.speed !== undefined) {
-                document.getElementById('currentSpeed').textContent = data.speed;
-            }
-            
-            if (data.progress !== undefined) {
-                document.getElementById('progressFill').style.width = `${data.progress}%`;
-            }
-            
-            isMoving = data.moving || false;
-            sequenceRunning = data.sequenceActive || false;
-        }
-// Display update functions
-        function updateSpeedDisplay(value) {
-            document.getElementById('speedDisplay').textContent = value + '%';
-        }
-        
-        function updateMoveSpeedDisplay(value) {
-            document.getElementById('moveSpeedDisplay').textContent = value + '%';
-        }
-        
-        function updateMaxSpeedDisplay(value) {
-            document.getElementById('maxSpeedDisplay').textContent = value + '%';
-        }
-        
-        function updateAccelDisplay(value) {
-            document.getElementById('accelDisplay').textContent = value;
-        }
-        
+        let bleDevice = null;
+        let characteristic = null;
+        let currentSpeedMultiplier = 1.0;
+        let jogInterval = null;
+        let isJogging = false;
+        let debugMode = false;
+
+        // State tracking
+        let motorPositions = { m1: 0, m2: 0 };
+        let isRunning = false;
+        let estimatedTimeInterval = null;
+
+        // Preset storage
+        let presets = {
+            1: null,
+            2: null,
+            3: null
+        };
+
+        // Settings object for export/import
+        let currentSettings = {
+            m1Start: 0,
+            m1End: 2000,
+            m1Speed: 2000,
+            m2Start: 0,
+            m2End: 2000,
+            m2Speed: 2000,
+            cycles: 1,
+            returnHome: true,
+            speedMultiplier: 1.0,
+            presets: {},
+            autoConnect: false
+        };
+
         // Initialize on page load
-        window.addEventListener('load', () => {
-            connectToESP32();
-            updateDisplay();
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSettings();
+            setupKeyboardShortcuts();
+            updateAllDisplayValues();
+            updateEstimatedTime();
+            
+            // Auto-connect if enabled
+            if (currentSettings.autoConnect) {
+                setTimeout(connectToSlider, 1000);
+            }
+            
+            log('Camera Slider Controller initialized');
         });
+
+        // Keyboard shortcuts
+        function setupKeyboardShortcuts() {
+            document.addEventListener('keydown', function(e) {
+                if (e.target.tagName === 'INPUT') return; // Don't interfere with input fields
+                
+                switch(e.code) {
+                    case 'Space':
+                        e.preventDefault();
+                        if (isRunning) {
+                            stopSequence();
+                        } else {
+                            startSequence();
+                        }
+                        break;
+                    case 'Escape':
+                        e.preventDefault();
+                        stopSequence();
+                        break;
+                    case 'KeyH':
+                        e.preventDefault();
+                        homeMotors();
+                        break;
+                    case 'KeyS':
+                        if (e.ctrlKey) {
+                            e.preventDefault();
+                            exportSettings();
+                        }
+                        break;
+                    case 'KeyL':
+                        if (e.ctrlKey) {
+                            e.preventDefault();
+                            importSettings();
+                        }
+                        break;
+                }
+            });
+        }
+
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = `[${timestamp}] ${message}`;
+            
+            console.log(logEntry);
+            
+            if (debugMode) {
+                const logPanel = document.getElementById('logPanel');
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.textContent = logEntry;
+                
+                logPanel.appendChild(entry);
+                logPanel.scrollTop = logPanel.scrollHeight;
+                
+                // Keep only last 50 entries
+                while (logPanel.children.length > 50) {
+                    logPanel.removeChild(logPanel.firstChild);
+                }
+            }
+        }
+
+        // BLE Connection Functions
+        async function connectToSlider() {
+            if (!navigator.bluetooth) {
+                alert('Bluetooth not supported in this browser');
+                return;
+            }
+
+            try {
+                log('Connecting to Camera Slider...');
+                
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    filters: [{ name: 'CameraSlider' }],
+                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+                });
+
+                const server = await bleDevice.gatt.connect();
+                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+
+                isConnected = true;
+                updateConnectionStatus();
+                log('Connected to Camera Slider successfully');
+                
+                // Send current settings to device
+                syncSettingsToDevice();
+                
+            } catch (error) {
+                log(`Connection failed: ${error.message}`, 'error');
+                alert('Failed to connect to slider: ' + error.message);
+            }
+        }
+
+        function disconnectFromSlider() {
+            if (bleDevice && bleDevice.gatt.connected) {
+                bleDevice.gatt.disconnect();
+            }
+            
+            isConnected = false;
+            bleDevice = null;
+            characteristic = null;
+            updateConnectionStatus();
+            log('Disconnected from Camera Slider');
+        }
+
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            if (isConnected) {
+                status.className = 'status connected';
+                status.textContent = 'Connected to Camera Slider';
+            } else {
+                status.className = 'status disconnected';
+                status.textContent = 'Disconnected';
+            }
+        }
+// Send command to device if connected
+        async function sendCommand(command) {
+            if (!isConnected || !characteristic) {
+                log(`Cannot send command "${command}" - not connected`, 'error');
+                return false;
+            }
+
+            try {
+                const encoder = new TextEncoder();
+                await characteristic.writeValue(encoder.encode(command));
+                log(`Sent: ${command}`);
+                return true;
+            } catch (error) {
+                log(`Send failed: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Send command only if connected (for real-time updates)
+        function sendIfConnected(command) {
+            if (isConnected) {
+                sendCommand(command);
+            }
+        }
+
+        // Sync all current settings to device
+        async function syncSettingsToDevice() {
+            if (!isConnected) return;
+
+            const commands = [
+                `M1S:${document.getElementById('m1Start').value}`,
+                `M1E:${document.getElementById('m1End').value}`,
+                `M1SPD:${Math.round(document.getElementById('m1Speed').value * currentSpeedMultiplier)}`,
+                `M2S:${document.getElementById('m2Start').value}`,
+                `M2E:${document.getElementById('m2End').value}`,
+                `M2SPD:${Math.round(document.getElementById('m2Speed').value * currentSpeedMultiplier)}`,
+                `CYCLES:${document.getElementById('cycles').value}`,
+                `RETURN:${document.getElementById('returnHome').checked ? '1' : '0'}`
+            ];
+
+            for (const cmd of commands) {
+                await sendCommand(cmd);
+                await new Promise(resolve => setTimeout(resolve, 50)); // Small delay between commands
+            }
+        }
+
+        // Sequence Control Functions
+        async function startSequence() {
+            if (!isConnected) {
+                alert('Please connect to the slider first');
+                return;
+            }
+
+            if (isRunning) {
+                // Toggle pause
+                isRunning = false;
+                await sendCommand('STOP');
+                log('Sequence paused');
+            } else {
+                // Start sequence
+                await syncSettingsToDevice(); // Ensure device has latest settings
+                await sendCommand('RUN');
+                isRunning = true;
+                log('Sequence started');
+            }
+
+            updateSequenceButtons();
+        }
+
+        async function stopSequence() {
+            if (!isConnected) return;
+
+            await sendCommand('STOP');
+            isRunning = false;
+            log('Sequence stopped');
+            updateSequenceButtons();
+        }
+
+        async function homeMotors() {
+            if (!isConnected) {
+                alert('Please connect to the slider first');
+                return;
+            }
+
+            await sendCommand('HOME');
+            log('Homing motors...');
+        }
+
+        async function emergencyStop() {
+            if (!isConnected) return;
+
+            await sendCommand('STOP');
+            stopJog();
+            isRunning = false;
+            log('EMERGENCY STOP');
+            updateSequenceButtons();
+        }
+
+        function updateSequenceButtons() {
+            const startButtons = document.querySelectorAll('button[onclick="startSequence()"]');
+            startButtons.forEach(btn => {
+                if (isRunning) {
+                    btn.innerHTML = btn.innerHTML.includes('▶️') ? '⏸️' : '⏸️ Pause';
+                    btn.className = btn.className.replace('success', 'warning');
+                } else {
+                    btn.innerHTML = btn.innerHTML.includes('️') ? '▶️' : '▶️ Start Sequence';
+                    btn.className = btn.className.replace('warning', 'success');
+                }
+            });
+        }
+
+        // Manual Jog Controls
+        async function startJog(motor, direction) {
+            if (!isConnected || isJogging) return;
+
+            isJogging = true;
+            const speed = Math.round(direction * currentSpeedMultiplier * 100);
+            await sendCommand(`JOGSLIDER:${motor}:${speed}`);
+            log(`Jogging ${motor} at speed ${speed}`);
+        }
+
+        async function stopJog() {
+            if (!isConnected || !isJogging) return;
+
+            isJogging = false;
+            await sendCommand('JOGSLIDER:STOP:0');
+            log('Jog stopped');
+        }
+
+        // Speed multiplier control
+        function updateSpeedMultiplier(value) {
+            currentSpeedMultiplier = parseFloat(value);
+            document.getElementById('speedMultiplierValue').textContent = `${value}x`;
+            
+            // Update current motor speeds if connected
+            if (isConnected) {
+                sendIfConnected(`M1SPD:${Math.round(document.getElementById('m1Speed').value * currentSpeedMultiplier)}`);
+                sendIfConnected(`M2SPD:${Math.round(document.getElementById('m2Speed').value * currentSpeedMultiplier)}`);
+            }
+            
+            saveSettings();
+        }
+
+        // Update speed display values
+        function updateSpeedDisplay(motor, value) {
+            document.getElementById(motor + 'SpeedValue').textContent = value;
+        }
+
+        // Update all display values
+        function updateAllDisplayValues() {
+            updateSpeedDisplay('m1', document.getElementById('m1Speed').value);
+            updateSpeedDisplay('m2', document.getElementById('m2Speed').value);
+            updateSpeedMultiplier(document.getElementById('speedMultiplier').value);
+        }
+// Position and Preset Management
+        async function getCurrentPositions() {
+            if (!isConnected) {
+                alert('Please connect to the slider first');
+                return;
+            }
+
+            // In a real implementation, you'd request position from device
+            // For now, we'll simulate with stored values
+            log(`Current positions - M1: ${motorPositions.m1}, M2: ${motorPositions.m2}`);
+            alert(`Current Positions:\nMotor 1: ${motorPositions.m1}\nMotor 2: ${motorPositions.m2}`);
+        }
+
+        function setCurrentPositionAs(elementId) {
+            const motor = elementId.includes('m1') ? 'm1' : 'm2';
+            const currentPos = motorPositions[motor];
+            
+            document.getElementById(elementId).value = currentPos;
+            
+            // Send to device if connected
+            const command = elementId.includes('Start') ? 
+                `${motor.toUpperCase()}S:${currentPos}` : 
+                `${motor.toUpperCase()}E:${currentPos}`;
+            
+            sendIfConnected(command);
+            updateEstimatedTime();
+            saveSettings();
+            
+            log(`Set ${elementId} to current position: ${currentPos}`);
+        }
+
+        // Preset Management
+        function savePreset(presetNumber) {
+            const preset = {
+                m1Start: parseInt(document.getElementById('m1Start').value),
+                m1End: parseInt(document.getElementById('m1End').value),
+                m1Speed: parseInt(document.getElementById('m1Speed').value),
+                m2Start: parseInt(document.getElementById('m2Start').value),
+                m2End: parseInt(document.getElementById('m2End').value),
+                m2Speed: parseInt(document.getElementById('m2Speed').value),
+                cycles: parseInt(document.getElementById('cycles').value),
+                returnHome: document.getElementById('returnHome').checked,
+                timestamp: new Date().toLocaleString()
+            };
+
+            presets[presetNumber] = preset;
+            updatePresetDisplay(presetNumber);
+            saveSettings();
+            
+            log(`Preset ${presetNumber} saved`);
+        }
+
+        function loadPreset(presetNumber) {
+            const preset = presets[presetNumber];
+            if (!preset) {
+                alert(`Preset ${presetNumber} is empty`);
+                return;
+            }
+
+            // Load values into UI
+            document.getElementById('m1Start').value = preset.m1Start;
+            document.getElementById('m1End').value = preset.m1End;
+            document.getElementById('m1Speed').value = preset.m1Speed;
+            document.getElementById('m2Start').value = preset.m2Start;
+            document.getElementById('m2End').value = preset.m2End;
+            document.getElementById('m2Speed').value = preset.m2Speed;
+            document.getElementById('cycles').value = preset.cycles;
+            document.getElementById('returnHome').checked = preset.returnHome;
+
+            // Update displays
+            updateAllDisplayValues();
+            updateEstimatedTime();
+
+            // Send to device if connected
+            if (isConnected) {
+                syncSettingsToDevice();
+            }
+
+            saveSettings();
+            log(`Preset ${presetNumber} loaded`);
+        }
+
+        function updatePresetDisplay(presetNumber) {
+            const preset = presets[presetNumber];
+            const textElement = document.getElementById(`preset${presetNumber}Text`);
+            
+            if (preset) {
+                textElement.innerHTML = `
+                    M1: ${preset.m1Start}→${preset.m1End}<br>
+                    M2: ${preset.m2Start}→${preset.m2End}<br>
+                    <small>${preset.timestamp}</small>
+                `;
+            } else {
+                textElement.textContent = 'Empty';
+            }
+        }
+
+        // Time Estimation
+        function updateEstimatedTime() {
+            const m1Start = parseInt(document.getElementById('m1Start').value) || 0;
+            const m1End = parseInt(document.getElementById('m1End').value) || 0;
+            const m1Speed = parseInt(document.getElementById('m1Speed').value) || 1000;
+            
+            const m2Start = parseInt(document.getElementById('m2Start').value) || 0;
+            const m2End = parseInt(document.getElementById('m2End').value) || 0;
+            const m2Speed = parseInt(document.getElementById('m2Speed').value) || 1000;
+            
+            const cycles = parseInt(document.getElementById('cycles').value) || 1;
+            const returnHome = document.getElementById('returnHome').checked;
+
+            // Calculate time for one cycle
+            const m1Distance = Math.abs(m1End - m1Start);
+            const m2Distance = Math.abs(m2End - m2Start);
+            
+            const m1Time = m1Distance / (m1Speed * currentSpeedMultiplier);
+            const m2Time = m2Distance / (m2Speed * currentSpeedMultiplier);
+            
+            // Use the longer of the two motor times (they move together)
+            let cycleTime = Math.max(m1Time, m2Time);
+            
+            // If return home is enabled, double the time
+            if (returnHome) {
+                cycleTime *= 2;
+            }
+            
+            // Calculate total time
+            let totalTime = cycleTime;
+            if (cycles > 0) {
+                totalTime *= cycles;
+            } else {
+                totalTime = 0; // Infinite cycles
+            }
+            
+            // Format time display
+            const timeElement = document.getElementById('estimatedTime');
+            if (cycles === 0) {
+                timeElement.textContent = '∞ (Infinite)';
+            } else if (totalTime < 60) {
+                timeElement.textContent = `${totalTime.toFixed(1)}s`;
+            } else {
+                const minutes = Math.floor(totalTime / 60);
+                const seconds = Math.floor(totalTime % 60);
+                timeElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+// Settings Management
+        function saveSettings() {
+            // Collect current values from UI
+            currentSettings = {
+                m1Start: parseInt(document.getElementById('m1Start').value) || 0,
+                m1End: parseInt(document.getElementById('m1End').value) || 2000,
+                m1Speed: parseInt(document.getElementById('m1Speed').value) || 2000,
+                m2Start: parseInt(document.getElementById('m2Start').value) || 0,
+                m2End: parseInt(document.getElementById('m2End').value) || 2000,
+                m2Speed: parseInt(document.getElementById('m2Speed').value) || 2000,
+                cycles: parseInt(document.getElementById('cycles').value) || 1,
+                returnHome: document.getElementById('returnHome').checked,
+                speedMultiplier: currentSpeedMultiplier,
+                presets: { ...presets },
+                autoConnect: document.getElementById('autoConnect')?.checked || false
+            };
+
+            // Save to localStorage
+            localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
+        }
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('cameraSliderSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    
+                    // Load UI values
+                    document.getElementById('m1Start').value = settings.m1Start || 0;
+                    document.getElementById('m1End').value = settings.m1End || 2000;
+                    document.getElementById('m1Speed').value = settings.m1Speed || 2000;
+                    document.getElementById('m2Start').value = settings.m2Start || 0;
+                    document.getElementById('m2End').value = settings.m2End || 2000;
+                    document.getElementById('m2Speed').value = settings.m2Speed || 2000;
+                    document.getElementById('cycles').value = settings.cycles || 1;
+                    document.getElementById('returnHome').checked = settings.returnHome !== false;
+                    
+                    // Load speed multiplier
+                    currentSpeedMultiplier = settings.speedMultiplier || 1.0;
+                    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+                    
+                    // Load presets
+                    if (settings.presets) {
+                        presets = { ...settings.presets };
+                        for (let i = 1; i <= 3; i++) {
+                            updatePresetDisplay(i);
+                        }
+                    }
+                    
+                    // Load auto-connect setting
+                    if (document.getElementById('autoConnect')) {
+                        document.getElementById('autoConnect').checked = settings.autoConnect || false;
+                    }
+                    
+                    currentSettings = settings;
+                    log('Settings loaded from localStorage');
+                }
+            } catch (error) {
+                log(`Failed to load settings: ${error.message}`, 'error');
+            }
+        }
+
+        function exportSettings() {
+            saveSettings(); // Ensure current state is saved
+            
+            const dataStr = JSON.stringify(currentSettings, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `camera-slider-settings-${new Date().toISOString().slice(0,10)}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+            
+            log('Settings exported to file');
+        }
+function importSettings() {
+            document.getElementById('fileInput').click();
+        }
+
+        function handleFileImport(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const settings = JSON.parse(e.target.result);
+                    
+                    // Validate settings structure
+                    if (typeof settings !== 'object' || settings === null) {
+                        throw new Error('Invalid settings file format');
+                    }
+                    
+                    // Apply settings to UI
+                    if (settings.m1Start !== undefined) document.getElementById('m1Start').value = settings.m1Start;
+                    if (settings.m1End !== undefined) document.getElementById('m1End').value = settings.m1End;
+                    if (settings.m1Speed !== undefined) document.getElementById('m1Speed').value = settings.m1Speed;
+                    if (settings.m2Start !== undefined) document.getElementById('m2Start').value = settings.m2Start;
+                    if (settings.m2End !== undefined) document.getElementById('m2End').value = settings.m2End;
+                    if (settings.m2Speed !== undefined) document.getElementById('m2Speed').value = settings.m2Speed;
+                    if (settings.cycles !== undefined) document.getElementById('cycles').value = settings.cycles;
+                    if (settings.returnHome !== undefined) document.getElementById('returnHome').checked = settings.returnHome;
+                    
+                    // Apply speed multiplier
+                    if (settings.speedMultiplier !== undefined) {
+                        currentSpeedMultiplier = settings.speedMultiplier;
+                        document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+                        document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
+                    }
+                    
+                    // Apply presets
+                    if (settings.presets) {
+                        presets = { ...settings.presets };
+                        for (let i = 1; i <= 3; i++) {
+                            updatePresetDisplay(i);
+                        }
+                    }
+                    
+                    // Apply auto-connect setting
+                    if (settings.autoConnect !== undefined && document.getElementById('autoConnect')) {
+                        document.getElementById('autoConnect').checked = settings.autoConnect;
+                    }
+                    
+                    // Update displays
+                    updateAllDisplayValues();
+                    updateEstimatedTime();
+                    
+                    // Sync to device if connected
+                    if (isConnected) {
+                        syncSettingsToDevice();
+                    }
+                    
+                    // Save to localStorage
+                    saveSettings();
+                    
+                    log('Settings imported successfully');
+                    alert('Settings imported successfully!');
+                    
+                } catch (error) {
+                    log(`Import failed: ${error.message}`, 'error');
+                    alert('Failed to import settings: ' + error.message);
+                }
+            };
+            
+            reader.readAsText(file);
+            event.target.value = ''; // Clear file input
+        }
+
+        function resetToDefaults() {
+            if (!confirm('Reset all settings to defaults? This cannot be undone.')) {
+                return;
+            }
+            
+            // Reset UI to defaults
+            document.getElementById('m1Start').value = 0;
+            document.getElementById('m1End').value = 2000;
+            document.getElementById('m1Speed').value = 2000;
+            document.getElementById('m2Start').value = 0;
+            document.getElementById('m2End').value = 2000;
+            document.getElementById('m2Speed').value = 2000;
+            document.getElementById('cycles').value = 1;
+            document.getElementById('returnHome').checked = true;
+            document.getElementById('speedMultiplier').value = 1.0;
+            
+            if (document.getElementById('autoConnect')) {
+                document.getElementById('autoConnect').checked = false;
+            }
+            
+            // Reset presets
+            presets = { 1: null, 2: null, 3: null };
+            for (let i = 1; i <= 3; i++) {
+                updatePresetDisplay(i);
+            }
+            
+            // Reset speed multiplier
+            currentSpeedMultiplier = 1.0;
+            
+            // Update displays
+            updateAllDisplayValues();
+            updateEstimatedTime();
+            
+            // Sync to device if connected
+            if (isConnected) {
+                syncSettingsToDevice();
+            }
+            
+            // Save to localStorage
+            saveSettings();
+            
+            log('Settings reset to defaults');
+        }
+// Initialization and Event Handlers
+        function init() {
+            console.log('Initializing Camera Slider Control...');
+            
+            // Initialize Web Bluetooth if available
+            if (!navigator.bluetooth) {
+                document.getElementById('status').textContent = 'Web Bluetooth not supported';
+                document.getElementById('connectBtn').disabled = true;
+                log('Web Bluetooth not supported in this browser', 'error');
+                return;
+            }
+            
+            // Load saved settings
+            loadSettings();
+            
+            // Update all display values
+            updateAllDisplayValues();
+            updateEstimatedTime();
+            
+            // Set up event listeners
+            setupEventListeners();
+            
+            // Auto-connect if enabled
+            if (document.getElementById('autoConnect')?.checked) {
+                setTimeout(connectDevice, 1000);
+            }
+            
+            log('Camera Slider Control initialized');
+        }
+
+        function setupEventListeners() {
+            // Motor parameter inputs
+            const motorInputs = ['m1Start', 'm1End', 'm1Speed', 'm2Start', 'm2End', 'm2Speed'];
+            motorInputs.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.addEventListener('input', function() {
+                        updateDisplayValue(id);
+                        updateEstimatedTime();
+                        saveSettings();
+                        
+                        // Send to device if connected
+                        const command = getCommandForInput(id, this.value);
+                        sendIfConnected(command);
+                    });
+                }
+            });
+
+            // Cycles input
+            const cyclesElement = document.getElementById('cycles');
+            if (cyclesElement) {
+                cyclesElement.addEventListener('input', function() {
+                    document.getElementById('cyclesValue').textContent = 
+                        this.value == 0 ? '∞' : this.value;
+                    updateEstimatedTime();
+                    saveSettings();
+                    sendIfConnected(`CYCLES:${this.value}`);
+                });
+            }
+
+            // Return home checkbox
+            const returnHomeElement = document.getElementById('returnHome');
+            if (returnHomeElement) {
+                returnHomeElement.addEventListener('change', function() {
+                    updateEstimatedTime();
+                    saveSettings();
+                    sendIfConnected(`RETURN:${this.checked ? 1 : 0}`);
+                });
+            }
+
+            // Speed multiplier
+            const speedMultiplierElement = document.getElementById('speedMultiplier');
+            if (speedMultiplierElement) {
+                speedMultiplierElement.addEventListener('input', function() {
+                    currentSpeedMultiplier = parseFloat(this.value);
+                    document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
+                    updateEstimatedTime();
+                    saveSettings();
+                });
+            }
+
+            // File input for importing settings
+            const fileInputElement = document.getElementById('fileInput');
+            if (fileInputElement) {
+                fileInputElement.addEventListener('change', handleFileImport);
+            }
+
+            // Jog sliders
+            const jogSliders = ['jogSliderM1', 'jogSliderM2', 'jogSliderBoth'];
+            jogSliders.forEach(id => {
+                const slider = document.getElementById(id);
+                if (slider) {
+                    slider.addEventListener('input', function() {
+                        handleJogSlider(id, parseInt(this.value));
+                    });
+                    
+                    slider.addEventListener('mouseup', function() {
+                        this.value = 0;
+                        handleJogSlider(id, 0);
+                    });
+                    
+                    slider.addEventListener('touchend', function() {
+                        this.value = 0;
+                        handleJogSlider(id, 0);
+                    });
+                }
+            });
+        }
+
+        function getCommandForInput(inputId, value) {
+            const commands = {
+                'm1Start': `M1S:${value}`,
+                'm1End': `M1E:${value}`,
+                'm1Speed': `M1SPD:${value}`,
+                'm2Start': `M2S:${value}`,
+                'm2End': `M2E:${value}`,
+                'm2Speed': `M2SPD:${value}`
+            };
+            return commands[inputId] || '';
+        }
+
+        function updateAllDisplayValues() {
+            const inputs = ['m1Start', 'm1End', 'm1Speed', 'm2Start', 'm2End', 'm2Speed'];
+            inputs.forEach(id => updateDisplayValue(id));
+            
+            const cyclesValue = document.getElementById('cycles').value;
+            document.getElementById('cyclesValue').textContent = 
+                cyclesValue == 0 ? '∞' : cyclesValue;
+            
+            document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
+        }
+
+        function updateDisplayValue(inputId) {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(inputId + 'Value');
+            if (input && display) {
+                display.textContent = input.value;
+            }
+        }
+
+        function syncSettingsToDevice() {
+            if (!isConnected) return;
+            
+            const commands = [
+                `M1S:${document.getElementById('m1Start').value}`,
+                `M1E:${document.getElementById('m1End').value}`,
+                `M1SPD:${document.getElementById('m1Speed').value}`,
+                `M2S:${document.getElementById('m2Start').value}`,
+                `M2E:${document.getElementById('m2End').value}`,
+                `M2SPD:${document.getElementById('m2Speed').value}`,
+                `CYCLES:${document.getElementById('cycles').value}`,
+                `RETURN:${document.getElementById('returnHome').checked ? 1 : 0}`
+            ];
+            
+            commands.forEach(cmd => {
+                setTimeout(() => sendCommand(cmd), 50);
+            });
+            
+            log('Settings synced to device');
+        }
+
+        function sendIfConnected(command) {
+            if (isConnected && command) {
+                sendCommand(command);
+            }
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', init);
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', function() {
+            if (document.visibilityState === 'visible' && isConnected) {
+                // Page became visible, check connection
+                setTimeout(() => {
+                    if (bluetoothCharacteristic && bluetoothCharacteristic.service.device.gatt.connected) {
+                        log('Connection maintained while page was hidden');
+                    } else {
+                        log('Connection lost while page was hidden', 'error');
+                        handleDisconnection();
+                    }
+                }, 100);
+            }
+        });
+// Utility Functions
+        function formatTime(seconds) {
+            if (seconds < 60) {
+                return `${seconds.toFixed(1)}s`;
+            } else if (seconds < 3600) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes}m ${remainingSeconds.toFixed(0)}s`;
+            } else {
+                const hours = Math.floor(seconds / 3600);
+                const minutes = Math.floor((seconds % 3600) / 60);
+                return `${hours}h ${minutes}m`;
+            }
+        }
+
+        function calculateDistance(start, end) {
+            return Math.abs(end - start);
+        }
+
+        function calculateMoveTime(distance, speed, multiplier = 1) {
+            if (speed <= 0) return 0;
+            const effectiveSpeed = speed * multiplier;
+            return distance / effectiveSpeed;
+        }
+
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+
+        // Add error recovery mechanism
+        window.addEventListener('error', function(event) {
+            log(`JavaScript Error: ${event.message}`, 'error');
+            console.error('Error details:', event.error);
+        });
+
+        // Add unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(event) {
+            log(`Unhandled Promise Rejection: ${event.reason}`, 'error');
+            console.error('Promise rejection details:', event.reason);
+        });
+
+        // Performance monitoring
+        function logPerformance(label, startTime) {
+            const endTime = performance.now();
+            const duration = endTime - startTime;
+            if (duration > 100) { // Log operations taking longer than 100ms
+                console.warn(`Performance: ${label} took ${duration.toFixed(2)}ms`);
+            }
+        }
+
+        // Memory cleanup for long-running sessions
+        function cleanupMemory() {
+            // Clear old log entries if too many exist
+            const logContainer = document.getElementById('log');
+            if (logContainer && logContainer.children.length > 1000) {
+                const entries = Array.from(logContainer.children);
+                entries.slice(0, entries.length - 500).forEach(entry => entry.remove());
+                log('Log entries cleaned up for memory management');
+            }
+        }
+
+        // Run cleanup every 5 minutes
+        setInterval(cleanupMemory, 5 * 60 * 1000);
+
+        // Export key functions to global scope for debugging
+        window.sliderControl = {
+            connectDevice,
+            disconnectDevice,
+            sendCommand,
+            saveSettings,
+            loadSettings,
+            exportSettings,
+            importSettings,
+            resetToDefaults,
+            isConnected: () => isConnected,
+            getSettings: () => currentSettings,
+            log
+        };
+
+        // Development helpers (only in development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            window.debugSlider = {
+                simulateConnection: () => {
+                    isConnected = true;
+                    updateConnectionStatus();
+                    log('Simulated connection for debugging');
+                },
+                testCommand: (cmd) => {
+                    log(`Test command would send: ${cmd}`);
+                },
+                getInternalState: () => ({
+                    isConnected,
+                    isRunning,
+                    currentSettings,
+                    presets,
+                    currentSpeedMultiplier
+                })
+            };
+        }
+
     </script>
 </body>
 </html>
+
+
 
 
 
