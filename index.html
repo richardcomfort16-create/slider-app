@@ -215,49 +215,55 @@
             width: 0;
             height: 0;
         }
-.range-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 8px;
-            border-radius: 5px;
-            background: #ddd;
-            outline: none;
-            transition: background 0.3s ease;
+.slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 34px;
         }
 
-        .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
             border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
 
-        .range-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
+        input:checked + .slider {
+            background-color: #667eea;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+
+        .jog-controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .jog-btn {
+            padding: 20px 10px;
             border: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            touch-action: manipulation;
         }
 .jog-btn.active {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -560,25 +566,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
