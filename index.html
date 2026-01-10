@@ -18,54 +18,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-.preset-section {
-    margin: 20px 0;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
 
-.preset-buttons {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 15px;
-}
-
-.preset-btn, .save-btn {
-    padding: 12px;
-    font-size: 16px;
-    border: 2px solid #007bff;
-    background: #f8f9fa;
-    border-radius: 6px;
-    cursor: pointer;
-    touch-action: manipulation;
-}
-
-.preset-btn:active, .save-btn:active {
-    background: #007bff;
-    color: white;
-}
-
-.save-controls {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    margin-bottom: 10px;
-}
-
-.preset-select {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-}
-
-.current-preset {
-    text-align: center;
-    color: #666;
-}
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -195,91 +148,7 @@
         .slider-group input[type="range"] {
             flex: 1;
         }
-<!-- Add this new preset section -->
-<div class="preset-section">
-    <h3>Presets</h3>
-    function saveCurrentPreset() {
-    const slot = document.getElementById('saveSlot').value;
-    const preset = {
-        m1Start: document.getElementById('m1Start').value,
-        m1End: document.getElementById('m1End').value,
-        m1Speed: document.getElementById('m1Speed').value,
-        m2Start: document.getElementById('m2Start').value,
-        m2End: document.getElementById('m2End').value,
-        m2Speed: document.getElementById('m2Speed').value,
-        cycles: document.getElementById('cycles').value,
-        returnEnabled: document.getElementById('returnToggle').checked
-    };
-    
-    localStorage.setItem(`preset_${slot}`, JSON.stringify(preset));
-    document.getElementById('currentPresetDisplay').textContent = `Saved to Preset ${slot}`;
-    
-    // Visual feedback
-    const saveBtn = event.target;
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'Saved!';
-    saveBtn.style.background = '#28a745';
-    setTimeout(() => {
-        saveBtn.textContent = originalText;
-        saveBtn.style.background = '';
-    }, 1000);
-}
 
-function loadPreset(slot) {
-    const preset = localStorage.getItem(`preset_${slot}`);
-    if (!preset) {
-        alert(`Preset ${slot} is empty`);
-        return;
-    }
-    
-    const data = JSON.parse(preset);
-    
-    // Update UI
-    document.getElementById('m1Start').value = data.m1Start;
-    document.getElementById('m1End').value = data.m1End;
-    document.getElementById('m1Speed').value = data.m1Speed;
-    document.getElementById('m2Start').value = data.m2Start;
-    document.getElementById('m2End').value = data.m2End;
-    document.getElementById('m2Speed').value = data.m2Speed;
-    document.getElementById('cycles').value = data.cycles;
-    document.getElementById('returnToggle').checked = data.returnEnabled;
-    
-    // Send to Arduino
-    sendBLE(`M1S:${data.m1Start}`);
-    sendBLE(`M1E:${data.m1End}`);
-    sendBLE(`M1SPD:${data.m1Speed}`);
-    sendBLE(`M2S:${data.m2Start}`);
-    sendBLE(`M2E:${data.m2End}`);
-    sendBLE(`M2SPD:${data.m2Speed}`);
-    sendBLE(`CYCLES:${data.cycles}`);
-    sendBLE(`RETURN:${data.returnEnabled ? 1 : 0}`);
-    
-    document.getElementById('currentPresetDisplay').textContent = `Loaded Preset ${slot}`;
-}
-    <!-- Preset buttons for loading -->
-    <div class="preset-buttons">
-        <button class="preset-btn" onclick="loadPreset(1)">Load Preset 1</button>
-        <button class="preset-btn" onclick="loadPreset(2)">Load Preset 2</button>
-        <button class="preset-btn" onclick="loadPreset(3)">Load Preset 3</button>
-        <button class="preset-btn" onclick="loadPreset(4)">Load Preset 4</button>
-    </div>
-    
-    <!-- Save controls -->
-    <div class="save-controls">
-        <select id="saveSlot" class="preset-select">
-            <option value="1">Preset 1</option>
-            <option value="2">Preset 2</option>
-            <option value="3">Preset 3</option>
-            <option value="4">Preset 4</option>
-        </select>
-        <button class="save-btn" onclick="saveCurrentPreset()">Save to Selected Slot</button>
-    </div>
-    
-    <!-- Show current preset -->
-    <div class="current-preset">
-        <small id="currentPresetDisplay">No preset loaded</small>
-    </div>
-</div>
         .slider-value {
             min-width: 60px;
             text-align: center;
@@ -1650,6 +1519,7 @@ function importSettings() {
     </script>
 </body>
 </html>
+
 
 
 
