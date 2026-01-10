@@ -495,7 +495,223 @@
                     </div>
                 </div>
             </div>
+                          </div>
+                </div>
+                <script>
+// Enhanced preset management
+let presets = JSON.parse(localStorage.getItem('sliderPresets') || '{}');
 
+function savePreset(slot) {
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        name: `Preset ${slot}`,
+        timestamp: new Date().toLocaleString()
+    };
+    
+    presets[slot] = preset;
+    localStorage.setItem('sliderPresets', JSON.stringify(presets));
+    updatePresetDisplay(slot);
+    logMessage(`Preset ${slot} saved: ${preset.name}`);
+}
+
+function saveNamedPreset() {
+    const name = document.getElementById('presetName').value.trim();
+    if (!name) {
+        alert('Please enter a preset name');
+        return;
+    }
+    
+    // Find next available slot
+    let slot = 1;
+    while (presets[slot] && slot <= 10) slot++;
+    
+    if (slot > 10) {
+        alert('Maximum 10 presets allowed');
+        return;
+    }
+    
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        name: name,
+        timestamp: new Date().toLocaleString()
+    };
+    
+    presets[slot] = preset;
+    localStorage.setItem('sliderPresets', JSON.stringify(presets));
+    updatePresetDisplay(slot);
+    document.getElementById('presetName').value = '';
+    logMessage(`Named preset saved: ${name}`);
+}
+
+function loadPreset(slot) {
+    const preset = presets[slot];
+    if (!preset) {
+        logMessage(`Preset ${slot} is empty`);
+        return;
+    }
+    
+    // Update UI
+    document.getElementById('m1Start').value = preset.m1Start;
+    document.getElementById('m1End').value = preset.m1End;
+    document.getElementById('m1Speed').value = preset.m1Speed;
+    document.getElementById('m2Start').value = preset.m2Start;
+    document.getElementById('m2End').value = preset.m2End;
+    document.getElementById('m2Speed').value = preset.m2Speed;
+    document.getElementById('cycles').value = preset.cycles;
+    document.getElementById('returnHome').checked = preset.returnHome;
+    
+    // Update displays
+    updateSpeedDisplay('m1', preset.m1Speed);
+    updateSpeedDisplay('m2', preset.m2Speed);
+    updateEstimatedTime();
+    
+    // Send to ESP32
+    if (isConnected) {
+        sendCommand(`M1S:${preset.m1Start}`);
+        sendCommand(`M1E:${preset.m1End}`);
+        sendCommand(`M1SPD:${preset.m1Speed}`);
+        sendCommand(`M2S:${preset.m2Start}`);
+        sendCommand(`M2E:${preset.m2End}`);
+        sendCommand(`M2SPD:${preset.m2Speed}`);
+        sendCommand(`CYCLES:${preset.cycles}`);
+        sendCommand(`RETURN:${preset.returnHome ? '1' : '0'}`);
+    }
+    
+    logMessage(`Loaded: ${preset.name}`);
+}
+
+function updatePresetDisplay(slot) {
+    const preset = presets[slot];
+    const textElement = document.getElementById(`preset${slot}Text`);
+    
+    if (preset) {
+        textElement.textContent = `${preset.name}\n${preset.timestamp}`;
+        textElement.parentElement.classList.add('set');
+    } else {
+        textElement.textContent = 'Empty';
+        textElement.parentElement.classList.remove('set');
+    }
+}
+
+function clearAllPresets() {
+    if (confirm('Clear all presets? This cannot be undone.')) {
+        presets = {};
+        localStorage.removeItem('sliderPresets');
+        for (let i = 1; i <= 3; i++) {
+            updatePresetDisplay(i);
+        }
+        logMessage('All presets cleared');
+    }
+}
+
+function exportPresets() {
+    const data = JSON.stringify(presets, null, 2);
+    const blob = new Blob([data], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `slider_presets_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    logMessage('Presets exported');
+}
+
+function importPresets() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const imported = JSON.parse(e.target.result);
+                presets = {...presets, ...imported};
+                localStorage.setItem('sliderPresets', JSON.stringify(presets));
+                for (let i = 1; i <= 3; i++) {
+                    updatePresetDisplay(i);
+                }
+                logMessage('Presets imported successfully');
+            } catch (error) {
+                alert('Invalid preset file');
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+// Load presets on startup
+window.addEventListener('load', function() {
+    for (let i = 1; i <= 3; i++) {
+        updatePresetDisplay(i);
+    }
+});
+</script>
+                <!-- Enhanced Preset Controls -->
+                <div class="control-group">
+                    <label for="presetName">Preset Name:</label>
+                    <input type="text" id="presetName" placeholder="Enter preset name..." maxlength="20">
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="saveNamedPreset()">
+                        💾 Save Current as Named Preset
+                    </button>
+                    <button class="btn secondary" onclick="clearAllPresets()">
+                        🗑️ Clear All Presets
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn warning" onclick="exportPresets()">📤 Export</button>
+                    <button class="btn warning" onclick="importPresets()">📥 Import</button>
+                </div>
+            </div>
+
+            <!-- Settings -->
+                        <small>Click: Save | Right-click: Load</small>
+                    </div>
+                </div>
+                
+                <!-- Enhanced Preset Controls -->
+                <div class="control-group">
+                    <label for="presetName">Preset Name:</label>
+                    <input type="text" id="presetName" placeholder="Enter preset name..." maxlength="20">
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn" onclick="saveNamedPreset()">
+                        💾 Save Current as Named Preset
+                    </button>
+                    <button class="btn secondary" onclick="clearAllPresets()">
+                        🗑️ Clear All Presets
+                    </button>
+                </div>
+                
+                <div class="control-group">
+                    <button class="btn warning" onclick="exportPresets()">📤 Export</button>
+                    <button class="btn warning" onclick="importPresets()">📥 Import</button>
+                </div>
+            </div>
+
+            <!-- Settings -->
             <!-- Settings -->
             <div class="panel">
                 <h3>⚙️ Settings</h3>
@@ -1519,5 +1735,6 @@ function importSettings() {
     </script>
 </body>
 </html>
+
 
 
