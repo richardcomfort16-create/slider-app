@@ -5,564 +5,594 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Slider Control</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 400px;
+            font-family: Arial, sans-serif;
+            max-width: 600px;
             margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            background-color: #f5f5f5;
         }
-
+        
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
         h1 {
             text-align: center;
             color: #333;
             margin-bottom: 30px;
-            font-size: 24px;
-            font-weight: 600;
         }
-.connection-status {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .status-dot {
-            display: inline-block;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            margin-right: 8px;
-        }
-
-        .status-dot.disconnected {
-            background-color: #ff4444;
-        }
-
-        .status-dot.connected {
-            background-color: #00cc44;
-        }
-
-        .btn {
-            width: 100%;
+        
+        .control-group {
+            margin-bottom: 25px;
             padding: 15px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        
+        .control-group h3 {
+            margin: 0 0 15px 0;
+            color: #444;
             font-size: 16px;
-            font-weight: 600;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 5px;
+        }
+label {
+            display: block;
+            margin: 10px 0 5px 0;
+            font-weight: bold;
+            color: #555;
+        }
+        
+        input[type="number"], input[type="range"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        input[type="range"] {
+            height: 40px;
+            -webkit-appearance: none;
+            background: #ddd;
+            border-radius: 20px;
+            outline: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #007bff;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
-
-        .btn:active {
-            transform: translateY(2px);
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        
+        button {
+            background-color: #007bff;
             color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            min-width: 120px;
+            transition: background-color 0.3s;
         }
-
-        .btn-primary:hover {
-            background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+        
+        button:hover {
+            background-color: #0056b3;
         }
-.btn-secondary {
-            background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-            color: white;
+        
+        button:active {
+            background-color: #004494;
         }
-
-        .btn-secondary:hover {
-            background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+        
+        button:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.6;
         }
-
-        .btn-success {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-            color: white;
+.button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 15px 0;
         }
-
-        .btn-success:hover {
-            background: linear-gradient(135deg, #218838 0%, #1db584 100%);
+        
+        .button-row button {
+            flex: 1;
+            min-width: 100px;
+            max-width: 150px;
         }
-
-        .btn-danger {
-            background: linear-gradient(135deg, #dc3545 0%, #e83e8c 100%);
-            color: white;
+        
+        #connectionStatus {
+            font-weight: bold;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 14px;
+            border: 2px solid;
         }
-
-        .btn-danger:hover {
-            background: linear-gradient(135deg, #c82333 0%, #d91a72 100%);
+        
+        .status-connected {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
         }
-
-        .section {
-            margin: 20px 0;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 15px;
-            backdrop-filter: blur(10px);
+        
+        .status-disconnected {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
         }
-
-        .section h3 {
-            color: #333;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: 600;
-        }
-.input-group {
+        
+        .slider-container {
             display: flex;
             align-items: center;
-            margin: 10px 0;
-        }
-
-        .input-group label {
-            flex: 0 0 80px;
-            font-weight: 600;
-            color: #333;
-            margin-right: 10px;
-        }
-
-        .input-group input {
-            flex: 1;
-            padding: 12px;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            font-size: 16px;
-            transition: border-color 0.3s ease;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .control-row {
-            display: flex;
             gap: 10px;
             margin: 10px 0;
         }
-
-        .control-row .btn {
+        
+        .slider-container label {
+            margin: 0;
+            min-width: 100px;
+            font-size: 14px;
+        }
+        
+        .slider-container input[type="range"] {
             flex: 1;
             margin: 0;
         }
-
-        .slider-container {
-            margin: 15px 0;
+        
+        .slider-value {
+            min-width: 50px;
+            text-align: center;
+            font-weight: bold;
+            color: #007bff;
         }
-
-        .slider-label {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 8px;
-            display: block;
+.error-message {
+            color: #dc3545;
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
         }
-.range-slider {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 8px;
-            border-radius: 5px;
-            background: #ddd;
-            outline: none;
-            transition: background 0.3s ease;
+        
+        .success-message {
+            color: #155724;
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+            display: none;
         }
-
-        .range-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .range-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background: #667eea;
-            cursor: pointer;
-            border: none;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
-        }
-
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 34px;
-        }
-
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-.slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: 0.4s;
-            border-radius: 34px;
-        }
-
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 26px;
-            width: 26px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: 0.4s;
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: #667eea;
-        }
-
-        input:checked + .slider:before {
-            transform: translateX(26px);
-        }
-
-        .jog-controls {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
+        
+        .input-group {
+            display: flex;
+            align-items: center;
             gap: 10px;
-            margin: 15px 0;
+            margin: 10px 0;
         }
-
-        .jog-btn {
-            padding: 20px 10px;
-            border: none;
-            border-radius: 10px;
+        
+        .input-group label {
+            margin: 0;
+            min-width: 80px;
             font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            user-select: none;
-            touch-action: manipulation;
         }
-.jog-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            transform: scale(0.95);
+        
+        .input-group input {
+            flex: 1;
+            margin: 0;
         }
-
-        .jog-btn:nth-child(1) { grid-column: 2; }
-        .jog-btn:nth-child(2) { grid-column: 1; grid-row: 2; }
-        .jog-btn:nth-child(3) { grid-column: 3; grid-row: 2; }
-        .jog-btn:nth-child(4) { grid-column: 2; grid-row: 3; }
-        .jog-btn:nth-child(5) { grid-column: 1; grid-row: 2; }
-        .jog-btn:nth-child(6) { grid-column: 3; grid-row: 2; }
-
-        .speed-display {
-            text-align: center;
-            margin: 15px 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .speed-value {
-            display: inline-block;
-            padding: 8px 16px;
-            background: rgba(102, 126, 234, 0.1);
-            border-radius: 8px;
-            margin: 0 5px;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 30px;
-            padding: 20px;
+        
+        .input-group .unit {
+            min-width: 40px;
             font-size: 12px;
             color: #666;
         }
-@media (max-width: 600px) {
+        
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
             .container {
-                margin: 10px;
                 padding: 15px;
             }
-
-            .input-group {
+            
+            .button-row {
+                flex-direction: column;
+            }
+            
+            .button-row button {
+                max-width: none;
+                width: 100%;
+            }
+            
+            .slider-container {
                 flex-direction: column;
                 align-items: stretch;
             }
-
-            .input-group label {
-                flex: none;
-                margin-bottom: 5px;
-            }
-
-            .jog-controls {
-                gap: 8px;
-            }
-
-            .jog-btn {
-                padding: 15px 8px;
-                font-size: 12px;
+            
+            .slider-container label {
+                min-width: auto;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <h1>Camera Slider Control</h1>
-            <div class="connection-status" id="connectionStatus">
-                <span class="status-dot"></span>
-                <span class="status-text">Disconnected</span>
+        <h1>🎬 Camera Slider Control</h1>
+        
+        <!-- Connection Status -->
+        <div id="connectionStatus" class="status-disconnected">
+            Disconnected - Click Connect to start
+        </div>
+        
+        <!-- Connection Controls -->
+        <div class="control-group">
+            <h3>📡 Connection</h3>
+            <div class="button-row">
+                <button id="connectBtn" onclick="connectBLE()">Connect</button>
+                <button id="disconnectBtn" onclick="disconnectBLE()" disabled>Disconnect</button>
             </div>
         </div>
-<div class="control-section">
-            <h2>Motor 1 Controls</h2>
+        
+        <!-- Motor 1 Controls -->
+        <div class="control-group">
+            <h3>🎯 Motor 1 Settings</h3>
             
             <div class="input-group">
-                <label>Start Position:</label>
-                <input type="number" id="m1Start" value="0" step="10">
+                <label for="m1Start">Start Position:</label>
+                <input type="number" id="m1Start" value="0" oninput="sendCommand('M1S:' + this.value)">
+                <span class="unit">steps</span>
             </div>
             
             <div class="input-group">
-                <label>End Position:</label>
-                <input type="number" id="m1End" value="2000" step="10">
+                <label for="m1End">End Position:</label>
+                <input type="number" id="m1End" value="2000" oninput="sendCommand('M1E:' + this.value)">
+                <span class="unit">steps</span>
             </div>
             
             <div class="input-group">
-                <label>Speed:</label>
-                <input type="range" id="m1Speed" class="range-slider" 
-                       min="100" max="8000" value="2000" step="10">
-                <span class="speed-value" id="m1SpeedValue">2000</span>
-            </div>
-
-            <div class="jog-controls">
-                <button class="jog-btn" data-motor="M1" data-dir="1">↑ Forward</button>
-                <button class="jog-btn" data-motor="M1" data-dir="-1">↓ Backward</button>
+                <label for="m1Speed">Speed:</label>
+                <input type="number" id="m1Speed" value="2000" min="100" max="8000" oninput="sendCommand('M1SPD:' + this.value)">
+                <span class="unit">steps/s</span>
             </div>
         </div>
-<div class="control-section">
-            <h2>Motor 2 Controls</h2>
+<!-- Motor 2 Controls -->
+        <div class="control-group">
+            <h3>🎯 Motor 2 Settings</h3>
             
             <div class="input-group">
-                <label>Start Position:</label>
-                <input type="number" id="m2Start" value="0" step="10">
+                <label for="m2Start">Start Position:</label>
+                <input type="number" id="m2Start" value="0" oninput="sendCommand('M2S:' + this.value)">
+                <span class="unit">steps</span>
             </div>
             
             <div class="input-group">
-                <label>End Position:</label>
-                <input type="number" id="m2End" value="2000" step="10">
+                <label for="m2End">End Position:</label>
+                <input type="number" id="m2End" value="2000" oninput="sendCommand('M2E:' + this.value)">
+                <span class="unit">steps</span>
             </div>
             
             <div class="input-group">
-                <label>Speed:</label>
-                <input type="range" id="m2Speed" class="range-slider" 
-                       min="100" max="8000" value="2000" step="10">
-                <span class="speed-value" id="m2SpeedValue">2000</span>
-            </div>
-
-            <div class="jog-controls">
-                <button class="jog-btn" data-motor="M2" data-dir="1">↑ Forward</button>
-                <button class="jog-btn" data-motor="M2" data-dir="-1">↓ Backward</button>
+                <label for="m2Speed">Speed:</label>
+                <input type="number" id="m2Speed" value="2000" min="100" max="8000" oninput="sendCommand('M2SPD:' + this.value)">
+                <span class="unit">steps/s</span>
             </div>
         </div>
-<div class="control-section">
-            <h2>System Controls</h2>
+        
+        <!-- Cycle Controls -->
+        <div class="control-group">
+            <h3>🔄 Cycle Settings</h3>
             
             <div class="input-group">
-                <label>Cycles:</label>
-                <input type="number" id="cycles" value="0" min="0" max="99">
-                <small>0 = Infinite</small>
+                <label for="cycles">Cycles:</label>
+                <input type="number" id="cycles" value="0" min="0" max="100" oninput="sendCommand('CYCLES:' + this.value)">
+                <span class="unit">0 = ∞</span>
             </div>
             
             <div class="input-group">
-                <label>Return Mode:</label>
-                <select id="returnMode">
-                    <option value="1">Enabled</option>
-                    <option value="0">Disabled</option>
+                <label for="returnMode">Return Mode:</label>
+                <select id="returnMode" onchange="sendCommand('RETURN:' + (this.value === 'true' ? '1' : '0'))">
+                    <option value="true">Return to Start</option>
+                    <option value="false">One Direction</option>
                 </select>
             </div>
+        </div>
+<!-- Manual Controls -->
+        <div class="control-group">
+            <h3>🎮 Manual Controls</h3>
             
-            <div class="button-group">
-                <button id="runBtn" class="btn btn-primary">Run</button>
-                <button id="stopBtn" class="btn btn-secondary">Stop</button>
-                <button id="homeBtn" class="btn btn-secondary">Home</button>
+            <div class="slider-container">
+                <label>Motor 1:</label>
+                <input type="range" id="jogM1" min="-100" max="100" value="0" 
+                       oninput="handleJogSlider('M1', this.value)" 
+                       onchange="this.value = 0; handleJogSlider('M1', 0)">
+                <span class="slider-value" id="jogM1Value">0</span>
+            </div>
+            
+            <div class="slider-container">
+                <label>Motor 2:</label>
+                <input type="range" id="jogM2" min="-100" max="100" value="0" 
+                       oninput="handleJogSlider('M2', this.value)" 
+                       onchange="this.value = 0; handleJogSlider('M2', 0)">
+                <span class="slider-value" id="jogM2Value">0</span>
+            </div>
+            
+            <div class="slider-container">
+                <label>Both Motors:</label>
+                <input type="range" id="jogBoth" min="-100" max="100" value="0" 
+                       oninput="handleJogSlider('BOTH', this.value)" 
+                       onchange="this.value = 0; handleJogSlider('BOTH', 0)">
+                <span class="slider-value" id="jogBothValue">0</span>
             </div>
         </div>
-<script>
+        
+        <!-- Action Controls -->
+        <div class="control-group">
+            <h3>⚡ Actions</h3>
+            <div class="button-row">
+                <button onclick="sendCommand('RUN')">🏃 Run</button>
+                <button onclick="sendCommand('STOP')">🛑 Stop</button>
+                <button onclick="sendCommand('HOME')">🏠 Home</button>
+            </div>
+        </div>
+<!-- Status Display -->
+        <div class="control-group">
+            <h3>📊 Status</h3>
+            <div id="statusDisplay">
+                <div class="status-item">
+                    <span>Motor 1:</span>
+                    <span id="m1Status">Stopped</span>
+                </div>
+                <div class="status-item">
+                    <span>Motor 2:</span>
+                    <span id="m2Status">Stopped</span>
+                </div>
+                <div class="status-item">
+                    <span>Cycle:</span>
+                    <span id="cycleStatus">0/0</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
         let bleDevice = null;
         let bleCharacteristic = null;
         let isConnected = false;
-
+        
+        const SERVICE_UUID = '12345678-1234-1234-1234-1234567890ab';
+        const CHARACTERISTIC_UUID = 'abcd1234-1234-1234-1234-abcdef123456';
+        
         // Update connection status display
-        function updateConnectionStatus(connected) {
-            const status = document.getElementById('connectionStatus');
-            const dot = status.querySelector('.status-dot');
-            const text = status.querySelector('.status-text');
+        function updateConnectionStatus(status, isConnected) {
+            const statusDiv = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
             
-            if (connected) {
-                dot.style.backgroundColor = '#4CAF50';
-                text.textContent = 'Connected';
-            } else {
-                dot.style.backgroundColor = '#f44336';
-                text.textContent = 'Disconnected';
-            }
+            statusDiv.textContent = status;
+            statusDiv.className = isConnected ? 'status-connected' : 'status-disconnected';
+            
+            connectBtn.disabled = isConnected;
+            disconnectBtn.disabled = !isConnected;
         }
-
-        // Connect to BLE device
+// Connect to BLE device
         async function connectBLE() {
             try {
+                updateConnectionStatus('Connecting...', false);
+                
                 bleDevice = await navigator.bluetooth.requestDevice({
                     filters: [{ name: 'CameraSlider' }],
-                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
+                    optionalServices: [SERVICE_UUID]
                 });
-
+                
                 const server = await bleDevice.gatt.connect();
-                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-                bleCharacteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
-
+                const service = await server.getPrimaryService(SERVICE_UUID);
+                bleCharacteristic = await service.getCharacteristic(CHARACTERISTIC_UUID);
+                
                 isConnected = true;
-                updateConnectionStatus(true);
-                console.log('Connected to Camera Slider');
+                updateConnectionStatus('Connected', true);
+                
+                bleDevice.addEventListener('gattserverdisconnected', () => {
+                    isConnected = false;
+                    updateConnectionStatus('Disconnected', false);
+                });
+                
             } catch (error) {
                 console.error('BLE connection failed:', error);
-                updateConnectionStatus(false);
+                updateConnectionStatus('Connection Failed', false);
             }
         }
-// Send command to BLE device
-        async function sendBLECommand(command) {
+        
+        // Disconnect BLE device
+        async function disconnectBLE() {
+            if (bleDevice && bleDevice.gatt.connected) {
+                bleDevice.gatt.disconnect();
+            }
+            isConnected = false;
+            updateConnectionStatus('Disconnected', false);
+        }
+        
+        // Send command to Arduino
+        async function sendCommand(command) {
             if (!isConnected || !bleCharacteristic) {
                 console.log('Not connected to device');
                 return;
             }
             
             try {
-                await bleCharacteristic.writeValue(new TextEncoder().encode(command));
+                const encoder = new TextEncoder();
+                await bleCharacteristic.writeValue(encoder.encode(command));
                 console.log('Sent:', command);
             } catch (error) {
-                console.error('Send failed:', error);
+                console.error('Failed to send command:', error);
             }
         }
-
-        // Update speed value displays
-        function updateSpeedDisplay(motor) {
-            const speedSlider = document.getElementById(`${motor.toLowerCase()}Speed`);
-            const speedValue = document.getElementById(`${motor.toLowerCase()}SpeedValue`);
-            speedValue.textContent = speedSlider.value;
-        }
-
-        // Event listeners for speed sliders
-        document.getElementById('m1Speed').addEventListener('input', function() {
-            updateSpeedDisplay('M1');
-            sendBLECommand(`M1SPD:${this.value}`);
-        });
-
-        document.getElementById('m2Speed').addEventListener('input', function() {
-            updateSpeedDisplay('M2');
-            sendBLECommand(`M2SPD:${this.value}`);
-        });
-// Event listeners for position inputs
-        document.getElementById('m1Start').addEventListener('change', function() {
-            sendBLECommand(`M1S:${this.value}`);
-        });
-
-        document.getElementById('m1End').addEventListener('change', function() {
-            sendBLECommand(`M1E:${this.value}`);
-        });
-
-        document.getElementById('m2Start').addEventListener('change', function() {
-            sendBLECommand(`M2S:${this.value}`);
-        });
-
-        document.getElementById('m2End').addEventListener('change', function() {
-            sendBLECommand(`M2E:${this.value}`);
-        });
-
-        document.getElementById('cycles').addEventListener('change', function() {
-            sendBLECommand(`CYCLES:${this.value}`);
-        });
-
-        document.getElementById('returnMode').addEventListener('change', function() {
-            sendBLECommand(`RETURN:${this.value}`);
-        });
-// Button event handlers
-        document.getElementById('connectBtn').addEventListener('click', connectBLE);
-
-        document.getElementById('runBtn').addEventListener('click', function() {
-            sendBLECommand('RUN');
-        });
-
-        document.getElementById('stopBtn').addEventListener('click', function() {
-            sendBLECommand('STOP');
-        });
-
-        document.getElementById('homeBtn').addEventListener('click', function() {
-            sendBLECommand('HOME');
-        });
-
-        // Touch/mouse handlers for jog buttons
-        function addJogHandlers(buttonId, axis) {
-            const button = document.getElementById(buttonId);
+// Handle parameter input changes
+        function handleParameterChange(param, value) {
+            const numValue = parseInt(value);
+            if (isNaN(numValue)) return;
             
-            function startJog() {
-                sendBLECommand(`JOGSLIDER:${axis}:100`);
+            let command = '';
+            switch(param) {
+                case 'M1S': command = `M1S:${numValue}`; break;
+                case 'M1E': command = `M1E:${numValue}`; break;
+                case 'M1SPD': command = `M1SPD:${numValue}`; break;
+                case 'M2S': command = `M2S:${numValue}`; break;
+                case 'M2E': command = `M2E:${numValue}`; break;
+                case 'M2SPD': command = `M2SPD:${numValue}`; break;
+                case 'CYCLES': command = `CYCLES:${numValue}`; break;
+                case 'RETURN': command = `RETURN:${value === 'true' ? 1 : 0}`; break;
             }
-            
-            function stopJog() {
-                sendBLECommand(`JOGSLIDER:${axis}:0`);
-            }
-            
-            // Mouse events
-            button.addEventListener('mousedown', startJog);
-            button.addEventListener('mouseup', stopJog);
-            button.addEventListener('mouseleave', stopJog);
-            
-            // Touch events
-            button.addEventListener('touchstart', startJog);
-            button.addEventListener('touchend', stopJog);
+            if (command) sendCommand(command);
         }
-// Setup jog button handlers
-        addJogHandlers('jogM1Left', 'M1:-1');
-        addJogHandlers('jogM1Right', 'M1:1');
-        addJogHandlers('jogM2Left', 'M2:-1');
-        addJogHandlers('jogM2Right', 'M2:1');
-        addJogHandlers('jogBothLeft', 'BOTH:-1');
-        addJogHandlers('jogBothRight', 'BOTH:1');
-
-        // Initialize speed displays on page load
-        window.addEventListener('load', function() {
-            updateSpeedDisplay('M1');
-            updateSpeedDisplay('M2');
-            updateConnectionStatus(false);
-        });
-
-        // Handle disconnection
-        window.addEventListener('beforeunload', function() {
-            if (bleDevice && bleDevice.gatt.connected) {
-                bleDevice.gatt.disconnect();
+        
+        // Handle jog slider movement
+        function handleJogSlider(motor, value) {
+            const sliderValue = parseInt(value);
+            document.getElementById(`jog${motor}Value`).textContent = sliderValue;
+            
+            const command = `JOGSLIDER:${motor}:${sliderValue}`;
+            sendCommand(command);
+        }
+        
+        // Update display values from inputs
+        function updateDisplayValue(inputId, displayId) {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            display.textContent = input.value;
+        }
+        
+        // Initialize the interface
+        function initializeInterface() {
+            updateConnectionStatus('Not Connected', false);
+            
+            // Set initial display values
+            updateDisplayValue('m1Start', 'm1StartValue');
+            updateDisplayValue('m1End', 'm1EndValue');
+            updateDisplayValue('m1Speed', 'm1SpeedValue');
+            updateDisplayValue('m2Start', 'm2StartValue');
+            updateDisplayValue('m2End', 'm2EndValue');
+            updateDisplayValue('m2Speed', 'm2SpeedValue');
+            updateDisplayValue('cycles', 'cyclesValue');
+        }
+// Initialize event listeners
+        function setupEventListeners() {
+            // Connection buttons
+            document.getElementById('connectBtn').addEventListener('click', connectBLE);
+            document.getElementById('disconnectBtn').addEventListener('click', disconnectBLE);
+            
+            // Control buttons
+            document.getElementById('runBtn').addEventListener('click', () => sendCommand('RUN'));
+            document.getElementById('stopBtn').addEventListener('click', () => sendCommand('STOP'));
+            document.getElementById('homeBtn').addEventListener('click', () => sendCommand('HOME'));
+            
+            // Parameter inputs
+            document.getElementById('m1Start').addEventListener('input', (e) => {
+                handleParameterChange('M1S', e.target.value);
+                updateDisplayValue('m1Start', 'm1StartValue');
+            });
+            
+            document.getElementById('m1End').addEventListener('input', (e) => {
+                handleParameterChange('M1E', e.target.value);
+                updateDisplayValue('m1End', 'm1EndValue');
+            });
+            
+            document.getElementById('m1Speed').addEventListener('input', (e) => {
+                handleParameterChange('M1SPD', e.target.value);
+                updateDisplayValue('m1Speed', 'm1SpeedValue');
+            });
+            
+            document.getElementById('m2Start').addEventListener('input', (e) => {
+                handleParameterChange('M2S', e.target.value);
+                updateDisplayValue('m2Start', 'm2StartValue');
+            });
+            
+            document.getElementById('m2End').addEventListener('input', (e) => {
+                handleParameterChange('M2E', e.target.value);
+                updateDisplayValue('m2End', 'm2EndValue');
+            });
+            
+            document.getElementById('m2Speed').addEventListener('input', (e) => {
+                handleParameterChange('M2SPD', e.target.value);
+                updateDisplayValue('m2Speed', 'm2SpeedValue');
+            });
+document.getElementById('cycles').addEventListener('input', (e) => {
+                handleParameterChange('CYCLES', e.target.value);
+                updateDisplayValue('cycles', 'cyclesValue');
+            });
+            
+            document.getElementById('returnHome').addEventListener('change', (e) => {
+                handleParameterChange('RETURN', e.target.checked.toString());
+            });
+            
+            // Jog sliders
+            document.getElementById('jogM1').addEventListener('input', (e) => {
+                handleJogSlider('M1', e.target.value);
+            });
+            
+            document.getElementById('jogM2').addEventListener('input', (e) => {
+                handleJogSlider('M2', e.target.value);
+            });
+            
+            // Reset sliders when released
+            document.getElementById('jogM1').addEventListener('mouseup', () => {
+                document.getElementById('jogM1').value = 0;
+                document.getElementById('jog1Value').textContent = '0';
+                sendCommand('JOGSLIDER:M1:0');
+            });
+            
+            document.getElementById('jogM2').addEventListener('mouseup', () => {
+                document.getElementById('jogM2').value = 0;
+                document.getElementById('jog2Value').textContent = '0';
+                sendCommand('JOGSLIDER:M2:0');
+            });
+            
+            // Touch events for mobile
+            document.getElementById('jogM1').addEventListener('touchend', () => {
+                document.getElementById('jogM1').value = 0;
+                document.getElementById('jog1Value').textContent = '0';
+                sendCommand('JOGSLIDER:M1:0');
+            });
+            
+            document.getElementById('jogM2').addEventListener('touchend', () => {
+                document.getElementById('jogM2').value = 0;
+                document.getElementById('jog2Value').textContent = '0';
+                sendCommand('JOGSLIDER:M2:0');
+            });
+        }
+// Initialize the page when loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeInterface();
+            setupEventListeners();
+            
+            // Check for Web Bluetooth support
+            if (!navigator.bluetooth) {
+                document.getElementById('connectionStatus').textContent = 'Web Bluetooth not supported';
+                document.getElementById('connectBtn').disabled = true;
+                console.error('Web Bluetooth API is not available in this browser');
             }
         });
     </script>
 </body>
 </html>
+
