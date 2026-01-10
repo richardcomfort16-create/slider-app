@@ -1046,13 +1046,13 @@
                     const settings = JSON.parse(saved);
                     
                     // Load UI values
-                    document.getElementById('m1Start').value = settings.m1Start || 0;
+                    document.getElementById('m1Start').value = settings.m1Start || -2000;
                     document.getElementById('m1End').value = settings.m1End || 2000;
                     document.getElementById('m1Speed').value = settings.m1Speed || 2000;
-                    document.getElementById('m2Start').value = settings.m2Start || 0;
-                    document.getElementById('m2End').value = settings.m2End || 2000;
+                    document.getElementById('m2Start').value = settings.m2Start || -8000;
+                    document.getElementById('m2End').value = settings.m2End || 8000;
                     document.getElementById('m2Speed').value = settings.m2Speed || 2000;
-                    document.getElementById('cycles').value = settings.cycles || 1;
+                    document.getElementById('cycles').value = settings.cycles || 0;
                     document.getElementById('returnHome').checked = settings.returnHome !== false;
                     
                     // Load speed multiplier
@@ -1174,13 +1174,13 @@ function importSettings() {
             }
             
             // Reset UI to defaults
-            document.getElementById('m1Start').value = 0;
+            document.getElementById('m1Start').value = -2000;
             document.getElementById('m1End').value = 2000;
             document.getElementById('m1Speed').value = 2000;
-            document.getElementById('m2Start').value = 0;
-            document.getElementById('m2End').value = 2000;
+            document.getElementById('m2Start').value = -8000;
+            document.getElementById('m2End').value = 8000;
             document.getElementById('m2Speed').value = 2000;
-            document.getElementById('cycles').value = 1;
+            document.getElementById('cycles').value = 0;
             document.getElementById('returnHome').checked = true;
             document.getElementById('speedMultiplier').value = 1.0;
             
