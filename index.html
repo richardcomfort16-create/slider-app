@@ -391,7 +391,7 @@
                 <div class="control-group">
                     <label for="m2Speed">Speed (steps/sec):</label>
                     <div class="slider-group">
-                        <input type="range" id="m2Speed" min="100" max="10000" value="2000" step="100" 
+                        <input type="range" id="m2Speed" min="100" max="6000" value="2000" step="100" 
                                oninput="updateSpeedDisplay('m2', this.value); updateEstimatedTime(); sendIfConnected('M2SPD:' + Math.round(this.value * currentSpeedMultiplier))">
                         <span class="slider-value" id="m2SpeedValue">2000</span>
                     </div>
