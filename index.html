@@ -576,28 +576,18 @@
 // Unified Preset System and Settings Integration
 
 // Initialize presets as an array
+/* ============================
+   PRESET + SETTINGS SYSTEM
+   CLEAN 3‑PRESET VERSION
+   ============================ */
+
+// Three presets (index 0, 1, 2)
 let presets = [null, null, null];
 
-// Update Preset Display
-function updatePresetDisplay(presetNumber) {
-    const preset = presets[presetNumber];
-    const textElement = document.getElementById(`preset${presetNumber + 1}Text`);
-
-    if (!textElement) return;
-
-    if (preset) {
-        textElement.innerHTML = `
-            M1: ${preset.m1Start}→${preset.m1End}<br>
-            M2: ${preset.m2Start}→${preset.m2End}<br>
-            <small>${preset.timestamp}</small>
-        `;
-    } else {
-        textElement.textContent = 'Empty';
-    }
-}
-
-// Save Preset
-function savePreset(presetNumber) {
+/* ----------------------------
+   SAVE PRESET
+---------------------------- */
+function savePreset(index) {
     const preset = {
         m1Start: parseInt(document.getElementById('m1Start').value),
         m1End: parseInt(document.getElementById('m1End').value),
@@ -610,17 +600,19 @@ function savePreset(presetNumber) {
         timestamp: new Date().toLocaleString()
     };
 
-    presets[presetNumber] = preset;
-    updatePresetDisplay(presetNumber);
+    presets[index] = preset;
+    updatePresetDisplay(index);
     saveSettings();
-    log(`Preset ${presetNumber + 1} saved`);
+    log(`Preset ${index + 1} saved`);
 }
 
-// Load Preset
-function loadPreset(presetNumber) {
-    const preset = presets[presetNumber];
+/* ----------------------------
+   LOAD PRESET
+---------------------------- */
+function loadPreset(index) {
+    const preset = presets[index];
     if (!preset) {
-        alert(`Preset ${presetNumber + 1} is empty`);
+        alert(`Preset ${index + 1} is empty`);
         return;
     }
 
@@ -641,9 +633,131 @@ function loadPreset(presetNumber) {
     }
 
     saveSettings();
-    log(`Preset ${presetNumber + 1} loaded`);
+    log(`Preset ${index + 1} loaded`);
 }
 
+/* ----------------------------
+   UPDATE PRESET DISPLAY
+---------------------------- */
+function updatePresetDisplay(index) {
+    const preset = presets[index];
+    const textElement = document.getElementById(`preset${index + 1}Text`);
+    if (!textElement) return;
+
+    if (preset) {
+        textElement.innerHTML = `
+            M1: ${preset.m1Start}→${preset.m1End}<br>
+            M2: ${preset.m2Start}→${preset.m2End}<br>
+            <small>${preset.timestamp}</small>
+        `;
+    } else {
+        textElement.textContent = 'Empty';
+    }
+}
+
+/* ----------------------------
+   SAVE SETTINGS (INCLUDES PRESETS)
+---------------------------- */
+function saveSettings() {
+    currentSettings = {
+        m1Start: parseInt(document.getElementById('m1Start').value) || 0,
+        m1End: parseInt(document.getElementById('m1End').value) || 2000,
+        m1Speed: parseInt(document.getElementById('m1Speed').value) || 2000,
+        m2Start: parseInt(document.getElementById('m2Start').value) || 0,
+        m2End: parseInt(document.getElementById('m2End').value) || 2000,
+        m2Speed: parseInt(document.getElementById('m2Speed').value) || 2000,
+        cycles: parseInt(document.getElementById('cycles').value) || 1,
+        returnHome: document.getElementById('returnHome').checked,
+        speedMultiplier: currentSpeedMultiplier,
+        presets: presets,
+        autoConnect: document.getElementById('autoConnect')?.checked || false
+    };
+
+    localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
+    log('Settings saved to localStorage');
+}
+
+/* ----------------------------
+   LOAD SETTINGS (RESTORES PRESETS)
+---------------------------- */
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem('cameraSliderSettings');
+        if (!saved) return;
+
+        const settings = JSON.parse(saved);
+
+        document.getElementById('m1Start').value = settings.m1Start ?? -2000;
+        document.getElementById('m1End').value = settings.m1End ?? 2000;
+        document.getElementById('m1Speed').value = settings.m1Speed ?? 2000;
+        document.getElementById('m2Start').value = settings.m2Start ?? -8000;
+        document.getElementById('m2End').value = settings.m2End ?? 8000;
+        document.getElementById('m2Speed').value = settings.m2Speed ?? 2000;
+        document.getElementById('cycles').value = settings.cycles ?? 1;
+        document.getElementById('returnHome').checked = settings.returnHome ?? true;
+
+        currentSpeedMultiplier = settings.speedMultiplier ?? 1.0;
+        document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+
+        // Restore presets
+        if (Array.isArray(settings.presets)) {
+            presets = settings.presets;
+        } else {
+            presets = [null, null, null];
+        }
+
+        for (let i = 0; i < 3; i++) {
+            updatePresetDisplay(i);
+        }
+
+        if (document.getElementById('autoConnect')) {
+            document.getElementById('autoConnect').checked = settings.autoConnect ?? false;
+        }
+
+        currentSettings = settings;
+
+        updateAllDisplayValues();
+        updateEstimatedTime();
+
+        log('Settings loaded from localStorage');
+    } catch (error) {
+        log(`Failed to load settings: ${error.message}`, 'error');
+    }
+}
+
+/* ----------------------------
+   RESET TO DEFAULTS
+---------------------------- */
+function resetToDefaults() {
+    if (!confirm('Reset all settings to defaults?')) return;
+
+    document.getElementById('m1Start').value = -2000;
+    document.getElementById('m1End').value = 2000;
+    document.getElementById('m1Speed').value = 2000;
+    document.getElementById('m2Start').value = -8000;
+    document.getElementById('m2End').value = 8000;
+    document.getElementById('m2Speed').value = 2000;
+    document.getElementById('cycles').value = 1;
+    document.getElementById('returnHome').checked = true;
+
+    currentSpeedMultiplier = 1.0;
+    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+
+    presets = [null, null, null];
+    updatePresetDisplay(0);
+    updatePresetDisplay(1);
+    updatePresetDisplay(2);
+
+    updateAllDisplayValues();
+    updateEstimatedTime();
+
+    if (isConnected) {
+        syncSettingsToDevice();
+    }
+
+    saveSettings();
+    log('Settings reset to defaults');
+}
 // Save Current Settings to Local Storage
 function saveSettings() {
     currentSettings = {
@@ -1149,54 +1263,50 @@ function importSettings(event) {
                 cycles: parseInt(document.getElementById('cycles').value) || 1,
                 returnHome: document.getElementById('returnHome').checked,
                 speedMultiplier: currentSpeedMultiplier,
-                presets: { ...presets },
+                presets: presets,
                 autoConnect: document.getElementById('autoConnect')?.checked || false
             };
 
             // Save to localStorage
             localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
         }
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem('cameraSliderSettings');
+        if (!saved) return;
 
-        function loadSettings() {
-            try {
-                const saved = localStorage.getItem('cameraSliderSettings');
-                if (saved) {
-                    const settings = JSON.parse(saved);
-                    
-                    // Load UI values
-                    document.getElementById('m1Start').value = settings.m1Start || -2000;
-                    document.getElementById('m1End').value = settings.m1End || 2000;
-                    document.getElementById('m1Speed').value = settings.m1Speed || 2000;
-                    document.getElementById('m2Start').value = settings.m2Start || -8000;
-                    document.getElementById('m2End').value = settings.m2End || 8000;
-                    document.getElementById('m2Speed').value = settings.m2Speed || 2000;
-                    document.getElementById('cycles').value = settings.cycles || 0;
-                    document.getElementById('returnHome').checked = settings.returnHome !== false;
-                    
-                    // Load speed multiplier
-                    currentSpeedMultiplier = settings.speedMultiplier || 1.0;
-                    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
-                    
-                    // Load presets
-                    if (settings.presets) {
-                        presets = { ...settings.presets };
-                        for (let i = 1; i <= 3; i++) {
-                            updatePresetDisplay(i);
-                        }
-                    }
-                    
-                    // Load auto-connect setting
-                    if (document.getElementById('autoConnect')) {
-                        document.getElementById('autoConnect').checked = settings.autoConnect || false;
-                    }
-                    
-                    currentSettings = settings;
-                    log('Settings loaded from localStorage');
-                }
-            } catch (error) {
-                log(`Failed to load settings: ${error.message}`, 'error');
+        const settings = JSON.parse(saved);
+
+        document.getElementById('m1Start').value = settings.m1Start ?? -2000;
+        document.getElementById('m1End').value = settings.m1End ?? 2000;
+        document.getElementById('m1Speed').value = settings.m1Speed ?? 2000;
+        document.getElementById('m2Start').value = settings.m2Start ?? -8000;
+        document.getElementById('m2End').value = settings.m2End ?? 8000;
+        document.getElementById('m2Speed').value = settings.m2Speed ?? 2000;
+        document.getElementById('cycles').value = settings.cycles ?? 0;
+        document.getElementById('returnHome').checked = settings.returnHome ?? true;
+
+        currentSpeedMultiplier = settings.speedMultiplier ?? 1.0;
+        document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+
+        if (Array.isArray(settings.presets)) {
+            presets = settings.presets;
+            for (let i = 0; i < presets.length; i++) {
+                updatePresetDisplay(i);
             }
         }
+
+        if (document.getElementById('autoConnect')) {
+            document.getElementById('autoConnect').checked = settings.autoConnect ?? false;
+        }
+
+        currentSettings = settings;
+        log('Settings loaded from localStorage');
+
+    } catch (error) {
+        log(`Failed to load settings: ${error.message}`, 'error');
+    }
+}
 
         function exportSettings() {
             saveSettings(); // Ensure current state is saved
