@@ -478,24 +478,23 @@
                 <h3>💾 Preset Positions</h3>
                 
 <div class="preset-grid">
+<div class="preset-btn" onclick="loadPreset(0)">
+    <div><strong>Preset 1</strong></div>
+    <div id="preset1Text">Empty</div>
+    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
+</div>
 
-    <div class="preset-btn" onclick="savePreset(0)" oncontextmenu="loadPreset(0); return false;">
-        <div><strong>Preset 1</strong></div>
-        <div id="preset1Text">Empty</div>
-        <small>Click: Save | Right-click: Load</small>
-    </div>
+<div class="preset-btn" onclick="loadPreset(0)">
+    <div><strong>Preset 2</strong></div>
+    <div id="preset1Text">Empty</div>
+    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
+</div>
 
-    <div class="preset-btn" onclick="savePreset(1)" oncontextmenu="loadPreset(1); return false;">
-        <div><strong>Preset 2</strong></div>
-        <div id="preset2Text">Empty</div>
-        <small>Click: Save | Right-click: Load</small>
-    </div>
-
-    <div class="preset-btn" onclick="savePreset(2)" oncontextmenu="loadPreset(2); return false;">
-        <div><strong>Preset 3</strong></div>
-        <div id="preset3Text">Empty</div>
-        <small>Click: Save | Right-click: Load</small>
-    </div>
+<div class="preset-btn" onclick="loadPreset(0)">
+    <div><strong>Preset 3</strong></div>
+    <div id="preset1Text">Empty</div>
+    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
+</div>
 
 </div>
 </div>
