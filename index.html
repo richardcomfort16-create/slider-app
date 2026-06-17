@@ -476,27 +476,26 @@
             <!-- Preset Positions -->
             <div class="panel">
                 <h3>💾 Preset Positions</h3>
-                
-<div class="preset-grid">
-<div class="preset-btn" onclick="loadPreset(0)">
-    <div><strong>Preset 1</strong></div>
-    <div id="preset1Text">Empty</div>
-    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
-</div>
+                <div class="preset-grid">
 
-<div class="preset-btn" onclick="loadPreset(0)">
-    <div><strong>Preset 2</strong></div>
-    <div id="preset1Text">Empty</div>
-    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
-</div>
+    <div class="preset-btn" onclick="loadPreset(0)">
+        <div><strong>Preset 1</strong></div>
+        <div id="preset1Text">Empty</div>
+        <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
+    </div>
 
-<div class="preset-btn" onclick="loadPreset(0)">
-    <div><strong>Preset 3</strong></div>
-    <div id="preset1Text">Empty</div>
-    <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
-</div>
+    <div class="preset-btn" onclick="loadPreset(1)">
+        <div><strong>Preset 2</strong></div>
+        <div id="preset2Text">Empty</div>
+        <button onclick="event.stopPropagation(); savePreset(1);">Save</button>
+    </div>
 
-</div>
+    <div class="preset-btn" onclick="loadPreset(2)">
+        <div><strong>Preset 3</strong></div>
+        <div id="preset3Text">Empty</div>
+        <button onclick="event.stopPropagation(); savePreset(2);">Save</button>
+    </div>
+
 </div>
             <!-- Settings -->
             <div class="panel">
@@ -588,6 +587,8 @@ function savePreset(index) {
         distance: document.getElementById("distance").value,
         mode: document.getElementById("mode").value
     };
+document.getElementById(`preset${index + 1}Text`).innerText =
+    `Speed: ${presets[index].data.speed}, Dist: ${presets[index].data.distance}`;
     alert("Preset saved.");
 }
 
