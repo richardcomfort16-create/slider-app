@@ -474,28 +474,35 @@
             </div>
 
             <!-- Preset Positions -->
-            <div class="panel">
-                <h3>💾 Preset Positions</h3>
-                <div class="preset-grid">
-
-    <div class="preset-btn" onclick="loadPreset(0)">
-        <div><strong>Preset 1</strong></div>
-        <div id="preset1Text">Empty</div>
-        <button onclick="event.stopPropagation(); savePreset(0);">Save</button>
+<div class="panel">
+    <h3>💾 Preset Positions</h3>
+    
+    <div class="preset-grid">
+        <div class="preset-btn" id="preset1Card">
+            <div><strong>Preset 1</strong></div>
+            <div id="preset1Text">Empty</div>
+            <div style="margin-top:8px;">
+                <button class="btn secondary" onclick="loadPreset(1)">Load</button>
+                <button class="btn success" onclick="savePreset(1)">Save</button>
+            </div>
+        </div>
+        <div class="preset-btn" id="preset2Card">
+            <div><strong>Preset 2</strong></div>
+            <div id="preset2Text">Empty</div>
+            <div style="margin-top:8px;">
+                <button class="btn secondary" onclick="loadPreset(2)">Load</button>
+                <button class="btn success" onclick="savePreset(2)">Save</button>
+            </div>
+        </div>
+        <div class="preset-btn" id="preset3Card">
+            <div><strong>Preset 3</strong></div>
+            <div id="preset3Text">Empty</div>
+            <div style="margin-top:8px;">
+                <button class="btn secondary" onclick="loadPreset(3)">Load</button>
+                <button class="btn success" onclick="savePreset(3)">Save</button>
+            </div>
+        </div>
     </div>
-
-    <div class="preset-btn" onclick="loadPreset(1)">
-        <div><strong>Preset 2</strong></div>
-        <div id="preset2Text">Empty</div>
-        <button onclick="event.stopPropagation(); savePreset(1);">Save</button>
-    </div>
-
-    <div class="preset-btn" onclick="loadPreset(2)">
-        <div><strong>Preset 3</strong></div>
-        <div id="preset3Text">Empty</div>
-        <button onclick="event.stopPropagation(); savePreset(2);">Save</button>
-    </div>
-
 </div>
             <!-- Settings -->
             <div class="panel">
@@ -569,155 +576,12 @@
         let estimatedTimeInterval = null;
 
         // Preset storage
-// -------------------------
-// PRESET SYSTEM
-// -------------------------
-// Define presets array
-let presets = [null, null, null];
+        let presets = {
+            1: null,
+            2: null,
+            3: null
+        };
 
-// Save Preset
-function savePreset(presetNumber) {
-    const preset = {
-        m1Start: parseInt(document.getElementById('m1Start').value),
-        m1End: parseInt(document.getElementById('m1End').value),
-        m1Speed: parseInt(document.getElementById('m1Speed').value),
-        m2Start: parseInt(document.getElementById('m2Start').value),
-        m2End: parseInt(document.getElementById('m2End').value),
-        m2Speed: parseInt(document.getElementById('m2Speed').value),
-        cycles: parseInt(document.getElementById('cycles').value),
-        returnHome: document.getElementById('returnHome').checked,
-        timestamp: new Date().toLocaleString()
-    };
-    presets[presetNumber] = preset;
-    updatePresetDisplay(presetNumber);
-    saveSettings();
-    log(`Preset ${presetNumber + 1} saved`);
-}
-
-// Load Preset
-function loadPreset(presetNumber) {
-    const preset = presets[presetNumber];
-    if (!preset) {
-        alert(`Preset ${presetNumber + 1} is empty`);
-        return;
-    }
-    document.getElementById('m1Start').value = preset.m1Start;
-    document.getElementById('m1End').value = preset.m1End;
-    document.getElementById('m1Speed').value = preset.m1Speed;
-    document.getElementById('m2Start').value = preset.m2Start;
-    document.getElementById('m2End').value = preset.m2End;
-    document.getElementById('m2Speed').value = preset.m2Speed;
-    document.getElementById('cycles').value = preset.cycles;
-    document.getElementById('returnHome').checked = preset.returnHome;
-
-    updateAllDisplayValues();
-    updateEstimatedTime();
-
-    if (isConnected) {
-        syncSettingsToDevice();
-    }
-    saveSettings();
-    log(`Preset ${presetNumber + 1} loaded`);
-}
-
-// Update Preset Display
-function updatePresetDisplay(presetNumber) {
-    const preset = presets[presetNumber];
-    const textElement = document.getElementById(`preset${presetNumber + 1}Text`);
-
-    if (!textElement) return;
-
-    if (preset) {
-        textElement.innerHTML = `
-            M1: ${preset.m1Start}→${preset.m1End}<br>
-            M2: ${preset.m2Start}→${preset.m2End}<br>
-            <small>${preset.timestamp}</small>
-        `;
-    } else {
-        textElement.textContent = 'Empty';
-    }
-}
-/* ----------------------------
-   RESET TO DEFAULTS
----------------------------- */
-function resetToDefaults() {
-    if (!confirm('Reset all settings to defaults?')) return;
-
-    document.getElementById('m1Start').value = -2000;
-    document.getElementById('m1End').value = 2000;
-    document.getElementById('m1Speed').value = 2000;
-    document.getElementById('m2Start').value = -8000;
-    document.getElementById('m2End').value = 8000;
-    document.getElementById('m2Speed').value = 2000;
-    document.getElementById('cycles').value = 1;
-    document.getElementById('returnHome').checked = true;
-
-    currentSpeedMultiplier = 1.0;
-    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
-
-    presets = [null, null, null];
-    updatePresetDisplay(0);
-    updatePresetDisplay(1);
-    updatePresetDisplay(2);
-
-    updateAllDisplayValues();
-    updateEstimatedTime();
-
-    if (isConnected) {
-        syncSettingsToDevice();
-    }
-
-    saveSettings();
-    log('Settings reset to defaults');
-}
-// Save Current Settings to Local Storage
-function saveSettings() {
-    currentSettings = {
-        m1Start: parseInt(document.getElementById('m1Start').value) || 0,
-        m1End: parseInt(document.getElementById('m1End').value) || 2000,
-        m1Speed: parseInt(document.getElementById('m1Speed').value) || 2000,
-        m2Start: parseInt(document.getElementById('m2Start').value) || 0,
-        m2End: parseInt(document.getElementById('m2End').value) || 2000,
-        m2Speed: parseInt(document.getElementById('m2Speed').value) || 2000,
-        cycles: parseInt(document.getElementById('cycles').value) || 1,
-        returnHome: document.getElementById('returnHome').checked,
-        speedMultiplier: currentSpeedMultiplier,
-        presets: presets,
-        autoConnect: document.getElementById('autoConnect')?.checked || false
-    };
-
-    localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
-}
-
-// Load Settings from Local Storage
-function loadSettings() {
-    try {
-        const saved = localStorage.getItem('cameraSliderSettings');
-
-
-// EXPORT ALL PRESETS TO A FILE
-function exportSettings() {
-    const blob = new Blob([JSON.stringify(presets, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "presets.json";
-    a.click();
-}
-
-// IMPORT PRESETS FROM A FILE
-function importSettings(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        presets = JSON.parse(e.target.result);
-        alert("Presets imported.");
-    };
-    reader.readAsText(file);
-}
         // Settings object for export/import
         let currentSettings = {
             m1Start: 0,
@@ -1099,21 +963,27 @@ function importSettings(event) {
             log(`Preset ${presetNumber} loaded`);
         }
 
-        function updatePresetDisplay(presetNumber) {
-            const preset = presets[presetNumber];
-            const textElement = document.getElementById(`preset${presetNumber}Text`);
-            
-            if (preset) {
-                textElement.innerHTML = `
-                    M1: ${preset.m1Start}→${preset.m1End}<br>
-                    M2: ${preset.m2Start}→${preset.m2End}<br>
-                    <small>${preset.timestamp}</small>
-                `;
-            } else {
-                textElement.textContent = 'Empty';
-            }
-        }
+function updatePresetDisplay(presetNumber) {
+    const preset = presets[presetNumber];
+    const textElement = document.getElementById(`preset${presetNumber}Text`);
+    const cardElement = document.getElementById(`preset${presetNumber}Card`);
 
+    if (preset) {
+        textElement.innerHTML = `
+            M1: ${preset.m1Start}→${preset.m1End}<br>
+            M2: ${preset.m2Start}→${preset.m2End}<br>
+            <small>${preset.timestamp}</small>
+        `;
+        if (cardElement) {
+            cardElement.classList.add('set');
+        }
+    } else {
+        textElement.textContent = 'Empty';
+        if (cardElement) {
+            cardElement.classList.remove('set');
+        }
+    }
+}
         // Time Estimation
         function updateEstimatedTime() {
             const m1Start = parseInt(document.getElementById('m1Start').value) || 0;
@@ -1175,50 +1045,54 @@ function importSettings(event) {
                 cycles: parseInt(document.getElementById('cycles').value) || 1,
                 returnHome: document.getElementById('returnHome').checked,
                 speedMultiplier: currentSpeedMultiplier,
-                presets: presets,
+                presets: { ...presets },
                 autoConnect: document.getElementById('autoConnect')?.checked || false
             };
 
             // Save to localStorage
             localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
         }
-function loadSettings() {
-    try {
-        const saved = localStorage.getItem('cameraSliderSettings');
-        if (!saved) return;
 
-        const settings = JSON.parse(saved);
-
-        document.getElementById('m1Start').value = settings.m1Start ?? -2000;
-        document.getElementById('m1End').value = settings.m1End ?? 2000;
-        document.getElementById('m1Speed').value = settings.m1Speed ?? 2000;
-        document.getElementById('m2Start').value = settings.m2Start ?? -8000;
-        document.getElementById('m2End').value = settings.m2End ?? 8000;
-        document.getElementById('m2Speed').value = settings.m2Speed ?? 2000;
-        document.getElementById('cycles').value = settings.cycles ?? 0;
-        document.getElementById('returnHome').checked = settings.returnHome ?? true;
-
-        currentSpeedMultiplier = settings.speedMultiplier ?? 1.0;
-        document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
-
-        if (Array.isArray(settings.presets)) {
-            presets = settings.presets;
-            for (let i = 0; i < presets.length; i++) {
-                updatePresetDisplay(i);
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('cameraSliderSettings');
+                if (saved) {
+                    const settings = JSON.parse(saved);
+                    
+                    // Load UI values
+                    document.getElementById('m1Start').value = settings.m1Start || -2000;
+                    document.getElementById('m1End').value = settings.m1End || 2000;
+                    document.getElementById('m1Speed').value = settings.m1Speed || 2000;
+                    document.getElementById('m2Start').value = settings.m2Start || -8000;
+                    document.getElementById('m2End').value = settings.m2End || 8000;
+                    document.getElementById('m2Speed').value = settings.m2Speed || 2000;
+                    document.getElementById('cycles').value = settings.cycles || 0;
+                    document.getElementById('returnHome').checked = settings.returnHome !== false;
+                    
+                    // Load speed multiplier
+                    currentSpeedMultiplier = settings.speedMultiplier || 1.0;
+                    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
+                    
+                    // Load presets
+                    if (settings.presets) {
+                        presets = { ...settings.presets };
+                        for (let i = 1; i <= 3; i++) {
+                            updatePresetDisplay(i);
+                        }
+                    }
+                    
+                    // Load auto-connect setting
+                    if (document.getElementById('autoConnect')) {
+                        document.getElementById('autoConnect').checked = settings.autoConnect || false;
+                    }
+                    
+                    currentSettings = settings;
+                    log('Settings loaded from localStorage');
+                }
+            } catch (error) {
+                log(`Failed to load settings: ${error.message}`, 'error');
             }
         }
-
-        if (document.getElementById('autoConnect')) {
-            document.getElementById('autoConnect').checked = settings.autoConnect ?? false;
-        }
-
-        currentSettings = settings;
-        log('Settings loaded from localStorage');
-
-    } catch (error) {
-        log(`Failed to load settings: ${error.message}`, 'error');
-    }
-}
 
         function exportSettings() {
             saveSettings(); // Ensure current state is saved
@@ -1659,3 +1533,4 @@ function importSettings() {
     </script>
 </body>
 </html>
+
