@@ -1458,12 +1458,9 @@ function importSettings() {
                 }
             }
         }
-// New smoother easing:
-function easeInOutCubic(t, start, end, duration) {
-    t /= duration / 2;
-    if (t < 1) return start + (end - start) / 2 * t * t * t;
-    t -= 2;
-    return start + (end - start) / 2 * (t * t * t + 2);
+// Here's where you add the easing function:
+function easeLinear(t, start, end, duration) {
+    return start + (end - start) * (t / duration);
 }
 
         // Add error recovery mechanism
