@@ -1459,6 +1459,19 @@ function importSettings() {
             }
         }
 
+        function throttle(func, limit) {
+            let inThrottle;
+            return function() {
+                const args = arguments;
+                const context = this;
+                if (!inThrottle) {
+                    func.apply(context, args);
+                    inThrottle = true;
+                    setTimeout(() => inThrottle = false, limit);
+                }
+            }
+        }
+
         // Add error recovery mechanism
         window.addEventListener('error', function(event) {
             log(`JavaScript Error: ${event.message}`, 'error');
