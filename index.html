@@ -477,25 +477,29 @@
             <div class="panel">
                 <h3>💾 Preset Positions</h3>
                 
-                <div class="preset-grid">
-                    <div class="preset-btn" onclick="savePreset(1)" oncontextmenu="loadPreset(1); return false;">
-                        <div><strong>Preset 1</strong></div>
-                        <div id="preset1Text">Empty</div>
-                        <small>Click: Save | Right-click: Load</small>
-                    </div>
-                    <div class="preset-btn" onclick="savePreset(2)" oncontextmenu="loadPreset(2); return false;">
-                        <div><strong>Preset 2</strong></div>
-                        <div id="preset2Text">Empty</div>
-                        <small>Click: Save | Right-click: Load</small>
-                    </div>
-                    <div class="preset-btn" onclick="savePreset(3)" oncontextmenu="loadPreset(3); return false;">
-                        <div><strong>Preset 3</strong></div>
-                        <div id="preset3Text">Empty</div>
-                        <small>Click: Save | Right-click: Load</small>
-                    </div>
-                </div>
-            </div>
+<div class="preset-btn"
+     onclick="loadPreset(1)"
+     oncontextmenu="event.preventDefault(); savePreset(1)">
+    <div><strong id="preset1Name">Preset 1</strong></div>
+    <div id="preset1Text">Empty</div>
+    <small>Click: Load • Right‑click: Save</small>
+</div>
 
+<div class="preset-btn"
+     onclick="loadPreset(2)"
+     oncontextmenu="event.preventDefault(); savePreset(2)">
+    <div><strong id="preset2Name">Preset 2</strong></div>
+    <div id="preset2Text">Empty</div>
+    <small>Click: Load • Right‑click: Save</small>
+</div>
+
+<div class="preset-btn"
+     onclick="loadPreset(3)"
+     oncontextmenu="event.preventDefault(); savePreset(3)">
+    <div><strong id="preset3Name">Preset 3</strong></div>
+    <div id="preset3Text">Empty</div>
+    <small>Click: Load • Right‑click: Save</small>
+</div>
             <!-- Settings -->
             <div class="panel">
                 <h3>⚙️ Settings</h3>
@@ -568,11 +572,80 @@
         let estimatedTimeInterval = null;
 
         // Preset storage
-        let presets = {
-            1: null,
-            2: null,
-            3: null
-        };
+  // ===============================
+// PRESET SYSTEM (FULLY UPDATED)
+// ===============================
+
+let presets = { 1: null, 2: null, 3: null };
+
+// Save current UI values into a preset slot
+function savePreset(presetNumber) {
+    const preset = {
+        name: presets[presetNumber]?.name || `Preset ${presetNumber}`,
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        timestamp: new Date().toLocaleString()
+    };
+
+    presets[presetNumber] = preset;
+    updatePresetDisplay(presetNumber);
+    saveSettings();
+    log(`Preset ${presetNumber} saved`);
+}
+
+// Load a preset into the UI
+function loadPreset(presetNumber) {
+    const preset = presets[presetNumber];
+    if (!preset) {
+        log(`Preset ${presetNumber} is empty`, 'error');
+        return;
+    }
+
+    document.getElementById('m1Start').value = preset.m1Start;
+    document.getElementById('m1End').value = preset.m1End;
+    document.getElementById('m1Speed').value = preset.m1Speed;
+    document.getElementById('m2Start').value = preset.m2Start;
+    document.getElementById('m2End').value = preset.m2End;
+    document.getElementById('m2Speed').value = preset.m2Speed;
+    document.getElementById('cycles').value = preset.cycles;
+    document.getElementById('returnHome').checked = preset.returnHome;
+
+    updateAllDisplayValues();
+    updateEstimatedTime();
+    saveSettings();
+
+    if (isConnected) {
+        syncSettingsToDevice();
+    }
+
+    log(`Preset ${presetNumber} loaded`);
+}
+
+// Update the visual display of a preset tile
+function updatePresetDisplay(presetNumber) {
+    const preset = presets[presetNumber];
+    const nameEl = document.getElementById(`preset${presetNumber}Name`);
+    const textEl = document.getElementById(`preset${presetNumber}Text`);
+
+    if (!preset) {
+        nameEl.textContent = `Preset ${presetNumber}`;
+        textEl.textContent = "Empty";
+        return;
+    }
+
+    nameEl.textContent = preset.name || `Preset ${presetNumber}`;
+    textEl.innerHTML = `
+        M1: ${preset.m1Start} → ${preset.m1End}<br>
+        M2: ${preset.m2Start} → ${preset.m2End}<br>
+        <small>${preset.timestamp}</small>
+    `;
+}
 
         // Settings object for export/import
         let currentSettings = {
