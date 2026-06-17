@@ -668,22 +668,6 @@ function loadSettings() {
     try {
         const saved = localStorage.getItem('cameraSliderSettings');
 
-// LOAD A PRESET INTO THE UI
-function loadPreset(index) {
-    const p = presets[index].data;
-    if (!p) {
-        alert("Preset is empty.");
-        return;
-    }
-
-    // Load values back into the UI
-    document.getElementById("speed").value = p.speed;
-    document.getElementById("accel").value = p.accel;
-    document.getElementById("distance").value = p.distance;
-    document.getElementById("mode").value = p.mode;
-
-    alert("Preset loaded.");
-}
 
 // EXPORT ALL PRESETS TO A FILE
 function exportSettings() {
