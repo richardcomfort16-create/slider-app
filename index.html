@@ -580,6 +580,7 @@ let presets = [
 ];
 
 // SAVE CURRENT UI VALUES INTO A PRESET
+// SAVE CURRENT UI VALUES INTO A PRESET
 function savePreset(index) {
     presets[index].data = {
         speed: document.getElementById("speed").value,
@@ -587,10 +588,14 @@ function savePreset(index) {
         distance: document.getElementById("distance").value,
         mode: document.getElementById("mode").value
     };
-document.getElementById(`preset${index + 1}Text`).innerText =
-    `Speed: ${presets[index].data.speed}, Dist: ${presets[index].data.distance}`;
+
+    // Update the UI label for that preset
+    document.getElementById(`preset${index + 1}Text`).innerText =
+        `Speed: ${presets[index].data.speed}, Dist: ${presets[index].data.distance}`;
+
     alert("Preset saved.");
 }
+
 
 // LOAD A PRESET INTO THE UI
 function loadPreset(index) {
@@ -600,6 +605,14 @@ function loadPreset(index) {
         return;
     }
 
+    // Load values back into the UI
+    document.getElementById("speed").value = p.speed;
+    document.getElementById("accel").value = p.accel;
+    document.getElementById("distance").value = p.distance;
+    document.getElementById("mode").value = p.mode;
+
+    alert("Preset loaded.");
+}
     document.getElementById("speed").value = p.speed;
     document.getElementById("accel").value = p.accel;
     document.getElementById("distance").value = p.distance;
