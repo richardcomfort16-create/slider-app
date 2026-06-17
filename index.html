@@ -1458,19 +1458,13 @@ function importSettings() {
                 }
             }
         }
-
-        function throttle(func, limit) {
-            let inThrottle;
-            return function() {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
-        }
+// New smoother easing:
+function easeInOutCubic(t, start, end, duration) {
+    t /= duration / 2;
+    if (t < 1) return start + (end - start) / 2 * t * t * t;
+    t -= 2;
+    return start + (end - start) / 2 * (t * t * t + 2);
+}
 
         // Add error recovery mechanism
         window.addEventListener('error', function(event) {
