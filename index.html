@@ -573,29 +573,100 @@
 // PRESET SYSTEM
 // -------------------------
 
-let presets = [
-    { name: "Preset 1", data: null },
-    { name: "Preset 2", data: null },
-    { name: "Preset 3", data: null }
-];
+// Unified Preset System and Settings Integration
 
-// SAVE CURRENT UI VALUES INTO A PRESET
-// SAVE CURRENT UI VALUES INTO A PRESET
-function savePreset(index) {
-    presets[index].data = {
-        speed: document.getElementById("speed").value,
-        accel: document.getElementById("accel").value,
-        distance: document.getElementById("distance").value,
-        mode: document.getElementById("mode").value
-    };
+// Initialize presets as an array
+let presets = [null, null, null];
 
-    // Update the UI label for that preset
-    document.getElementById(`preset${index + 1}Text`).innerText =
-        `Speed: ${presets[index].data.speed}, Dist: ${presets[index].data.distance}`;
+// Update Preset Display
+function updatePresetDisplay(presetNumber) {
+    const preset = presets[presetNumber];
+    const textElement = document.getElementById(`preset${presetNumber + 1}Text`);
 
-    alert("Preset saved.");
+    if (!textElement) return;
+
+    if (preset) {
+        textElement.innerHTML = `
+            M1: ${preset.m1Start}→${preset.m1End}<br>
+            M2: ${preset.m2Start}→${preset.m2End}<br>
+            <small>${preset.timestamp}</small>
+        `;
+    } else {
+        textElement.textContent = 'Empty';
+    }
 }
 
+// Save Preset
+function savePreset(presetNumber) {
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked,
+        timestamp: new Date().toLocaleString()
+    };
+
+    presets[presetNumber] = preset;
+    updatePresetDisplay(presetNumber);
+    saveSettings();
+    log(`Preset ${presetNumber + 1} saved`);
+}
+
+// Load Preset
+function loadPreset(presetNumber) {
+    const preset = presets[presetNumber];
+    if (!preset) {
+        alert(`Preset ${presetNumber + 1} is empty`);
+        return;
+    }
+
+    document.getElementById('m1Start').value = preset.m1Start;
+    document.getElementById('m1End').value = preset.m1End;
+    document.getElementById('m1Speed').value = preset.m1Speed;
+    document.getElementById('m2Start').value = preset.m2Start;
+    document.getElementById('m2End').value = preset.m2End;
+    document.getElementById('m2Speed').value = preset.m2Speed;
+    document.getElementById('cycles').value = preset.cycles;
+    document.getElementById('returnHome').checked = preset.returnHome;
+
+    updateAllDisplayValues();
+    updateEstimatedTime();
+
+    if (isConnected) {
+        syncSettingsToDevice();
+    }
+
+    saveSettings();
+    log(`Preset ${presetNumber + 1} loaded`);
+}
+
+// Save Current Settings to Local Storage
+function saveSettings() {
+    currentSettings = {
+        m1Start: parseInt(document.getElementById('m1Start').value) || 0,
+        m1End: parseInt(document.getElementById('m1End').value) || 2000,
+        m1Speed: parseInt(document.getElementById('m1Speed').value) || 2000,
+        m2Start: parseInt(document.getElementById('m2Start').value) || 0,
+        m2End: parseInt(document.getElementById('m2End').value) || 2000,
+        m2Speed: parseInt(document.getElementById('m2Speed').value) || 2000,
+        cycles: parseInt(document.getElementById('cycles').value) || 1,
+        returnHome: document.getElementById('returnHome').checked,
+        speedMultiplier: currentSpeedMultiplier,
+        presets: presets,
+        autoConnect: document.getElementById('autoConnect')?.checked || false
+    };
+
+    localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
+}
+
+// Load Settings from Local Storage
+function loadSettings() {
+    try {
+        const saved = localStorage.getItem('cameraSliderSettings');
 
 // LOAD A PRESET INTO THE UI
 function loadPreset(index) {
