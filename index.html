@@ -504,17 +504,6 @@
         </div>
     </div>
 </div>
-function startJog(axis, speed) {
-    // Start a continuous jog on the given axis at the specified speed
-    console.log(`Starting jog on axis ${axis} at speed ${speed}`);
-    // Your jog logic here (e.g., sending this data to your motor controller)
-}
-
-function stopJog(axis) {
-    // Stop the jog on the given axis
-    console.log(`Stopping jog on axis ${axis}`);
-    // Your stop logic here
-}
             <!-- Settings -->
             <div class="panel">
                 <h3>⚙️ Settings</h3>
@@ -850,66 +839,23 @@ function stopJog(axis) {
         }
 
         // Manual Jog Controls
-// Manual Jog Controls with Smooth Accel/Decel
-let jogRampInterval = null;
-let lastSentSpeed = 0;
+        async function startJog(motor, direction) {
+            if (!isConnected || isJogging) return;
 
-async function startJog(motor, direction) {
-    if (!isConnected || isJogging) return;
-
-    isJogging = true;
-
-    const targetSpeed = Math.round(direction * currentSpeedMultiplier * 100);
-    let currentSpeed = 0;
-    lastSentSpeed = 0;
-
-    // Clear any previous ramp
-    if (jogRampInterval) clearInterval(jogRampInterval);
-
-    jogRampInterval = setInterval(async () => {
-        if (!isJogging) {
-            clearInterval(jogRampInterval);
-            return;
+            isJogging = true;
+            const speed = Math.round(direction * currentSpeedMultiplier * 100);
+            await sendCommand(`JOGSLIDER:${motor}:${speed}`);
+            log(`Jogging ${motor} at speed ${speed}`);
         }
 
-        // Ramp up in steps
-        currentSpeed += direction * 10;
+        async function stopJog() {
+            if (!isConnected || !isJogging) return;
 
-        // Clamp to target
-        if (Math.abs(currentSpeed) >= Math.abs(targetSpeed)) {
-            currentSpeed = targetSpeed;
-            clearInterval(jogRampInterval);
+            isJogging = false;
+            await sendCommand('JOGSLIDER:STOP:0');
+            log('Jog stopped');
         }
 
-        lastSentSpeed = currentSpeed;
-        await sendCommand(`JOGSLIDER:${motor}:${currentSpeed}`);
-    }, 20);
-
-    log(`Jogging ${motor} (ramping to ${targetSpeed})`);
-}
-async function stopJog() {
-    if (!isConnected || !isJogging) return;
-
-    isJogging = false;
-
-    // Clear any ramp-up interval
-    if (jogRampInterval) clearInterval(jogRampInterval);
-
-    let currentSpeed = lastSentSpeed;
-
-    // Smooth exponential decay
-    while (Math.abs(currentSpeed) > 5) {
-        currentSpeed *= 0.7; // deceleration curve
-        await sendCommand(`JOGSLIDER:STOP:${Math.round(currentSpeed)}`);
-        await new Promise(r => setTimeout(r, 20));
-    }
-
-    // Final stop
-    await sendCommand('JOGSLIDER:STOP:0');
-    lastSentSpeed = 0;
-
-    log('Jog stopped smoothly');
-}
         // Speed multiplier control
         function updateSpeedMultiplier(value) {
             currentSpeedMultiplier = parseFloat(value);
@@ -1512,21 +1458,6 @@ function importSettings() {
                 }
             }
         }
-</script>
-<script>
-// Manual Jog Controls with Smooth Accel/Decel
-let jogRampInterval = null;
-let lastSentSpeed = 0;
-
-async function startJog(...) { ... }
-async function stopJog(...) { ... }
-</script>
-function easeInOutCubic(t, start, end, duration) {
-    t /= duration / 2;
-    if (t < 1) return start + (end - start) / 2 * t * t * t;
-    t -= 2;
-    return start + (end - start) / 2 * (t * t * t + 2);
-}
 
 
         // Add error recovery mechanism
@@ -1549,4 +1480,58 @@ function easeInOutCubic(t, start, end, duration) {
                 console.warn(`Performance: ${label} took ${duration.toFixed(2)}ms`);
             }
         }
+
+        // Memory cleanup for long-running sessions
+        function cleanupMemory() {
+            // Clear old log entries if too many exist
+            const logContainer = document.getElementById('log');
+            if (logContainer && logContainer.children.length > 1000) {
+                const entries = Array.from(logContainer.children);
+                entries.slice(0, entries.length - 500).forEach(entry => entry.remove());
+                log('Log entries cleaned up for memory management');
+            }
+        }
+
+        // Run cleanup every 5 minutes
+        setInterval(cleanupMemory, 5 * 60 * 1000);
+
+        // Export key functions to global scope for debugging
+        window.sliderControl = {
+            connectDevice,
+            disconnectDevice,
+            sendCommand,
+            saveSettings,
+            loadSettings,
+            exportSettings,
+            importSettings,
+            resetToDefaults,
+            isConnected: () => isConnected,
+            getSettings: () => currentSettings,
+            log
+        };
+
+        // Development helpers (only in development)
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            window.debugSlider = {
+                simulateConnection: () => {
+                    isConnected = true;
+                    updateConnectionStatus();
+                    log('Simulated connection for debugging');
+                },
+                testCommand: (cmd) => {
+                    log(`Test command would send: ${cmd}`);
+                },
+                getInternalState: () => ({
+                    isConnected,
+                    isRunning,
+                    currentSettings,
+                    presets,
+                    currentSpeedMultiplier
+                })
+            };
+        }
+
+    </script>
+</body>
+</html>
 
