@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Slider Controller</title>
+
     <style>
         * {
             margin: 0;
@@ -111,32 +112,15 @@
             transform: none;
         }
 
-        .success {
-            background: linear-gradient(45deg, #28a745, #20c997);
-        }
-
-        .danger {
-            background: linear-gradient(45deg, #dc3545, #c82333);
-        }
-
-        .warning {
-            background: linear-gradient(45deg, #ffc107, #e0a800);
-            color: #000;
-        }
-
-        .secondary {
-            background: linear-gradient(45deg, #6c757d, #545b62);
-        }
+        .success { background: linear-gradient(45deg, #28a745, #20c997); }
+        .danger { background: linear-gradient(45deg, #dc3545, #c82333); }
+        .warning { background: linear-gradient(45deg, #ffc107, #e0a800); color: #000; }
+        .secondary { background: linear-gradient(45deg, #6c757d, #545b62); }
 
         .checkbox-group {
             display: flex;
             align-items: center;
             gap: 10px;
-        }
-
-        .checkbox-group input[type="checkbox"] {
-            width: auto;
-            transform: scale(1.2);
         }
 
         .slider-group {
@@ -157,7 +141,8 @@
             border-radius: 5px;
             padding: 5px;
         }
-.status {
+
+        .status {
             padding: 10px;
             border-radius: 8px;
             margin: 10px 0;
@@ -259,77 +244,24 @@
         .log-entry:last-child {
             border-bottom: none;
         }
-
-        .debug-panel {
-            display: none;
-        }
-
-        .debug-panel.active {
-            display: block;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-
-            h1 {
-                font-size: 1.8em;
-                margin-bottom: 20px;
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-                margin-bottom: 100px;
-            }
-
-            .panel {
-                padding: 15px;
-            }
-
-            .jog-controls .btn {
-                min-width: 50px;
-                min-height: 50px;
-                font-size: 16px;
-            }
-
-            .quick-actions-bar {
-                position: fixed;
-                top: 10px;
-                right: 10px;
-                left: 10px;
-                bottom: auto;
-                justify-content: center;
-                flex-wrap: wrap;
-            }
-
-            .quick-actions-bar .btn {
-                flex: 1;
-                margin: 2px;
-                min-width: auto;
-            }
-        }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>🎬 Camera Slider Controller</h1>
-        
+
         <div class="grid">
-            <!-- Connection Panel -->
+
+            <!-- CONNECTION PANEL -->
             <div class="panel">
                 <h3>📡 Connection</h3>
-                <div id="connectionStatus" class="status disconnected">
-                    Disconnected
-                </div>
-                <button class="btn" onclick="connectToSlider()">
-                    Connect to Slider
-                </button>
-                <button class="btn secondary" onclick="disconnectFromSlider()">
-                    Disconnect
-                </button>
-                
+
+                <div id="connectionStatus" class="status disconnected">Disconnected</div>
+
+                <button class="btn" onclick="connectToSlider()">Connect to Slider</button>
+                <button class="btn secondary" onclick="disconnectFromSlider()">Disconnect</button>
+
                 <div class="control-group">
                     <div class="checkbox-group">
                         <input type="checkbox" id="debugMode" onchange="toggleDebugMode()">
@@ -337,201 +269,194 @@
                     </div>
                 </div>
             </div>
-<!-- Motor 1 Controls -->
+
+            <!-- MOTOR 1 PANEL -->
             <div class="panel">
                 <h3>🎯 Motor 1 (Pan/Tilt)</h3>
-                
+
                 <div class="control-group">
                     <label for="m1Start">Start Position:</label>
-                    <input type="number" id="m1Start" value="0" step="10" 
-                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M1S:' + this.value)">
+                    <input type="number" id="m1Start" value="0" step="10"
+                           onchange="updateEstimatedTime()" 
+                           oninput="sendIfConnected('M1S:' + this.value)">
                 </div>
-                
+
                 <div class="control-group">
                     <label for="m1End">End Position:</label>
-                    <input type="number" id="m1End" value="2000" step="10" 
-                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M1E:' + this.value)">
+                    <input type="number" id="m1End" value="2000" step="10"
+                           onchange="updateEstimatedTime()" 
+                           oninput="sendIfConnected('M1E:' + this.value)">
                 </div>
-                
+
                 <div class="control-group">
                     <label for="m1Speed">Speed (steps/sec):</label>
                     <div class="slider-group">
-                        <input type="range" id="m1Speed" min="100" max="6000" value="2000" step="100" 
+                        <input type="range" id="m1Speed" min="100" max="6000" value="2000" step="100"
                                oninput="updateSpeedDisplay('m1', this.value); updateEstimatedTime(); sendIfConnected('M1SPD:' + Math.round(this.value * currentSpeedMultiplier))">
                         <span class="slider-value" id="m1SpeedValue">2000</span>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <button class="btn secondary" onclick="setCurrentPositionAs('m1Start')">
-                        Set Current as Start
-                    </button>
-                    <button class="btn secondary" onclick="setCurrentPositionAs('m1End')">
-                        Set Current as End
-                    </button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m1Start')">Set Current as Start</button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m1End')">Set Current as End</button>
                 </div>
             </div>
 
-            <!-- Motor 2 Controls -->
+            <!-- MOTOR 2 PANEL -->
             <div class="panel">
                 <h3>🎯 Motor 2 (Slider)</h3>
-                
+
                 <div class="control-group">
                     <label for="m2Start">Start Position:</label>
-                    <input type="number" id="m2Start" value="0" step="10" 
-                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M2S:' + this.value)">
+                    <input type="number" id="m2Start" value="0" step="10"
+                           onchange="updateEstimatedTime()" 
+                           oninput="sendIfConnected('M2S:' + this.value)">
                 </div>
-                
+
                 <div class="control-group">
                     <label for="m2End">End Position:</label>
-                    <input type="number" id="m2End" value="2000" step="10" 
-                           onchange="updateEstimatedTime()" oninput="sendIfConnected('M2E:' + this.value)">
+                    <input type="number" id="m2End" value="2000" step="10"
+                           onchange="updateEstimatedTime()" 
+                           oninput="sendIfConnected('M2E:' + this.value)">
                 </div>
-                
+
                 <div class="control-group">
                     <label for="m2Speed">Speed (steps/sec):</label>
                     <div class="slider-group">
-                        <input type="range" id="m2Speed" min="100" max="6000" value="2000" step="100" 
+                        <input type="range" id="m2Speed" min="100" max="6000" value="2000" step="100"
                                oninput="updateSpeedDisplay('m2', this.value); updateEstimatedTime(); sendIfConnected('M2SPD:' + Math.round(this.value * currentSpeedMultiplier))">
                         <span class="slider-value" id="m2SpeedValue">2000</span>
                     </div>
                 </div>
 
                 <div class="control-group">
-                    <button class="btn secondary" onclick="setCurrentPositionAs('m2Start')">
-                        Set Current as Start
-                    </button>
-                    <button class="btn secondary" onclick="setCurrentPositionAs('m2End')">
-                        Set Current as End
-                    </button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m2Start')">Set Current as Start</button>
+                    <button class="btn secondary" onclick="setCurrentPositionAs('m2End')">Set Current as End</button>
                 </div>
             </div>
 
-            <!-- Sequence Controls -->
+            <!-- SEQUENCE PANEL -->
             <div class="panel">
                 <h3>🎬 Sequence Settings</h3>
-                
+
                 <div class="control-group">
                     <label for="cycles">Cycles (0 = infinite):</label>
-                    <input type="number" id="cycles" min="0" max="999" value="1" 
-                           onchange="updateEstimatedTime()" oninput="sendIfConnected('CYCLES:' + this.value)">
+                    <input type="number" id="cycles" min="0" max="999" value="1"
+                           onchange="updateEstimatedTime()" 
+                           oninput="sendIfConnected('CYCLES:' + this.value)">
                 </div>
-                
+
                 <div class="control-group">
                     <div class="checkbox-group">
-                        <input type="checkbox" id="returnHome" checked 
+                        <input type="checkbox" id="returnHome" checked
                                onchange="updateEstimatedTime(); sendIfConnected('RETURN:' + (this.checked ? '1' : '0'))">
                         <label for="returnHome">Return to Start Position</label>
                     </div>
                 </div>
-                
+
                 <div class="control-group">
                     <label>Estimated Time: <span id="estimatedTime">0:00</span></label>
                 </div>
 
                 <div class="control-group">
-                    <button class="btn success" onclick="startSequence()">
-                        ▶️ Start Sequence
-                    </button>
-                    <button class="btn danger" onclick="stopSequence()">
-                        ⏹️ Stop
-                    </button>
-                    <button class="btn secondary" onclick="homeMotors()">
-                        🏠 Home
-                    </button>
+                    <button class="btn success" onclick="startSequence()">▶️ Start Sequence</button>
+                    <button class="btn danger" onclick="stopSequence()">⏹️ Stop</button>
+                    <button class="btn secondary" onclick="homeMotors()">🏠 Home</button>
                 </div>
             </div>
-<!-- Manual Controls -->
+
+            <!-- MANUAL CONTROL PANEL -->
             <div class="panel">
                 <h3>🕹️ Manual Control</h3>
-                
+
                 <div class="control-group">
                     <label for="speedMultiplier">Speed Multiplier:</label>
                     <div class="slider-group">
-                        <input type="range" id="speedMultiplier" min="0.1" max="3" value="1" step="0.1" 
+                        <input type="range" id="speedMultiplier" min="0.1" max="3" value="1" step="0.1"
                                oninput="updateSpeedMultiplier(this.value)">
                         <span class="slider-value" id="speedMultiplierValue">1.0x</span>
                     </div>
                 </div>
 
                 <div class="jog-controls">
-                    <button class="btn jog-up" onmousedown="startJog('M1', 100)" onmouseup="stopJog()" 
-                            ontouchstart="startJog('M1', 100)" ontouchend="stopJog()">↑</button>
-                    <button class="btn jog-left" onmousedown="startJog('M2', -100)" onmouseup="stopJog()" 
-                            ontouchstart="startJog('M2', -100)" ontouchend="stopJog()">←</button>
+                    <button class="btn jog-up" 
+                        onmousedown="startJog('M1', 1)" 
+                        onmouseup="stopJog()" 
+                        ontouchstart="startJog('M1', 1)" 
+                        ontouchend="stopJog()">↑</button>
+
+                    <button class="btn jog-left" 
+                        onmousedown="startJog('M2', -1)" 
+                        onmouseup="stopJog()" 
+                        ontouchstart="startJog('M2', -1)" 
+                        ontouchend="stopJog()">←</button>
+
                     <button class="btn danger jog-stop" onclick="emergencyStop()">STOP</button>
-                    <button class="btn jog-right" onmousedown="startJog('M2', 100)" onmouseup="stopJog()" 
-                            ontouchstart="startJog('M2', 100)" ontouchend="stopJog()">→</button>
-                    <button class="btn jog-down" onmousedown="startJog('M1', -100)" onmouseup="stopJog()" 
-                            ontouchstart="startJog('M1', -100)" ontouchend="stopJog()">↓</button>
+
+                    <button class="btn jog-right" 
+                        onmousedown="startJog('M2', 1)" 
+                        onmouseup="stopJog()" 
+                        ontouchstart="startJog('M2', 1)" 
+                        ontouchend="stopJog()">→</button>
+
+                    <button class="btn jog-down" 
+                        onmousedown="startJog('M1', -1)" 
+                        onmouseup="stopJog()" 
+                        ontouchstart="startJog('M1', -1)" 
+                        ontouchend="stopJog()">↓</button>
                 </div>
 
                 <div class="control-group">
-                    <button class="btn secondary" onclick="getCurrentPositions()">
-                        📍 Get Current Positions
-                    </button>
+                    <button class="btn secondary" onclick="getCurrentPositions()">📍 Get Current Positions</button>
                 </div>
             </div>
 
-            <!-- Preset Positions -->
-<div class="panel">
-    <h3>💾 Preset Positions</h3>
-    
-    <div class="preset-grid">
-        <div class="preset-btn" id="preset1Card">
-            <div><strong>Preset 1</strong></div>
-            <div id="preset1Text">Empty</div>
-            <div style="margin-top:8px;">
-                <button class="btn secondary" onclick="loadPreset(1)">Load</button>
-                <button class="btn success" onclick="savePreset(1)">Save</button>
-            </div>
-        </div>
-        <div class="preset-btn" id="preset2Card">
-            <div><strong>Preset 2</strong></div>
-            <div id="preset2Text">Empty</div>
-            <div style="margin-top:8px;">
-                <button class="btn secondary" onclick="loadPreset(2)">Load</button>
-                <button class="btn success" onclick="savePreset(2)">Save</button>
-            </div>
-        </div>
-        <div class="preset-btn" id="preset3Card">
-            <div><strong>Preset 3</strong></div>
-            <div id="preset3Text">Empty</div>
-            <div style="margin-top:8px;">
-                <button class="btn secondary" onclick="loadPreset(3)">Load</button>
-                <button class="btn success" onclick="savePreset(3)">Save</button>
-            </div>
-        </div>
-    </div>
-</div>
-function startJog(axis, speed) {
-    // Start a continuous jog on the given axis at the specified speed
-    console.log(`Starting jog on axis ${axis} at speed ${speed}`);
-    // Your jog logic here (e.g., sending this data to your motor controller)
-}
+            <!-- PRESETS PANEL -->
+            <div class="panel">
+                <h3>💾 Preset Positions</h3>
 
-function stopJog(axis) {
-    // Stop the jog on the given axis
-    console.log(`Stopping jog on axis ${axis}`);
-    // Your stop logic here
-}
-            <!-- Settings -->
+                <div class="preset-grid">
+                    <div class="preset-btn" id="preset1Card">
+                        <div><strong>Preset 1</strong></div>
+                        <div id="preset1Text">Empty</div>
+                        <div style="margin-top:8px;">
+                            <button class="btn secondary" onclick="loadPreset(1)">Load</button>
+                            <button class="btn success" onclick="savePreset(1)">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="preset-btn" id="preset2Card">
+                        <div><strong>Preset 2</strong></div>
+                        <div id="preset2Text">Empty</div>
+                        <div style="margin-top:8px;">
+                            <button class="btn secondary" onclick="loadPreset(2)">Load</button>
+                            <button class="btn success" onclick="savePreset(2)">Save</button>
+                        </div>
+                    </div>
+
+                    <div class="preset-btn" id="preset3Card">
+                        <div><strong>Preset 3</strong></div>
+                        <div id="preset3Text">Empty</div>
+                        <div style="margin-top:8px;">
+                            <button class="btn secondary" onclick="loadPreset(3)">Load</button>
+                            <button class="btn success" onclick="savePreset(3)">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SETTINGS PANEL -->
             <div class="panel">
                 <h3>⚙️ Settings</h3>
-                
+
                 <div class="control-group">
-                    <button class="btn secondary" onclick="exportSettings()">
-                        📤 Export Settings
-                    </button>
-                    <button class="btn secondary" onclick="importSettings()">
-                        📥 Import Settings
-                    </button>
+                    <button class="btn secondary" onclick="exportSettings()">📤 Export Settings</button>
+                    <button class="btn secondary" onclick="importSettings()">📥 Import Settings</button>
                 </div>
 
                 <div class="control-group">
-                    <button class="btn warning" onclick="resetToDefaults()">
-                        🔄 Reset to Defaults
-                    </button>
+                    <button class="btn warning" onclick="resetToDefaults()">🔄 Reset to Defaults</button>
                 </div>
 
                 <div class="control-group">
@@ -541,329 +466,143 @@ function stopJog(axis) {
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Debug Panel -->
-        <div class="panel debug-panel" id="debugPanel">
-            <h3>🐛 Debug Console</h3>
-            <div class="log-panel" id="logPanel">
-                <div class="log-entry">Debug mode enabled</div>
-            </div>
-            <button class="btn secondary" onclick="clearLog()">Clear Log</button>
-        </div>
-    </div>
+        </div> <!-- end grid -->
 
-    <!-- Quick Actions Bar -->
-    <div class="quick-actions-bar">
-        <button class="btn success" onclick="startSequence()" title="Start/Pause (Space)">
-            ▶️
-        </button>
-        <button class="btn danger" onclick="stopSequence()" title="Stop (Esc)">
-            ⏹️
-        </button>
-        <button class="btn secondary" onclick="homeMotors()" title="Home (H)">
-            🏠
-        </button>
-        <button class="btn warning" onclick="emergencyStop()" title="Emergency Stop">
-            🛑
-        </button>
-    </div>
-
-    <!-- Hidden file input for import -->
-    <input type="file" id="fileInput" style="display: none" accept=".json" onchange="handleFileImport(event)">
+        <!-- DEBUG PANEL
 <script>
-        // Global variables
-        let isConnected = false;
-        let bleDevice = null;
-        let characteristic = null;
-        let currentSpeedMultiplier = 1.0;
-        let jogInterval = null;
-        let isJogging = false;
-        let debugMode = false;
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+let isConnected = false;
+let bleDevice = null;
+let characteristic = null;
 
-        // State tracking
-        let motorPositions = { m1: 0, m2: 0 };
-        let isRunning = false;
-        let estimatedTimeInterval = null;
+let currentSpeedMultiplier = 1.0;
+let isRunning = false;
+let debugMode = false;
 
-        // Preset storage
-        let presets = {
-            1: null,
-            2: null,
-            3: null
-        };
+let motorPositions = { m1: 0, m2: 0 };
+let presets = { 1: null, 2: null, 3: null };
 
-        // Settings object for export/import
-        let currentSettings = {
-            m1Start: 0,
-            m1End: 2000,
-            m1Speed: 2000,
-            m2Start: 0,
-            m2End: 2000,
-            m2Speed: 2000,
-            cycles: 1,
-            returnHome: true,
-            speedMultiplier: 1.0,
-            presets: {},
-            autoConnect: false
-        };
+let jogInterval = null;
+let jogRampInterval = null;
+let isJogging = false;
+let lastSentSpeed = 0;
 
-        // Initialize on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            loadSettings();
-            setupKeyboardShortcuts();
-            updateAllDisplayValues();
-            updateEstimatedTime();
-            
-            // Auto-connect if enabled
-            if (currentSettings.autoConnect) {
-                setTimeout(connectToSlider, 1000);
-            }
-            
-            log('Camera Slider Controller initialized');
+/* ============================================================
+   LOGGING
+============================================================ */
+function log(message, type = 'info') {
+    const timestamp = new Date().toLocaleTimeString();
+    const entry = `[${timestamp}] ${message}`;
+    console.log(entry);
+
+    if (!debugMode) return;
+
+    const panel = document.getElementById('logPanel');
+    if (!panel) return;
+
+    const div = document.createElement('div');
+    div.className = 'log-entry';
+    div.textContent = entry;
+
+    panel.appendChild(div);
+    panel.scrollTop = panel.scrollHeight;
+
+    while (panel.children.length > 200) {
+        panel.removeChild(panel.firstChild);
+    }
+}
+
+function toggleDebugMode() {
+    debugMode = document.getElementById('debugMode').checked;
+    document.getElementById('debugPanel').classList.toggle('active', debugMode);
+}
+
+/* ============================================================
+   BLUETOOTH CONNECTION
+============================================================ */
+async function connectToSlider() {
+    try {
+        log('Requesting BLE device…');
+
+        bleDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ name: 'CameraSlider' }],
+            optionalServices: ['12345678-1234-1234-1234-1234567890ab']
         });
 
-        // Keyboard shortcuts
-        function setupKeyboardShortcuts() {
-            document.addEventListener('keydown', function(e) {
-                if (e.target.tagName === 'INPUT') return; // Don't interfere with input fields
-                
-                switch(e.code) {
-                    case 'Space':
-                        e.preventDefault();
-                        if (isRunning) {
-                            stopSequence();
-                        } else {
-                            startSequence();
-                        }
-                        break;
-                    case 'Escape':
-                        e.preventDefault();
-                        stopSequence();
-                        break;
-                    case 'KeyH':
-                        e.preventDefault();
-                        homeMotors();
-                        break;
-                    case 'KeyS':
-                        if (e.ctrlKey) {
-                            e.preventDefault();
-                            exportSettings();
-                        }
-                        break;
-                    case 'KeyL':
-                        if (e.ctrlKey) {
-                            e.preventDefault();
-                            importSettings();
-                        }
-                        break;
-                }
-            });
-        }
+        const server = await bleDevice.gatt.connect();
+        const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
+        characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
 
-        // Logging function
-        function log(message, type = 'info') {
-            const timestamp = new Date().toLocaleTimeString();
-            const logEntry = `[${timestamp}] ${message}`;
-            
-            console.log(logEntry);
-            
-            if (debugMode) {
-                const logPanel = document.getElementById('logPanel');
-                const entry = document.createElement('div');
-                entry.className = 'log-entry';
-                entry.textContent = logEntry;
-                
-                logPanel.appendChild(entry);
-                logPanel.scrollTop = logPanel.scrollHeight;
-                
-                // Keep only last 50 entries
-                while (logPanel.children.length > 50) {
-                    logPanel.removeChild(logPanel.firstChild);
-                }
-            }
-        }
+        isConnected = true;
+        updateConnectionStatus();
+        log('Connected successfully');
 
-        // BLE Connection Functions
-        async function connectToSlider() {
-            if (!navigator.bluetooth) {
-                alert('Bluetooth not supported in this browser');
-                return;
-            }
+        syncSettingsToDevice();
 
-            try {
-                log('Connecting to Camera Slider...');
-                
-                bleDevice = await navigator.bluetooth.requestDevice({
-                    filters: [{ name: 'CameraSlider' }],
-                    optionalServices: ['12345678-1234-1234-1234-1234567890ab']
-                });
+    } catch (err) {
+        log(`Connection failed: ${err.message}`, 'error');
+        alert('Failed to connect: ' + err.message);
+    }
+}
 
-                const server = await bleDevice.gatt.connect();
-                const service = await server.getPrimaryService('12345678-1234-1234-1234-1234567890ab');
-                characteristic = await service.getCharacteristic('abcd1234-1234-1234-1234-abcdef123456');
+function disconnectFromSlider() {
+    if (bleDevice && bleDevice.gatt.connected) {
+        bleDevice.gatt.disconnect();
+    }
+    isConnected = false;
+    characteristic = null;
+    updateConnectionStatus();
+    log('Disconnected');
+}
 
-                isConnected = true;
-                updateConnectionStatus();
-                log('Connected to Camera Slider successfully');
-                
-                // Send current settings to device
-                syncSettingsToDevice();
-                
-            } catch (error) {
-                log(`Connection failed: ${error.message}`, 'error');
-                alert('Failed to connect to slider: ' + error.message);
-            }
-        }
+function updateConnectionStatus() {
+    const el = document.getElementById('connectionStatus');
+    if (isConnected) {
+        el.className = 'status connected';
+        el.textContent = 'Connected to Camera Slider';
+    } else {
+        el.className = 'status disconnected';
+        el.textContent = 'Disconnected';
+    }
+}
 
-        function disconnectFromSlider() {
-            if (bleDevice && bleDevice.gatt.connected) {
-                bleDevice.gatt.disconnect();
-            }
-            
-            isConnected = false;
-            bleDevice = null;
-            characteristic = null;
-            updateConnectionStatus();
-            log('Disconnected from Camera Slider');
-        }
+/* ============================================================
+   COMMAND SENDING
+============================================================ */
+async function sendCommand(cmd) {
+    if (!isConnected || !characteristic) return;
 
-        function updateConnectionStatus() {
-            const status = document.getElementById('connectionStatus');
-            if (isConnected) {
-                status.className = 'status connected';
-                status.textContent = 'Connected to Camera Slider';
-            } else {
-                status.className = 'status disconnected';
-                status.textContent = 'Disconnected';
-            }
-        }
-// Send command to device if connected
-        async function sendCommand(command) {
-            if (!isConnected || !characteristic) {
-                log(`Cannot send command "${command}" - not connected`, 'error');
-                return false;
-            }
+    try {
+        await characteristic.writeValue(new TextEncoder().encode(cmd));
+        log(`Sent: ${cmd}`);
+    } catch (err) {
+        log(`Send failed: ${err.message}`, 'error');
+    }
+}
 
-            try {
-                const encoder = new TextEncoder();
-                await characteristic.writeValue(encoder.encode(command));
-                log(`Sent: ${command}`);
-                return true;
-            } catch (error) {
-                log(`Send failed: ${error.message}`, 'error');
-                return false;
-            }
-        }
+function sendIfConnected(cmd) {
+    if (isConnected) sendCommand(cmd);
+}
 
-        // Send command only if connected (for real-time updates)
-        function sendIfConnected(command) {
-            if (isConnected) {
-                sendCommand(command);
-            }
-        }
-
-        // Sync all current settings to device
-        async function syncSettingsToDevice() {
-            if (!isConnected) return;
-
-            const commands = [
-                `M1S:${document.getElementById('m1Start').value}`,
-                `M1E:${document.getElementById('m1End').value}`,
-                `M1SPD:${Math.round(document.getElementById('m1Speed').value * currentSpeedMultiplier)}`,
-                `M2S:${document.getElementById('m2Start').value}`,
-                `M2E:${document.getElementById('m2End').value}`,
-                `M2SPD:${Math.round(document.getElementById('m2Speed').value * currentSpeedMultiplier)}`,
-                `CYCLES:${document.getElementById('cycles').value}`,
-                `RETURN:${document.getElementById('returnHome').checked ? '1' : '0'}`
-            ];
-
-            for (const cmd of commands) {
-                await sendCommand(cmd);
-                await new Promise(resolve => setTimeout(resolve, 50)); // Small delay between commands
-            }
-        }
-
-        // Sequence Control Functions
-        async function startSequence() {
-            if (!isConnected) {
-                alert('Please connect to the slider first');
-                return;
-            }
-
-            if (isRunning) {
-                // Toggle pause
-                isRunning = false;
-                await sendCommand('STOP');
-                log('Sequence paused');
-            } else {
-                // Start sequence
-                await syncSettingsToDevice(); // Ensure device has latest settings
-                await sendCommand('RUN');
-                isRunning = true;
-                log('Sequence started');
-            }
-
-            updateSequenceButtons();
-        }
-
-        async function stopSequence() {
-            if (!isConnected) return;
-
-            await sendCommand('STOP');
-            isRunning = false;
-            log('Sequence stopped');
-            updateSequenceButtons();
-        }
-
-        async function homeMotors() {
-            if (!isConnected) {
-                alert('Please connect to the slider first');
-                return;
-            }
-
-            await sendCommand('HOME');
-            log('Homing motors...');
-        }
-
-        async function emergencyStop() {
-            if (!isConnected) return;
-
-            await sendCommand('STOP');
-            stopJog();
-            isRunning = false;
-            log('EMERGENCY STOP');
-            updateSequenceButtons();
-        }
-
-        function updateSequenceButtons() {
-            const startButtons = document.querySelectorAll('button[onclick="startSequence()"]');
-            startButtons.forEach(btn => {
-                if (isRunning) {
-                    btn.innerHTML = btn.innerHTML.includes('▶️') ? '⏸️' : '⏸️ Pause';
-                    btn.className = btn.className.replace('success', 'warning');
-                } else {
-                    btn.innerHTML = btn.innerHTML.includes('️') ? '▶️' : '▶️ Start Sequence';
-                    btn.className = btn.className.replace('warning', 'success');
-                }
-            });
-        }
-
-        // Manual Jog Controls
-// Manual Jog Controls with Smooth Accel/Decel
-let jogRampInterval = null;
-let lastSentSpeed = 0;
+/* ============================================================
+   GENTLE SMOOTH JOG SYSTEM
+============================================================ */
 
 async function startJog(motor, direction) {
     if (!isConnected || isJogging) return;
 
     isJogging = true;
-
-    const targetSpeed = Math.round(direction * currentSpeedMultiplier * 100);
-    let currentSpeed = 0;
     lastSentSpeed = 0;
 
-    // Clear any previous ramp
+    const maxSpeed = 3000 * currentSpeedMultiplier;   // gentle cap
+    const accelStep = 8;                              // gentle ramp
+    const interval = 20;                              // smooth timing
+
+    let currentSpeed = 0;
+
     if (jogRampInterval) clearInterval(jogRampInterval);
 
     jogRampInterval = setInterval(async () => {
@@ -872,735 +611,380 @@ async function startJog(motor, direction) {
             return;
         }
 
-        // Ramp up in steps
-        currentSpeed += direction * 10;
+        currentSpeed += accelStep * direction;
 
-        // Clamp to target
-        if (Math.abs(currentSpeed) >= Math.abs(targetSpeed)) {
-            currentSpeed = targetSpeed;
-            clearInterval(jogRampInterval);
+        if (Math.abs(currentSpeed) > maxSpeed) {
+            currentSpeed = maxSpeed * direction;
         }
 
         lastSentSpeed = currentSpeed;
-        await sendCommand(`JOGSLIDER:${motor}:${currentSpeed}`);
-    }, 20);
+        await sendCommand(`JOG:${motor}:${Math.round(currentSpeed)}`);
 
-    log(`Jogging ${motor} (ramping to ${targetSpeed})`);
+    }, interval);
+
+    log(`Jogging ${motor} (gentle accel)`);
 }
+
 async function stopJog() {
-    if (!isConnected || !isJogging) return;
+    if (!isJogging) return;
 
     isJogging = false;
 
-    // Clear any ramp-up interval
     if (jogRampInterval) clearInterval(jogRampInterval);
 
-    let currentSpeed = lastSentSpeed;
+    let speed = lastSentSpeed;
 
-    // Smooth exponential decay
-    while (Math.abs(currentSpeed) > 5) {
-        currentSpeed *= 0.7; // deceleration curve
-        await sendCommand(`JOGSLIDER:STOP:${Math.round(currentSpeed)}`);
+    while (Math.abs(speed) > 5) {
+        speed *= 0.7;  // gentle decel
+        await sendCommand(`JOG:STOP:${Math.round(speed)}`);
         await new Promise(r => setTimeout(r, 20));
     }
 
-    // Final stop
-    await sendCommand('JOGSLIDER:STOP:0');
+    await sendCommand('JOG:STOP:0');
     lastSentSpeed = 0;
 
-    log('Jog stopped smoothly');
+    log('Jog stopped gently');
 }
-        // Speed multiplier control
-        function updateSpeedMultiplier(value) {
-            currentSpeedMultiplier = parseFloat(value);
-            document.getElementById('speedMultiplierValue').textContent = `${value}x`;
-            
-            // Update current motor speeds if connected
-            if (isConnected) {
-                sendIfConnected(`M1SPD:${Math.round(document.getElementById('m1Speed').value * currentSpeedMultiplier)}`);
-                sendIfConnected(`M2SPD:${Math.round(document.getElementById('m2Speed').value * currentSpeedMultiplier)}`);
-            }
-            
-            saveSettings();
-        }
 
-        // Update speed display values
-        function updateSpeedDisplay(motor, value) {
-            document.getElementById(motor + 'SpeedValue').textContent = value;
-        }
+/* ============================================================
+   SEQUENCE CONTROL
+============================================================ */
+async function startSequence() {
+    if (!isConnected) return alert('Connect first');
 
-        // Update all display values
-        function updateAllDisplayValues() {
-            updateSpeedDisplay('m1', document.getElementById('m1Speed').value);
-            updateSpeedDisplay('m2', document.getElementById('m2Speed').value);
-            updateSpeedMultiplier(document.getElementById('speedMultiplier').value);
-        }
-// Position and Preset Management
-        async function getCurrentPositions() {
-            if (!isConnected) {
-                alert('Please connect to the slider first');
-                return;
-            }
-
-            // In a real implementation, you'd request position from device
-            // For now, we'll simulate with stored values
-            log(`Current positions - M1: ${motorPositions.m1}, M2: ${motorPositions.m2}`);
-            alert(`Current Positions:\nMotor 1: ${motorPositions.m1}\nMotor 2: ${motorPositions.m2}`);
-        }
-
-        function setCurrentPositionAs(elementId) {
-            const motor = elementId.includes('m1') ? 'm1' : 'm2';
-            const currentPos = motorPositions[motor];
-            
-            document.getElementById(elementId).value = currentPos;
-            
-            // Send to device if connected
-            const command = elementId.includes('Start') ? 
-                `${motor.toUpperCase()}S:${currentPos}` : 
-                `${motor.toUpperCase()}E:${currentPos}`;
-            
-            sendIfConnected(command);
-            updateEstimatedTime();
-            saveSettings();
-            
-            log(`Set ${elementId} to current position: ${currentPos}`);
-        }
-
-        // Preset Management
-        function savePreset(presetNumber) {
-            const preset = {
-                m1Start: parseInt(document.getElementById('m1Start').value),
-                m1End: parseInt(document.getElementById('m1End').value),
-                m1Speed: parseInt(document.getElementById('m1Speed').value),
-                m2Start: parseInt(document.getElementById('m2Start').value),
-                m2End: parseInt(document.getElementById('m2End').value),
-                m2Speed: parseInt(document.getElementById('m2Speed').value),
-                cycles: parseInt(document.getElementById('cycles').value),
-                returnHome: document.getElementById('returnHome').checked,
-                timestamp: new Date().toLocaleString()
-            };
-
-            presets[presetNumber] = preset;
-            updatePresetDisplay(presetNumber);
-            saveSettings();
-            
-            log(`Preset ${presetNumber} saved`);
-        }
-
-        function loadPreset(presetNumber) {
-            const preset = presets[presetNumber];
-            if (!preset) {
-                alert(`Preset ${presetNumber} is empty`);
-                return;
-            }
-
-            // Load values into UI
-            document.getElementById('m1Start').value = preset.m1Start;
-            document.getElementById('m1End').value = preset.m1End;
-            document.getElementById('m1Speed').value = preset.m1Speed;
-            document.getElementById('m2Start').value = preset.m2Start;
-            document.getElementById('m2End').value = preset.m2End;
-            document.getElementById('m2Speed').value = preset.m2Speed;
-            document.getElementById('cycles').value = preset.cycles;
-            document.getElementById('returnHome').checked = preset.returnHome;
-
-            // Update displays
-            updateAllDisplayValues();
-            updateEstimatedTime();
-
-            // Send to device if connected
-            if (isConnected) {
-                syncSettingsToDevice();
-            }
-
-            saveSettings();
-            log(`Preset ${presetNumber} loaded`);
-        }
-
-function updatePresetDisplay(presetNumber) {
-    const preset = presets[presetNumber];
-    const textElement = document.getElementById(`preset${presetNumber}Text`);
-    const cardElement = document.getElementById(`preset${presetNumber}Card`);
-
-    if (preset) {
-        textElement.innerHTML = `
-            M1: ${preset.m1Start}→${preset.m1End}<br>
-            M2: ${preset.m2Start}→${preset.m2End}<br>
-            <small>${preset.timestamp}</small>
-        `;
-        if (cardElement) {
-            cardElement.classList.add('set');
-        }
+    if (isRunning) {
+        await sendCommand('STOP');
+        isRunning = false;
+        log('Sequence paused');
     } else {
-        textElement.textContent = 'Empty';
-        if (cardElement) {
-            cardElement.classList.remove('set');
+        await syncSettingsToDevice();
+        await sendCommand('RUN');
+        isRunning = true;
+        log('Sequence started');
+    }
+
+    updateSequenceButtons();
+}
+
+async function stopSequence() {
+    if (!isConnected) return;
+    await sendCommand('STOP');
+    isRunning = false;
+    updateSequenceButtons();
+    log('Sequence stopped');
+}
+
+async function homeMotors() {
+    if (!isConnected) return alert('Connect first');
+    await sendCommand('HOME');
+    log('Homing motors…');
+}
+
+async function emergencyStop() {
+    if (!isConnected) return;
+    await sendCommand('STOP');
+    stopJog();
+    isRunning = false;
+    updateSequenceButtons();
+    log('EMERGENCY STOP');
+}
+
+function updateSequenceButtons() {
+    const btns = document.querySelectorAll('button[onclick="startSequence()"]');
+    btns.forEach(btn => {
+        if (isRunning) {
+            btn.innerHTML = '⏸️ Pause';
+            btn.classList.remove('success');
+            btn.classList.add('warning');
+        } else {
+            btn.innerHTML = '▶️ Start Sequence';
+            btn.classList.remove('warning');
+            btn.classList.add('success');
         }
+    });
+}
+
+/* ============================================================
+   SPEED + UI UPDATES
+============================================================ */
+function updateSpeedMultiplier(v) {
+    currentSpeedMultiplier = parseFloat(v);
+    document.getElementById('speedMultiplierValue').textContent = `${v}x`;
+    saveSettings();
+}
+
+function updateSpeedDisplay(motor, value) {
+    document.getElementById(motor + 'SpeedValue').textContent = value;
+}
+
+/* ============================================================
+   PRESETS
+============================================================ */
+function savePreset(n) {
+    presets[n] = {
+        m1Start: +m1Start.value,
+        m1End: +m1End.value,
+        m1Speed: +m1Speed.value,
+        m2Start: +m2Start.value,
+        m2End: +m2End.value,
+        m2Speed: +m2Speed.value,
+        cycles: +cycles.value,
+        returnHome: returnHome.checked,
+        timestamp: new Date().toLocaleString()
+    };
+
+    updatePresetDisplay(n);
+    saveSettings();
+    log(`Preset ${n} saved`);
+}
+
+function loadPreset(n) {
+    const p = presets[n];
+    if (!p) return alert(`Preset ${n} empty`);
+
+    m1Start.value = p.m1Start;
+    m1End.value = p.m1End;
+    m1Speed.value = p.m1Speed;
+    m2Start.value = p.m2Start;
+    m2End.value = p.m2End;
+    m2Speed.value = p.m2Speed;
+    cycles.value = p.cycles;
+    returnHome.checked = p.returnHome;
+
+    updateAllDisplayValues();
+    updateEstimatedTime();
+    saveSettings();
+
+    if (isConnected) syncSettingsToDevice();
+
+    log(`Preset ${n} loaded`);
+}
+
+function updatePresetDisplay(n) {
+    const p = presets[n];
+    const text = document.getElementById(`preset${n}Text`);
+    const card = document.getElementById(`preset${n}Card`);
+
+    if (!p) {
+        text.textContent = 'Empty';
+        card.classList.remove('set');
+        return;
+    }
+
+    text.innerHTML = `
+        M1: ${p.m1Start}→${p.m1End}<br>
+        M2: ${p.m2Start}→${p.m2End}<br>
+        <small>${p.timestamp}</small>
+    `;
+    card.classList.add('set');
+}
+
+/* ============================================================
+   SETTINGS SAVE/LOAD
+============================================================ */
+function saveSettings() {
+    const settings = {
+        m1Start: +m1Start.value,
+        m1End: +m1End.value,
+        m1Speed: +m1Speed.value,
+        m2Start: +m2Start.value,
+        m2End: +m2End.value,
+        m2Speed: +m2Speed.value,
+        cycles: +cycles.value,
+        returnHome: returnHome.checked,
+        speedMultiplier: currentSpeedMultiplier,
+        presets,
+        autoConnect: autoConnect.checked
+    };
+
+    localStorage.setItem('cameraSliderSettings', JSON.stringify(settings));
+}
+
+function loadSettings() {
+    const saved = localStorage.getItem('cameraSliderSettings');
+    if (!saved) return;
+
+    try {
+        const s = JSON.parse(saved);
+
+        m1Start.value = s.m1Start ?? 0;
+        m1End.value = s.m1End ?? 2000;
+        m1Speed.value = s.m1Speed ?? 2000;
+
+        m2Start.value = s.m2Start ?? 0;
+        m2End.value = s.m2End ?? 2000;
+        m2Speed.value = s.m2Speed ?? 2000;
+
+        cycles.value = s.cycles ?? 1;
+        returnHome.checked = s.returnHome ?? true;
+
+        currentSpeedMultiplier = s.speedMultiplier ?? 1.0;
+        speedMultiplier.value = currentSpeedMultiplier;
+
+        presets = s.presets ?? presets;
+        for (let i = 1; i <= 3; i++) updatePresetDisplay(i);
+
+        autoConnect.checked = s.autoConnect ?? false;
+
+        updateAllDisplayValues();
+        updateEstimatedTime();
+
+        log('Settings loaded');
+
+    } catch (err) {
+        log(`Failed to load settings: ${err.message}`, 'error');
     }
 }
-        // Time Estimation
-        function updateEstimatedTime() {
-            const m1Start = parseInt(document.getElementById('m1Start').value) || 0;
-            const m1End = parseInt(document.getElementById('m1End').value) || 0;
-            const m1Speed = parseInt(document.getElementById('m1Speed').value) || 1000;
-            
-            const m2Start = parseInt(document.getElementById('m2Start').value) || 0;
-            const m2End = parseInt(document.getElementById('m2End').value) || 0;
-            const m2Speed = parseInt(document.getElementById('m2Speed').value) || 1000;
-            
-            const cycles = parseInt(document.getElementById('cycles').value) || 1;
-            const returnHome = document.getElementById('returnHome').checked;
 
-            // Calculate time for one cycle
-            const m1Distance = Math.abs(m1End - m1Start);
-            const m2Distance = Math.abs(m2End - m2Start);
-            
-            const m1Time = m1Distance / (m1Speed * currentSpeedMultiplier);
-            const m2Time = m2Distance / (m2Speed * currentSpeedMultiplier);
-            
-            // Use the longer of the two motor times (they move together)
-            let cycleTime = Math.max(m1Time, m2Time);
-            
-            // If return home is enabled, double the time
-            if (returnHome) {
-                cycleTime *= 2;
-            }
-            
-            // Calculate total time
-            let totalTime = cycleTime;
-            if (cycles > 0) {
-                totalTime *= cycles;
-            } else {
-                totalTime = 0; // Infinite cycles
-            }
-            
-            // Format time display
-            const timeElement = document.getElementById('estimatedTime');
-            if (cycles === 0) {
-                timeElement.textContent = '∞ (Infinite)';
-            } else if (totalTime < 60) {
-                timeElement.textContent = `${totalTime.toFixed(1)}s`;
-            } else {
-                const minutes = Math.floor(totalTime / 60);
-                const seconds = Math.floor(totalTime % 60);
-                timeElement.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
-            }
-        }
-// Settings Management
-        function saveSettings() {
-            // Collect current values from UI
-            currentSettings = {
-                m1Start: parseInt(document.getElementById('m1Start').value) || 0,
-                m1End: parseInt(document.getElementById('m1End').value) || 2000,
-                m1Speed: parseInt(document.getElementById('m1Speed').value) || 2000,
-                m2Start: parseInt(document.getElementById('m2Start').value) || 0,
-                m2End: parseInt(document.getElementById('m2End').value) || 2000,
-                m2Speed: parseInt(document.getElementById('m2Speed').value) || 2000,
-                cycles: parseInt(document.getElementById('cycles').value) || 1,
-                returnHome: document.getElementById('returnHome').checked,
-                speedMultiplier: currentSpeedMultiplier,
-                presets: { ...presets },
-                autoConnect: document.getElementById('autoConnect')?.checked || false
-            };
+/* ============================================================
+   SETTINGS IMPORT/EXPORT
+============================================================ */
+function exportSettings() {
+    saveSettings();
+    const data = JSON.stringify(JSON.parse(localStorage.getItem('cameraSliderSettings')), null, 2);
+    const blob = new Blob([data], { type: 'application/json' });
 
-            // Save to localStorage
-            localStorage.setItem('cameraSliderSettings', JSON.stringify(currentSettings));
-        }
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'camera-slider-settings.json';
+    a.click();
 
-        function loadSettings() {
-            try {
-                const saved = localStorage.getItem('cameraSliderSettings');
-                if (saved) {
-                    const settings = JSON.parse(saved);
-                    
-                    // Load UI values
-                    document.getElementById('m1Start').value = settings.m1Start || -2000;
-                    document.getElementById('m1End').value = settings.m1End || 2000;
-                    document.getElementById('m1Speed').value = settings.m1Speed || 2000;
-                    document.getElementById('m2Start').value = settings.m2Start || -8000;
-                    document.getElementById('m2End').value = settings.m2End || 8000;
-                    document.getElementById('m2Speed').value = settings.m2Speed || 2000;
-                    document.getElementById('cycles').value = settings.cycles || 0;
-                    document.getElementById('returnHome').checked = settings.returnHome !== false;
-                    
-                    // Load speed multiplier
-                    currentSpeedMultiplier = settings.speedMultiplier || 1.0;
-                    document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
-                    
-                    // Load presets
-                    if (settings.presets) {
-                        presets = { ...settings.presets };
-                        for (let i = 1; i <= 3; i++) {
-                            updatePresetDisplay(i);
-                        }
-                    }
-                    
-                    // Load auto-connect setting
-                    if (document.getElementById('autoConnect')) {
-                        document.getElementById('autoConnect').checked = settings.autoConnect || false;
-                    }
-                    
-                    currentSettings = settings;
-                    log('Settings loaded from localStorage');
-                }
-            } catch (error) {
-                log(`Failed to load settings: ${error.message}`, 'error');
-            }
-        }
-
-        function exportSettings() {
-            saveSettings(); // Ensure current state is saved
-            
-            const dataStr = JSON.stringify(currentSettings, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `camera-slider-settings-${new Date().toISOString().slice(0,10)}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
-            
-            log('Settings exported to file');
-        }
-function importSettings() {
-            document.getElementById('fileInput').click();
-        }
-
-        function handleFileImport(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const settings = JSON.parse(e.target.result);
-                    
-                    // Validate settings structure
-                    if (typeof settings !== 'object' || settings === null) {
-                        throw new Error('Invalid settings file format');
-                    }
-                    
-                    // Apply settings to UI
-                    if (settings.m1Start !== undefined) document.getElementById('m1Start').value = settings.m1Start;
-                    if (settings.m1End !== undefined) document.getElementById('m1End').value = settings.m1End;
-                    if (settings.m1Speed !== undefined) document.getElementById('m1Speed').value = settings.m1Speed;
-                    if (settings.m2Start !== undefined) document.getElementById('m2Start').value = settings.m2Start;
-                    if (settings.m2End !== undefined) document.getElementById('m2End').value = settings.m2End;
-                    if (settings.m2Speed !== undefined) document.getElementById('m2Speed').value = settings.m2Speed;
-                    if (settings.cycles !== undefined) document.getElementById('cycles').value = settings.cycles;
-                    if (settings.returnHome !== undefined) document.getElementById('returnHome').checked = settings.returnHome;
-                    
-                    // Apply speed multiplier
-                    if (settings.speedMultiplier !== undefined) {
-                        currentSpeedMultiplier = settings.speedMultiplier;
-                        document.getElementById('speedMultiplier').value = currentSpeedMultiplier;
-                        document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
-                    }
-                    
-                    // Apply presets
-                    if (settings.presets) {
-                        presets = { ...settings.presets };
-                        for (let i = 1; i <= 3; i++) {
-                            updatePresetDisplay(i);
-                        }
-                    }
-                    
-                    // Apply auto-connect setting
-                    if (settings.autoConnect !== undefined && document.getElementById('autoConnect')) {
-                        document.getElementById('autoConnect').checked = settings.autoConnect;
-                    }
-                    
-                    // Update displays
-                    updateAllDisplayValues();
-                    updateEstimatedTime();
-                    
-                    // Sync to device if connected
-                    if (isConnected) {
-                        syncSettingsToDevice();
-                    }
-                    
-                    // Save to localStorage
-                    saveSettings();
-                    
-                    log('Settings imported successfully');
-                    alert('Settings imported successfully!');
-                    
-                } catch (error) {
-                    log(`Import failed: ${error.message}`, 'error');
-                    alert('Failed to import settings: ' + error.message);
-                }
-            };
-            
-            reader.readAsText(file);
-            event.target.value = ''; // Clear file input
-        }
-
-        function resetToDefaults() {
-            if (!confirm('Reset all settings to defaults? This cannot be undone.')) {
-                return;
-            }
-            
-            // Reset UI to defaults
-            document.getElementById('m1Start').value = -2000;
-            document.getElementById('m1End').value = 2000;
-            document.getElementById('m1Speed').value = 2000;
-            document.getElementById('m2Start').value = -8000;
-            document.getElementById('m2End').value = 8000;
-            document.getElementById('m2Speed').value = 2000;
-            document.getElementById('cycles').value = 0;
-            document.getElementById('returnHome').checked = true;
-            document.getElementById('speedMultiplier').value = 1.0;
-            
-            if (document.getElementById('autoConnect')) {
-                document.getElementById('autoConnect').checked = false;
-            }
-            
-            // Reset presets
-            presets = { 1: null, 2: null, 3: null };
-            for (let i = 1; i <= 3; i++) {
-                updatePresetDisplay(i);
-            }
-            
-            // Reset speed multiplier
-            currentSpeedMultiplier = 1.0;
-            
-            // Update displays
-            updateAllDisplayValues();
-            updateEstimatedTime();
-            
-            // Sync to device if connected
-            if (isConnected) {
-                syncSettingsToDevice();
-            }
-            
-            // Save to localStorage
-            saveSettings();
-            
-            log('Settings reset to defaults');
-        }
-// Initialization and Event Handlers
-        function init() {
-            console.log('Initializing Camera Slider Control...');
-            
-            // Initialize Web Bluetooth if available
-            if (!navigator.bluetooth) {
-                document.getElementById('status').textContent = 'Web Bluetooth not supported';
-                document.getElementById('connectBtn').disabled = true;
-                log('Web Bluetooth not supported in this browser', 'error');
-                return;
-            }
-            
-            // Load saved settings
-            loadSettings();
-            
-            // Update all display values
-            updateAllDisplayValues();
-            updateEstimatedTime();
-            
-            // Set up event listeners
-            setupEventListeners();
-            
-            // Auto-connect if enabled
-            if (document.getElementById('autoConnect')?.checked) {
-                setTimeout(connectDevice, 1000);
-            }
-            
-            log('Camera Slider Control initialized');
-        }
-
-        function setupEventListeners() {
-            // Motor parameter inputs
-            const motorInputs = ['m1Start', 'm1End', 'm1Speed', 'm2Start', 'm2End', 'm2Speed'];
-            motorInputs.forEach(id => {
-                const element = document.getElementById(id);
-                if (element) {
-                    element.addEventListener('input', function() {
-                        updateDisplayValue(id);
-                        updateEstimatedTime();
-                        saveSettings();
-                        
-                        // Send to device if connected
-                        const command = getCommandForInput(id, this.value);
-                        sendIfConnected(command);
-                    });
-                }
-            });
-
-            // Cycles input
-            const cyclesElement = document.getElementById('cycles');
-            if (cyclesElement) {
-                cyclesElement.addEventListener('input', function() {
-                    document.getElementById('cyclesValue').textContent = 
-                        this.value == 0 ? '∞' : this.value;
-                    updateEstimatedTime();
-                    saveSettings();
-                    sendIfConnected(`CYCLES:${this.value}`);
-                });
-            }
-
-            // Return home checkbox
-            const returnHomeElement = document.getElementById('returnHome');
-            if (returnHomeElement) {
-                returnHomeElement.addEventListener('change', function() {
-                    updateEstimatedTime();
-                    saveSettings();
-                    sendIfConnected(`RETURN:${this.checked ? 1 : 0}`);
-                });
-            }
-
-            // Speed multiplier
-            const speedMultiplierElement = document.getElementById('speedMultiplier');
-            if (speedMultiplierElement) {
-                speedMultiplierElement.addEventListener('input', function() {
-                    currentSpeedMultiplier = parseFloat(this.value);
-                    document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
-                    updateEstimatedTime();
-                    saveSettings();
-                });
-            }
-
-            // File input for importing settings
-            const fileInputElement = document.getElementById('fileInput');
-            if (fileInputElement) {
-                fileInputElement.addEventListener('change', handleFileImport);
-            }
-
-            // Jog sliders
-            const jogSliders = ['jogSliderM1', 'jogSliderM2', 'jogSliderBoth'];
-            jogSliders.forEach(id => {
-                const slider = document.getElementById(id);
-                if (slider) {
-                    slider.addEventListener('input', function() {
-                        handleJogSlider(id, parseInt(this.value));
-                    });
-                    
-                    slider.addEventListener('mouseup', function() {
-                        this.value = 0;
-                        handleJogSlider(id, 0);
-                    });
-                    
-                    slider.addEventListener('touchend', function() {
-                        this.value = 0;
-                        handleJogSlider(id, 0);
-                    });
-                }
-            });
-        }
-
-        function getCommandForInput(inputId, value) {
-            const commands = {
-                'm1Start': `M1S:${value}`,
-                'm1End': `M1E:${value}`,
-                'm1Speed': `M1SPD:${value}`,
-                'm2Start': `M2S:${value}`,
-                'm2End': `M2E:${value}`,
-                'm2Speed': `M2SPD:${value}`
-            };
-            return commands[inputId] || '';
-        }
-
-        function updateAllDisplayValues() {
-            const inputs = ['m1Start', 'm1End', 'm1Speed', 'm2Start', 'm2End', 'm2Speed'];
-            inputs.forEach(id => updateDisplayValue(id));
-            
-            const cyclesValue = document.getElementById('cycles').value;
-            document.getElementById('cyclesValue').textContent = 
-                cyclesValue == 0 ? '∞' : cyclesValue;
-            
-            document.getElementById('speedMultiplierValue').textContent = `${currentSpeedMultiplier}x`;
-        }
-
-        function updateDisplayValue(inputId) {
-            const input = document.getElementById(inputId);
-            const display = document.getElementById(inputId + 'Value');
-            if (input && display) {
-                display.textContent = input.value;
-            }
-        }
-
-        function syncSettingsToDevice() {
-            if (!isConnected) return;
-            
-            const commands = [
-                `M1S:${document.getElementById('m1Start').value}`,
-                `M1E:${document.getElementById('m1End').value}`,
-                `M1SPD:${document.getElementById('m1Speed').value}`,
-                `M2S:${document.getElementById('m2Start').value}`,
-                `M2E:${document.getElementById('m2End').value}`,
-                `M2SPD:${document.getElementById('m2Speed').value}`,
-                `CYCLES:${document.getElementById('cycles').value}`,
-                `RETURN:${document.getElementById('returnHome').checked ? 1 : 0}`
-            ];
-            
-            commands.forEach(cmd => {
-                setTimeout(() => sendCommand(cmd), 50);
-            });
-            
-            log('Settings synced to device');
-        }
-
-        function sendIfConnected(command) {
-            if (isConnected && command) {
-                sendCommand(command);
-            }
-        }
-
-        // Initialize when page loads
-        document.addEventListener('DOMContentLoaded', init);
-
-        // Handle page visibility changes
-        document.addEventListener('visibilitychange', function() {
-            if (document.visibilityState === 'visible' && isConnected) {
-                // Page became visible, check connection
-                setTimeout(() => {
-                    if (bluetoothCharacteristic && bluetoothCharacteristic.service.device.gatt.connected) {
-                        log('Connection maintained while page was hidden');
-                    } else {
-                        log('Connection lost while page was hidden', 'error');
-                        handleDisconnection();
-                    }
-                }, 100);
-            }
-        });
-// Utility Functions
-        function formatTime(seconds) {
-            if (seconds < 60) {
-                return `${seconds.toFixed(1)}s`;
-            } else if (seconds < 3600) {
-                const minutes = Math.floor(seconds / 60);
-                const remainingSeconds = seconds % 60;
-                return `${minutes}m ${remainingSeconds.toFixed(0)}s`;
-            } else {
-                const hours = Math.floor(seconds / 3600);
-                const minutes = Math.floor((seconds % 3600) / 60);
-                return `${hours}h ${minutes}m`;
-            }
-        }
-
-        function calculateDistance(start, end) {
-            return Math.abs(end - start);
-        }
-
-        function calculateMoveTime(distance, speed, multiplier = 1) {
-            if (speed <= 0) return 0;
-            const effectiveSpeed = speed * multiplier;
-            return distance / effectiveSpeed;
-        }
-
-        function debounce(func, wait) {
-            let timeout;
-            return function executedFunction(...args) {
-                const later = () => {
-                    clearTimeout(timeout);
-                    func(...args);
-                };
-                clearTimeout(timeout);
-                timeout = setTimeout(later, wait);
-            };
-        }
-
-        function throttle(func, limit) {
-            let inThrottle;
-            return function() {
-                const args = arguments;
-                const context = this;
-                if (!inThrottle) {
-                    func.apply(context, args);
-                    inThrottle = true;
-                    setTimeout(() => inThrottle = false, limit);
-                }
-            }
-        }
-</script>
-<script>
-// Manual Jog Controls with Smooth Accel/Decel
-let jogRampInterval = null;
-let lastSentSpeed = 0;
-
-async function startJog(...) { ... }
-async function stopJog(...) { ... }
-</script>
-function easeInOutCubic(t, start, end, duration) {
-    t /= duration / 2;
-    if (t < 1) return start + (end - start) / 2 * t * t * t;
-    t -= 2;
-    return start + (end - start) / 2 * (t * t * t + 2);
+    log('Settings exported');
 }
 
+function importSettings() {
+    document.getElementById('fileInput').click();
+}
 
-        // Add error recovery mechanism
-        window.addEventListener('error', function(event) {
-            log(`JavaScript Error: ${event.message}`, 'error');
-            console.error('Error details:', event.error);
-        });
+function handleFileImport(e) {
+    const file = e.target.files[0];
+    if (!file) return;
 
-        // Add unhandled promise rejection handling
-        window.addEventListener('unhandledrejection', function(event) {
-            log(`Unhandled Promise Rejection: ${event.reason}`, 'error');
-            console.error('Promise rejection details:', event.reason);
-        });
+    const reader = new FileReader();
+    reader.onload = evt => {
+        try {
+            const s = JSON.parse(evt.target.result);
 
-        // Performance monitoring
-        function logPerformance(label, startTime) {
-            const endTime = performance.now();
-            const duration = endTime - startTime;
-            if (duration > 100) { // Log operations taking longer than 100ms
-                console.warn(`Performance: ${label} took ${duration.toFixed(2)}ms`);
-            }
+            m1Start.value = s.m1Start;
+            m1End.value = s.m1End;
+            m1Speed.value = s.m1Speed;
+
+            m2Start.value = s.m2Start;
+            m2End.value = s.m2End;
+            m2Speed.value = s.m2Speed;
+
+            cycles.value = s.cycles;
+            returnHome.checked = s.returnHome;
+
+            currentSpeedMultiplier = s.speedMultiplier;
+            speedMultiplier.value = currentSpeedMultiplier;
+
+            presets = s.presets;
+            for (let i = 1; i <= 3; i++) updatePresetDisplay(i);
+
+            autoConnect.checked = s.autoConnect;
+
+            updateAllDisplayValues();
+            updateEstimatedTime();
+            saveSettings();
+
+            if (isConnected) syncSettingsToDevice();
+
+            alert('Settings imported');
+            log('Settings imported');
+
+        } catch (err) {
+            alert('Import failed: ' + err.message);
+            log(`Import failed: ${err.message}`, 'error');
         }
+    };
 
-        // Memory cleanup for long-running sessions
-        function cleanupMemory() {
-            // Clear old log entries if too many exist
-            const logContainer = document.getElementById('log');
-            if (logContainer && logContainer.children.length > 1000) {
-                const entries = Array.from(logContainer.children);
-                entries.slice(0, entries.length - 500).forEach(entry => entry.remove());
-                log('Log entries cleaned up for memory management');
-            }
-        }
+    reader.readAsText(file);
+    e.target.value = '';
+}
 
-        // Run cleanup every 5 minutes
-        setInterval(cleanupMemory, 5 * 60 * 1000);
+/* ============================================================
+   ESTIMATED TIME
+============================================================ */
+function updateEstimatedTime() {
+    const m1Dist = Math.abs(+m1End.value - +m1Start.value);
+    const m2Dist = Math.abs(+m2End.value - +m2Start.value);
 
-        // Export key functions to global scope for debugging
-        window.sliderControl = {
-            connectDevice,
-            disconnectDevice,
-            sendCommand,
-            saveSettings,
-            loadSettings,
-            exportSettings,
-            importSettings,
-            resetToDefaults,
-            isConnected: () => isConnected,
-            getSettings: () => currentSettings,
-            log
-        };
+    const m1Time = m1Dist / (+m1Speed.value * currentSpeedMultiplier);
+    const m2Time = m2Dist / (+m2Speed.value * currentSpeedMultiplier);
 
-        // Development helpers (only in development)
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-            window.debugSlider = {
-                simulateConnection: () => {
-                    isConnected = true;
-                    updateConnectionStatus();
-                    log('Simulated connection for debugging');
-                },
-                testCommand: (cmd) => {
-                    log(`Test command would send: ${cmd}`);
-                },
-                getInternalState: () => ({
-                    isConnected,
-                    isRunning,
-                    currentSettings,
-                    presets,
-                    currentSpeedMultiplier
-                })
-            };
-        }
+    let cycleTime = Math.max(m1Time, m2Time);
+    if (returnHome.checked) cycleTime *= 2;
 
-    </script>
+    let total = cycleTime * (+cycles.value || 1);
+
+    const el = document.getElementById('estimatedTime');
+
+    if (+cycles.value === 0) {
+        el.textContent = '∞ (Infinite)';
+    } else if (total < 60) {
+        el.textContent = `${total.toFixed(1)}s`;
+    } else {
+        const m = Math.floor(total / 60);
+        const s = Math.floor(total % 60);
+        el.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+    }
+}
+
+/* ============================================================
+   INITIALISATION
+============================================================ */
+function updateAllDisplayValues() {
+    updateSpeedDisplay('m1', m1Speed.value);
+    updateSpeedDisplay('m2', m2Speed.value);
+    speedMultiplierValue.textContent = `${currentSpeedMultiplier}x`;
+}
+
+function toggleAutoConnect() {
+    saveSettings();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadSettings();
+    updateAllDisplayValues();
+    updateEstimatedTime();
+
+    if (autoConnect.checked) {
+        setTimeout(connectToSlider, 800);
+    }
+
+    log('UI initialised');
+});
+
+/* ============================================================
+   ERROR HANDLING
+============================================================ */
+window.addEventListener('error', e => {
+    log(`JS Error: ${e.message}`, 'error');
+});
+
+window.addEventListener('unhandledrejection', e => {
+    log(`Promise Error: ${e.reason}`, 'error');
+});
+</script>
+    <!-- Hidden file input for importing settings -->
+    <input type="file" id="fileInput" style="display:none" accept=".json">
+
+    <!-- Debug Panel -->
+    <div class="panel debug-panel" id="debugPanel" style="display:none;">
+        <h3>🐛 Debug Console</h3>
+        <div class="log-panel" id="logPanel"></div>
+        <button class="btn secondary" onclick="document.getElementById('logPanel').innerHTML=''">Clear Log</button>
+    </div>
+
+    <!-- Quick Actions Bar -->
+    <div class="quick-actions-bar">
+        <button class="btn success" onclick="startSequence()" title="Start/Pause">▶️</button>
+        <button class="btn danger" onclick="stopSequence()" title="Stop">⏹️</button>
+        <button class="btn secondary" onclick="homeMotors()" title="Home">🏠</button>
+        <button class="btn warning" onclick="emergencyStop()" title="Emergency Stop">🛑</button>
+    </div>
+
 </body>
 </html>
 
