@@ -527,8 +527,9 @@ async function connectToSlider() {
     try {
         log('Requesting BLE device…');
 
+        // FIXED: always opens picker
         bleDevice = await navigator.bluetooth.requestDevice({
-            filters: [{ name: 'CameraSlider' }],
+            acceptAllDevices: true,
             optionalServices: ['12345678-1234-1234-1234-1234567890ab']
         });
 
@@ -547,7 +548,6 @@ async function connectToSlider() {
         alert('Failed to connect: ' + err.message);
     }
 }
-
 function disconnectFromSlider() {
     if (bleDevice && bleDevice.gatt.connected) {
         bleDevice.gatt.disconnect();
