@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Camera Slider Controller</title>
     <style>
         * {
@@ -310,35 +310,33 @@
                 min-width: auto;
             }
         }
+/* --- JOYSTICK STYLES --- */
+
 .joystick-container {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+    justify-content: center;
     margin-top: 20px;
 }
 
 #joystickBase {
     width: 160px;
-    height: 160px;
-    background: rgba(255,255,255,0.1);
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
+    height: 100px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 80px / 50px;
     position: relative;
     touch-action: none;
 }
 
 #joystick {
-    width: 60px;
-    height: 60px;
+    width: 40px;
+    height: 40px;
     background: #4a90e2;
     border-radius: 50%;
     position: absolute;
-    left: 50%;
     top: 50%;
-    transform: translate(-50%, -50%);
-    transition: 0.1s ease-out;
-    touch-action: none;
+    left: 50%;
+    transform: translate(-20px, -20px);
+    transition: transform 0.1s ease-out;
 }
     </style>
 </head>
@@ -483,14 +481,12 @@
                         <span class="slider-value" id="speedMultiplierValue">1.0x</span>
                     </div>
                 </div>
-
 <div class="joystick-container">
     <div id="joystickBase">
         <div id="joystick"></div>
     </div>
-
-    <button class="btn danger jog-stop" onclick="emergencyStop()">STOP</button>
 </div>
+
                 <div class="control-group">
                     <button class="btn secondary" onclick="getCurrentPositions()">
                         📍 Get Current Positions
@@ -865,7 +861,7 @@
 
         // Manual Jog Controls
         async function startJog(motor, direction) {
-            if (!isConnected) return;
+            if (!isConnected || isJogging) return;
 
             isJogging = true;
             const speed = Math.round(direction * currentSpeedMultiplier * 100);
@@ -880,84 +876,7 @@
             await sendCommand('JOGSLIDER:STOP:0');
             log('Jog stopped');
         }
-// --- JOYSTICK LOGIC ---
-// --- JOYSTICK LOGIC ---
 
-let joystickDragging = false;  // Only ONE declaration
-
-const maxX = 60;   // wider left/right
-const maxY = 35;   // shorter up/down
-
-function joystickMove(clientX, clientY) {
-    const base = document.getElementById("joystickBase");
-    const stick = document.getElementById("joystick");
-
-    const rect = base.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-
-    let dx = clientX - cx;
-    let dy = clientY - cy;
-
-    // Clamp to oval
-    dx = Math.max(-maxX, Math.min(maxX, dx));
-    dy = Math.max(-maxY, Math.min(maxY, dy));
-
-    stick.style.transform = `translate(${dx}px, ${dy}px)`;
-
-    // Dead zone
-    if (Math.abs(dx) < 10 && Math.abs(dy) < 10) {
-        stopJog();
-        return;
-    }
-
-    // UP/DOWN = M1, LEFT/RIGHT = M2
-    if (Math.abs(dy) > Math.abs(dx)) {
-        if (dy < 0) startJog("M1", 100);
-        else startJog("M1", -100);
-    } else {
-        if (dx < 0) startJog("M2", -100);
-        else startJog("M2", 100);
-    }
-}
-
-function joystickRelease() {
-    stopJog(); // Do NOT reset joystick position
-}
-
-// Mouse
-document.getElementById("joystickBase").addEventListener("mousedown", e => {
-    joystickDragging = true;
-    joystickMove(e.clientX, e.clientY);
-});
-
-document.addEventListener("mousemove", e => {
-    if (joystickDragging) joystickMove(e.clientX, e.clientY);
-});
-
-document.addEventListener("mouseup", () => {
-    if (joystickDragging) joystickRelease();
-    joystickDragging = false;
-});
-
-// Touch
-document.getElementById("joystickBase").addEventListener("touchstart", e => {
-    joystickDragging = true;
-    const t = e.touches[0];
-    joystickMove(t.clientX, t.clientY);
-});
-
-document.getElementById("joystickBase").addEventListener("touchmove", e => {
-    if (joystickDragging) {
-        const t = e.touches[0];
-        joystickMove(t.clientX, t.clientY);
-    }
-});
-
-document.getElementById("joystickBase").addEventListener("touchend", () => {
-    joystickDragging = false;
-    joystickRelease();
-});
         // Speed multiplier control
         function updateSpeedMultiplier(value) {
             currentSpeedMultiplier = parseFloat(value);
@@ -1415,28 +1334,11 @@ function importSettings() {
             }
 
             // Jog sliders
-            const jogSliders = ['jogSliderM1', 'jogSliderM2', 'jogSliderBoth'];
-            jogSliders.forEach(id => {
-                const slider = document.getElementById(id);
-                if (slider) {
-                    slider.addEventListener('input', function() {
-                        handleJogSlider(id, parseInt(this.value));
-                    });
-                    
-                    slider.addEventListener('mouseup', function() {
-                        this.value = 0;
-                        handleJogSlider(id, 0);
-                    });
-                    
-                    slider.addEventListener('touchend', function() {
-                        this.value = 0;
-                        handleJogSlider(id, 0);
-                    });
-                }
-            });
+            
         }
 
         function getCommandForInput(inputId, value) {
+
             const commands = {
                 'm1Start': `M1S:${value}`,
                 'm1End': `M1E:${value}`,
@@ -1466,7 +1368,7 @@ function importSettings() {
                 display.textContent = input.value;
             }
         }
-
+const fileInputElement = document.getElementById('fileInput');
         function syncSettingsToDevice() {
             if (!isConnected) return;
             
@@ -1636,3 +1538,5 @@ function importSettings() {
     </script>
 </body>
 </html>
+
+
