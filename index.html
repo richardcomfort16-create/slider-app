@@ -965,7 +965,6 @@
             saveSettings();
             log(`Preset ${presetNumber} loaded`);
         }
-
 function updatePresetDisplay(presetNumber) {
     const preset = presets[presetNumber];
     const textElement = document.getElementById(`preset${presetNumber}Text`);
@@ -975,7 +974,7 @@ function updatePresetDisplay(presetNumber) {
         textElement.innerHTML = `
             M1: ${preset.m1Start}→${preset.m1End}<br>
             M2: ${preset.m2Start}→${preset.m2End}<br>
-            <small>${preset.timestamp}</small>
+            <small>M1 Speed: ${preset.m1Speed} | M2 Speed: ${preset.m2Speed}</small>
         `;
         if (cardElement) {
             cardElement.classList.add('set');
@@ -987,6 +986,7 @@ function updatePresetDisplay(presetNumber) {
         }
     }
 }
+
         // Time Estimation
         function updateEstimatedTime() {
             const m1Start = parseInt(document.getElementById('m1Start').value) || 0;
