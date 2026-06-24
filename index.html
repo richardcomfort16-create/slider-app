@@ -913,26 +913,24 @@
         }
 
         // Preset Management
-        function savePreset(presetNumber) {
-            const preset = {
-                m1Start: parseInt(document.getElementById('m1Start').value),
-                m1End: parseInt(document.getElementById('m1End').value),
-                m1Speed: parseInt(document.getElementById('m1Speed').value),
-                m2Start: parseInt(document.getElementById('m2Start').value),
-                m2End: parseInt(document.getElementById('m2End').value),
-                m2Speed: parseInt(document.getElementById('m2Speed').value),
-                cycles: parseInt(document.getElementById('cycles').value),
-                returnHome: document.getElementById('returnHome').checked,
-                timestamp: new Date().toLocaleString()
-            };
+function savePreset(presetNumber) {
+    const preset = {
+        m1Start: parseInt(document.getElementById('m1Start').value),
+        m1End: parseInt(document.getElementById('m1End').value),
+        m1Speed: parseInt(document.getElementById('m1Speed').value),
+        m2Start: parseInt(document.getElementById('m2Start').value),
+        m2End: parseInt(document.getElementById('m2End').value),
+        m2Speed: parseInt(document.getElementById('m2Speed').value),
+        cycles: parseInt(document.getElementById('cycles').value),
+        returnHome: document.getElementById('returnHome').checked
+    };
 
-            presets[presetNumber] = preset;
-            updatePresetDisplay(presetNumber);
-            saveSettings();
-            
-            log(`Preset ${presetNumber} saved`);
-        }
-
+    presets[presetNumber] = preset;
+    updatePresetDisplay(presetNumber);
+    saveSettings();
+    
+    log(`Preset ${presetNumber} saved`);
+}
         function loadPreset(presetNumber) {
             const preset = presets[presetNumber];
             if (!preset) {
@@ -1534,4 +1532,5 @@ function importSettings() {
     </script>
 </body>
 </html>
+
 
