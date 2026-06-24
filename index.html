@@ -913,24 +913,26 @@
         }
 
         // Preset Management
-function savePreset(presetNumber) {
-    const preset = {
-        m1Start: parseInt(document.getElementById('m1Start').value),
-        m1End: parseInt(document.getElementById('m1End').value),
-        m1Speed: parseInt(document.getElementById('m1Speed').value),
-        m2Start: parseInt(document.getElementById('m2Start').value),
-        m2End: parseInt(document.getElementById('m2End').value),
-        m2Speed: parseInt(document.getElementById('m2Speed').value),
-        cycles: parseInt(document.getElementById('cycles').value),
-        returnHome: document.getElementById('returnHome').checked
-    };
+        function savePreset(presetNumber) {
+            const preset = {
+                m1Start: parseInt(document.getElementById('m1Start').value),
+                m1End: parseInt(document.getElementById('m1End').value),
+                m1Speed: parseInt(document.getElementById('m1Speed').value),
+                m2Start: parseInt(document.getElementById('m2Start').value),
+                m2End: parseInt(document.getElementById('m2End').value),
+                m2Speed: parseInt(document.getElementById('m2Speed').value),
+                cycles: parseInt(document.getElementById('cycles').value),
+                returnHome: document.getElementById('returnHome').checked,
+                
+            };
 
-    presets[presetNumber] = preset;
-    updatePresetDisplay(presetNumber);
-    saveSettings();
-    
-    log(`Preset ${presetNumber} saved`);
-}
+            presets[presetNumber] = preset;
+            updatePresetDisplay(presetNumber);
+            saveSettings();
+            
+            log(`Preset ${presetNumber} saved`);
+        }
+
         function loadPreset(presetNumber) {
             const preset = presets[presetNumber];
             if (!preset) {
@@ -960,7 +962,6 @@ function savePreset(presetNumber) {
             saveSettings();
             log(`Preset ${presetNumber} loaded`);
         }
-
 function updatePresetDisplay(presetNumber) {
     const preset = presets[presetNumber];
     const textElement = document.getElementById(`preset${presetNumber}Text`);
@@ -968,10 +969,12 @@ function updatePresetDisplay(presetNumber) {
 
     if (preset) {
         textElement.innerHTML = `
-            M1: ${preset.m1Start}→${preset.m1End}<br>
-            M2: ${preset.m2Start}→${preset.m2End}<br>
-            <small>${preset.timestamp}</small>
+            M1: ${preset.m1Start} → ${preset.m1End}<br>
+            M2: ${preset.m2Start} → ${preset.m2End}<br>
+            <strong>Speed M1:</strong> ${preset.m1Speed}<br>
+            <strong>Speed M2:</strong> ${preset.m2Speed}
         `;
+
         if (cardElement) {
             cardElement.classList.add('set');
         }
