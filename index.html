@@ -881,13 +881,12 @@
             log('Jog stopped');
         }
 // --- JOYSTICK LOGIC ---
-let joystickDragging = false;
-// Joystick control (oval movement)
-let joystickDragging = false; // If you already declare this earlier, remove this line.
+// --- JOYSTICK LOGIC ---
+
+let joystickDragging = false;  // Only ONE declaration
 
 const maxX = 60;   // wider left/right
 const maxY = 35;   // shorter up/down
-
 
 function joystickMove(clientX, clientY) {
     const base = document.getElementById("joystickBase");
