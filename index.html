@@ -889,6 +889,13 @@ const maxX = 60;   // wider left/right
 const maxY = 35;   // shorter up/down
 
 function joystickMove(clientX, clientY) {
+// Joystick control (oval movement)
+let joystickDragging = false; // If already declared earlier, remove this line.
+
+const maxX = 60;   // wider left/right
+const maxY = 35;   // shorter up/down
+
+function joystickMove(clientX, clientY) {
     const base = document.getElementById("joystickBase");
     const stick = document.getElementById("joystick");
 
@@ -913,21 +920,16 @@ function joystickMove(clientX, clientY) {
 
     // UP/DOWN = M1, LEFT/RIGHT = M2
     if (Math.abs(dy) > Math.abs(dx)) {
-        // UP
         if (dy < 0) startJog("M1", 100);
-        // DOWN
         else startJog("M1", -100);
     } else {
-        // LEFT
         if (dx < 0) startJog("M2", -100);
-        // RIGHT
         else startJog("M2", 100);
     }
 }
 
 function joystickRelease() {
-    // Leave joystick where it is, just stop motion
-    stopJog();
+    stopJog(); // Do NOT reset joystick position
 }
 
 // Mouse
@@ -963,7 +965,6 @@ document.getElementById("joystickBase").addEventListener("touchend", () => {
     joystickDragging = false;
     joystickRelease();
 });
-
         // Speed multiplier control
         function updateSpeedMultiplier(value) {
             currentSpeedMultiplier = parseFloat(value);
