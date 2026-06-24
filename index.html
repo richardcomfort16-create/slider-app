@@ -882,13 +882,9 @@
         }
 // --- JOYSTICK LOGIC ---
 let joystickDragging = false;
+// Joystick control (oval movement)
+let joystickDragging = false; // If you already declare this earlier, remove this line.
 
-
-let joystickDragging = false;
-let joyX = 0;
-let joyY = 0;
-
-// Oval shape limits
 const maxX = 60;   // wider left/right
 const maxY = 35;   // shorter up/down
 
@@ -900,16 +896,12 @@ function joystickMove(clientX, clientY) {
     const cx = rect.left + rect.width / 2;
     const cy = rect.top + rect.height / 2;
 
-    // Raw movement
     let dx = clientX - cx;
     let dy = clientY - cy;
 
     // Clamp to oval
     dx = Math.max(-maxX, Math.min(maxX, dx));
     dy = Math.max(-maxY, Math.min(maxY, dy));
-
-    joyX = dx;
-    joyY = dy;
 
     stick.style.transform = `translate(${dx}px, ${dy}px)`;
 
@@ -919,20 +911,22 @@ function joystickMove(clientX, clientY) {
         return;
     }
 
-    // Decide direction
+    // UP/DOWN = M1, LEFT/RIGHT = M2
     if (Math.abs(dy) > Math.abs(dx)) {
-        // UP/DOWN = M1
+        // UP
         if (dy < 0) startJog("M1", 100);
+        // DOWN
         else startJog("M1", -100);
     } else {
-        // LEFT/RIGHT = M2
+        // LEFT
         if (dx < 0) startJog("M2", -100);
+        // RIGHT
         else startJog("M2", 100);
     }
 }
 
 function joystickRelease() {
-    // DO NOT reset joystick position — leave it where it is
+    // Leave joystick where it is, just stop motion
     stopJog();
 }
 
@@ -969,39 +963,7 @@ document.getElementById("joystickBase").addEventListener("touchend", () => {
     joystickDragging = false;
     joystickRelease();
 });
-// Mouse
-document.getElementById("joystickBase").addEventListener("mousedown", e => {
-    joystickDragging = true;
-    joystickMove(e.clientX, e.clientY);
-});
 
-document.addEventListener("mousemove", e => {
-    if (joystickDragging) joystickMove(e.clientX, e.clientY);
-});
-
-document.addEventListener("mouseup", () => {
-    if (joystickDragging) joystickReset();
-    joystickDragging = false;
-});
-
-// Touch
-document.getElementById("joystickBase").addEventListener("touchstart", e => {
-    joystickDragging = true;
-    const t = e.touches[0];
-    joystickMove(t.clientX, t.clientY);
-});
-
-document.getElementById("joystickBase").addEventListener("touchmove", e => {
-    if (joystickDragging) {
-        const t = e.touches[0];
-        joystickMove(t.clientX, t.clientY);
-    }
-});
-
-document.getElementById("joystickBase").addEventListener("touchend", () => {
-    joystickDragging = false;
-    joystickReset();
-});
         // Speed multiplier control
         function updateSpeedMultiplier(value) {
             currentSpeedMultiplier = parseFloat(value);
@@ -1680,5 +1642,3 @@ function importSettings() {
     </script>
 </body>
 </html>
-
-
