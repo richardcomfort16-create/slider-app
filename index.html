@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=0.8, minimum-scale=0.8, maximum-scale=0.8, user-scalable=no">
     <title>Camera Slider Controller</title>
     <style>
         * {
@@ -883,8 +883,48 @@
 // --- JOYSTICK LOGIC ---
 let joystickDragging = false;
 
-function joystickMove
 
+function joystickMove(clientX, clientY) {
+    const base = document.getElementById("joystickBase");
+    const stick = document.getElementById("joystick");
+
+    const rect = base.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+
+    const dx = clientX - cx;
+    const dy = clientY - cy;
+
+    const distance = Math.min(Math.sqrt(dx*dx + dy*dy), 50);
+    const angle = Math.atan2(dy, dx);
+
+    const x = Math.cos(angle) * distance;
+    const y = Math.sin(angle) * distance;
+
+    stick.style.transform = `translate(${x}px, ${y}px)`;
+
+    // DEAD ZONE
+    if (Math.abs(x) < 15 && Math.abs(y) < 15) {
+        stopJog();
+        return;
+    }
+
+    // --- MOTOR MAPPING ---
+    // UP/DOWN = M1
+    // LEFT/RIGHT = M2
+
+    if (Math.abs(y) > Math.abs(x)) {
+        // UP
+        if (y < 0) startJog("M1", 100);
+        // DOWN
+        else startJog("M1", -100);
+    } else {
+        // LEFT
+        if (x < 0) startJog("M2", -100);
+        // RIGHT
+        else startJog("M2", 100);
+    }
+}
 function joystickReset() {
     const stick = document.getElementById("joystick");
     stick.style.transform = "translate(-50%, -50%)";
