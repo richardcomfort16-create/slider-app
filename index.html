@@ -4,10 +4,14 @@
 <head>
     <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-body {
-    transform: scale(0.90);
-    transform-origin: top left;
-}
+
+<style>
+    body {
+        transform: scale(0.90);
+        transform-origin: top left;
+    }
+</style>
+
 
 
 
@@ -364,7 +368,7 @@ body {
                 <div class="control-group">
                     <label for="m1Speed">Speed (steps/sec):</label>
                     <div class="slider-group">
-                        <input type="range" id="m1Speed" min="100" max="12000" value="2000" step="100" 
+                        <input type="range" id="m1Speed" min="10" max="6000" value="2000" step="100" 
                                oninput="updateSpeedDisplay('m1', this.value); updateEstimatedTime(); sendIfConnected('M1SPD:' + Math.round(this.value * currentSpeedMultiplier))">
                         <span class="slider-value" id="m1SpeedValue">2000</span>
                     </div>
